@@ -25,8 +25,8 @@ builder.Services.AddHttpClient<IUMSService, UMSService>(client => {
                 client.BaseAddress = new Uri("https://nums.api.hanjucorp.co.kr");            });
 
 builder.Services.AddHttpClient<IJsiniService, JsiniService>(client => {
-  //client.BaseAddress = new Uri("https://api.jsini.co.kr");
-  client.BaseAddress = new Uri("http://localhost:5267");
+  client.BaseAddress = new Uri("https://api.jsini.co.kr");
+  //client.BaseAddress = new Uri("http://localhost:5267");
 });
 
 builder.Services.AddHttpClient<IFuneralService, FuneralService>(client => {
