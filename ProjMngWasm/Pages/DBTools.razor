@@ -1,0 +1,50 @@
+﻿@page "/dbtool";
+@using ProjMngWasm.Models;
+@using ProjMngWasm.Services;
+
+<RadzenCard class="rz-my-6">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">        
+    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenTextBox  />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenButton  Text="Search"></RadzenButton>
+    </RadzenStack>
+  </RadzenStack>
+</RadzenCard>
+
+
+<RadzenCard class="rz-my-6">
+
+  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+    <RadzenColumn Size="3">
+      <RadzenDataGrid Style="height: 500px" 
+        TItem="IDictionary<string, object>" ColumnWidth="150px"
+        AllowFiltering="true" 
+        FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+        FilterMode="FilterMode.Advanced" 
+        AllowPaging="false" 
+        AllowSorting="true"
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true">
+        <Columns>
+          <RadzenDataGridColumn title="ProcName">
+
+          </RadzenDataGridColumn>    
+        </Columns>
+      </RadzenDataGrid>
+    </RadzenColumn>
+    <RadzenColumn Size="9">
+      <RadzenTextArea>
+
+      </RadzenTextArea>
+    </RadzenColumn>
+  </RadzenRow>
+
+</RadzenCard>
+
+@code {
+protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+  }
+}
