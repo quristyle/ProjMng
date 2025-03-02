@@ -29,7 +29,7 @@ public class JsiniService : IJsiniService {
 
 protected string AuthToken {get;set;} = "ums_token";
 protected string AuthTokenKey {get;set;} = "Bearer";
-protected string DataPath {get;set;} = "DataSet.dt0.data";
+protected string DataPath {get;set;} = "result";
 protected string FirstDataRow {get;set;} = "$..data[0]";
 
   protected readonly HttpClient _httpClient;
@@ -43,11 +43,9 @@ protected string FirstDataRow {get;set;} = "$..data[0]";
 
   public async Task<IEnumerable<IDictionary<string, object>>> GetList(string path, Dictionary<string, object> dic) {
     
-    dic.Add("p", path);
-    string url = "fr3.jsp";
 
     try    {
-        HttpResponseMessage response = await _httpClient  .PostAsJsonAsync(url, dic, JsonSerializerOptions.Default);
+        HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/Dev", dic, JsonSerializerOptions.Default);
         //요청 성공 여부 확인
         response.EnsureSuccessStatusCode();
 

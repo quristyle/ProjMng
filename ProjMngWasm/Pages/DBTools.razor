@@ -8,7 +8,7 @@
       <RadzenTextBox  />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <RadzenButton  Text="Search"></RadzenButton>
+      <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
     </RadzenStack>
   </RadzenStack>
 </RadzenCard>
@@ -18,8 +18,9 @@
 
   <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
     <RadzenColumn Size="3">
-      <RadzenDataGrid Style="height: 500px" 
-        TItem="IDictionary<string, object>" ColumnWidth="150px"
+      <RadzenDataGrid Style="height: 500px" @bind-Value=@selectedItems
+                      Data="@data"
+        TItem="IDictionary<string, object>" ColumnWidth="550px"
         AllowFiltering="true" 
         FilterPopupRenderMode="PopupRenderMode.OnDemand" 
         FilterMode="FilterMode.Advanced" 
@@ -28,22 +29,41 @@
         PagerHorizontalAlign="HorizontalAlign.Left" 
         ShowPagingSummary="true">
         <Columns>
-          <RadzenDataGridColumn title="ProcName">
-
+          <RadzenDataGridColumn title="ProcName" >
+            <Template>
+              @context["ProcedureName"]
+            </Template>
           </RadzenDataGridColumn>    
         </Columns>
       </RadzenDataGrid>
     </RadzenColumn>
     <RadzenColumn Size="9">
-      <RadzenTextArea>
-
-      </RadzenTextArea>
+      <pre Style="height: 500px" >
+        @selectedItems?[0]["ROUTINE_DEFINITION"]
+  </pre>
+      
     </RadzenColumn>
   </RadzenRow>
 
 </RadzenCard>
 
+
+
 @code {
+
+
+  [Inject] protected IJsiniService JsiniService { get; set; }
+
+  IList<IDictionary<string, object>> selectedItems;
+
+  public IEnumerable<IDictionary<string, object>> data { get; set; }
+
+  
+protected async Task OnLoad() {
+    data = await JsiniService.GetList("db", new Dictionary<string, object>() { });
+}
+
+
 protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
   }

@@ -1,44 +1,50 @@
+using Microsoft.OpenApi.Models;
 using ProjMngServer.Components;
+using ProjMngServer.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<DevService>();
+
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
-
-
 // Configure the HTTP request pipeline.
-//if (!app.Environment.IsDevelopment()){
-//    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-//    app.UseHsts();
-//}
+if (app.Environment.IsDevelopment()) {
+  app.UseSwagger();
+  app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
 
 
-#region Cors 정보 등록
+app.MapControllers();
+
+
+
 // Cors 정보 등록
 app.UseCors(cors => cors
                .AllowAnyOrigin()
                .AllowAnyHeader()
                .AllowAnyMethod()
-               //.WithMethods("POST")
-               //.AllowCredentials()
-               //.WithHeaders("Content-Type", "Content-Length", "Accept-Encoding", "Connection", "Accept", "User-Agent", "Host", "Authorization")
+           //.WithMethods("POST")
+           //.AllowCredentials()
+           //.WithHeaders("Content-Type", "Content-Length", "Accept-Encoding", "Connection", "Accept", "User-Agent", "Host", "Authorization")
            );
-#endregion Cors 정보 등록
+//Cors 정보 등록
 
-
-
-app.UseHttpsRedirection();
-
-
-app.UseAntiforgery();
 
 
 app.Run();
+
