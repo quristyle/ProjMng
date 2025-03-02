@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjMngServer", "ProjMngServer\ProjMngServer.csproj", "{AA2A5FD5-CA2D-82D4-EC41-04E0AF0617AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjMngWasm", "ProjMngWasm\ProjMngWasm.csproj", "{9C996C46-3825-543D-5E5F-D02F1E077445}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA2A5FD5-CA2D-82D4-EC41-04E0AF0617AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA2A5FD5-CA2D-82D4-EC41-04E0AF0617AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA2A5FD5-CA2D-82D4-EC41-04E0AF0617AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA2A5FD5-CA2D-82D4-EC41-04E0AF0617AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C996C46-3825-543D-5E5F-D02F1E077445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C996C46-3825-543D-5E5F-D02F1E077445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C996C46-3825-543D-5E5F-D02F1E077445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C996C46-3825-543D-5E5F-D02F1E077445}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {71311C71-7688-4729-AEBD-B5FA7E44CD13}
+	EndGlobalSection
+EndGlobal

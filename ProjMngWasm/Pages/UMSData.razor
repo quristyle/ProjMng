@@ -1,0 +1,119 @@
+﻿@page "/umsw";
+@using ProjMngWasm.Models;
+@using ProjMngWasm.Services;
+
+<RadzenCard class="rz-my-6">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            ID
+            <RadzenText >@selectedItems?[0]["a"]</RadzenText>
+</RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Menu Name
+            <RadzenText >@selectedItems?[0]["d"]</RadzenText>
+</RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Save
+        <RadzenButton Click="@OnSave" Text="complete"></RadzenButton>        
+ </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Choice
+  <RadzenTextBox  @bind-value="srtype" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Load
+            <RadzenButton Click="@OnLoadWrk" Text="Load Work"></RadzenButton>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem">
+    <RadzenColumn Size="12" class=" rz-text-align-center rz-p-2">
+        
+
+      <RadzenDataGrid Data="@data2" @bind-Value=@selectedItems  Style="height: 500px"
+  TItem="IDictionary<string, object>" 
+  ColumnWidth="150px"
+                AllowFiltering="true" 
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+                FilterMode="FilterMode.Advanced" 
+                AllowPaging="false" 
+                AllowSorting="true"
+                
+
+                  PagerHorizontalAlign="HorizontalAlign.Left" 
+                  ShowPagingSummary="true">
+
+                 @* PageSize="5"  *@
+
+  <Columns>
+    
+        @foreach (var column in cols)        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @context[@column.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    
+  </Columns>
+</RadzenDataGrid>
+
+    </RadzenColumn>
+</RadzenRow>
+
+
+
+
+
+
+@code {
+
+[Parameter] public string abcde{get;set;}
+
+  public string srtype { get; set; } = "12";
+
+
+    [Inject]    protected IUMSService UmsService { get; set; }
+
+
+
+  protected async Task OnLoadWrk() {
+    cols.Clear();
+    data2 = await UmsService.GetList("p_work", new Dictionary<string, object>() { { "SRTP", srtype } });
+
+if (data2 != null && data2.Any()){
+    foreach( var dd in data2 ){
+      foreach( var d in dd ){
+       cols.Add( d.Key, typeof(string) );
+      }
+      break;
+    }
+    }
+
+    //data2 = dt.AsEnumerable();
+  }
+
+  protected async Task OnSave() {
+    cols.Clear();
+    data2 = await UmsService.GetList("p_work", new Dictionary<string, object>() { { "SRTP", srtype }, { "ID", selectedItems?[0]["a"] }, { "EDT", DateTime.Now.ToString("yyyy-MM-dd") } });
+
+
+
+  }
+
+  IList<IDictionary<string, object>> selectedItems;
+  
+  public IEnumerable<IDictionary<string, object>> data2 { get; set; }
+  
+  public IDictionary<string, Type> cols { get; set; } = new Dictionary<string, Type>();
+
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+
+    await OnLoadWrk();
+  }
+
+}

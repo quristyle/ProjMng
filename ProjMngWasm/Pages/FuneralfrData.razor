@@ -1,0 +1,95 @@
+﻿@page "/funeralw";
+@using ProjMngWasm.Models;
+@using ProjMngWasm.Services;
+
+<RadzenCard class="rz-my-6">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Choice
+  <RadzenTextBox  @bind-value="srtype" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            Load
+            <RadzenButton Click="@OnLoadWrk" Text="Load Work"></RadzenButton>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem">
+    <RadzenColumn Size="12" class=" rz-text-align-center rz-p-2">
+        
+
+      <RadzenDataGrid Data="@data2" Style="height: 500px"
+  TItem="IDictionary<string, object>" 
+  ColumnWidth="150px"
+                AllowFiltering="true" 
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+                FilterMode="FilterMode.Advanced" 
+                AllowPaging="false" 
+                AllowSorting="true"
+                
+
+                  PagerHorizontalAlign="HorizontalAlign.Left" 
+                  ShowPagingSummary="true">
+
+                 @* PageSize="5"  *@
+
+  <Columns>
+    
+        @foreach (var col in cols)        {
+            <RadzenDataGridColumn @key=@col.Key Title="@col.Key" Type="col.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(col.Key, col.Value)">
+                <Template>
+                    @context[@col.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    
+  </Columns>
+</RadzenDataGrid>
+
+    </RadzenColumn>
+</RadzenRow>
+
+
+
+
+
+
+@code {
+
+  public string srtype { get; set; } = "2";
+
+    [Inject]    protected IFuneralService FuneralService { get; set; }
+
+
+  public IEnumerable<IDictionary<string, object>> data2 { get; set; }
+  
+  public IDictionary<string, Type> cols { get; set; } = new Dictionary<string, Type>();
+
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    //await OnLoadWrk();
+  }
+
+  protected async Task OnLoadWrk() {
+    cols.Clear();
+    data2 = await FuneralService.GetList("fr.room.roomstatus2", new Dictionary<string, object>() { { "company", srtype }
+      , { "b_key", "" }
+      , { "srch", "" }
+       });
+if (data2 != null && data2.Any()){
+    foreach( var dd in data2 ){
+      foreach( var d in dd ){
+       cols.Add( d.Key, typeof(string) );
+      }
+      break;
+    }
+    }
+
+    //data2 = dt.AsEnumerable();
+  }
+  
+
+}
