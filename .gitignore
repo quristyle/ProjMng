@@ -1467,3 +1467,7 @@ ProjMngWasm/obj/Debug/net8.0/webcil/zh-Hans/Microsoft.CodeAnalysis.CSharp.resour
 ProjMngWasm/obj/Debug/net8.0/webcil/zh-Hans/Microsoft.CodeAnalysis.resources.wasm
 ProjMngWasm/obj/Debug/net8.0/webcil/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.wasm
 ProjMngWasm/obj/Debug/net8.0/webcil/zh-Hant/Microsoft.CodeAnalysis.resources.wasm
+ProjMngWasm/obj/
+ProjMngWasm/bin/
+ProjMngServer/bin/
+ProjMngServer/obj/

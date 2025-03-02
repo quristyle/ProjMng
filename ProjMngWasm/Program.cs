@@ -28,7 +28,7 @@ builder.Services.AddHttpClient<IJsiniService, JsiniService>(client => {
                 client.BaseAddress = new Uri("https://api.jsini.co.kr");            });
 
 builder.Services.AddHttpClient<IFuneralService, FuneralService>(client => {
-                client.BaseAddress = new Uri("http://funeralfr.jsini.co.kr");            });
+                client.BaseAddress = new Uri("https://funeralfr.jsini.co.kr");            });
 
 builder.Services.AddScoped<ExampleService>();
 builder.Services.AddSingleton<GitHubService>();
