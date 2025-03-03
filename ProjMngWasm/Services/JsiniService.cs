@@ -22,20 +22,8 @@ protected string FirstDataRow {get;set;} = "$..data[0]";
 	_sess = sess;
 }
 
-  void SetDic(string path, ref Dictionary<string, string> dic) {
 
-    dic.Add("stp", path);
-    dic.Add("sta", "");
-    dic.Add("sob", "");
-  }
-
-  public async Task<IEnumerable<T>> GetList<T>(string path, Dictionary<string, string> dic) {
-
-
-
-    SetDic( path, ref dic);
-
-
+  public async Task<IEnumerable<T>> GetList<T>(Dictionary<string, string> dic) {
 
     try {
       HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/Dev", dic, JsonSerializerOptions.Default);
@@ -77,9 +65,7 @@ protected string FirstDataRow {get;set;} = "$..data[0]";
     return Enumerable.Empty<T>();
   }
 
-  public async Task<T> Get<T>(string path, Dictionary<string, string> dic) {
-
-    SetDic(path, ref dic);
+  public async Task<T> Get<T>(Dictionary<string, string> dic) {
 
     try {
       HttpResponseMessage response = await _httpClient.PostAsJsonAsync("api/Dev", dic, JsonSerializerOptions.Default);
@@ -127,6 +113,6 @@ protected string FirstDataRow {get;set;} = "$..data[0]";
 
 
 public interface IJsiniService {
-  Task<IEnumerable<T>> GetList<T>(string path, Dictionary<string, string> dic);
-  Task<T> Get<T>(string path, Dictionary<string, string> dic);
+  Task<IEnumerable<T>> GetList<T>(Dictionary<string, string> dic);
+  Task<T> Get<T>(Dictionary<string, string> dic);
 }

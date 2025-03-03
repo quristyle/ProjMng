@@ -6,6 +6,12 @@
 <RadzenCard class="rz-my-6">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenDropDown @bind-Value=@dbType Data=@DBNames ></RadzenDropDown>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenDropDown @bind-Value=@projectName Data=@ProjectNames></RadzenDropDown>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
     </RadzenStack>
   </RadzenStack>
@@ -14,7 +20,10 @@
 
 
 
-<RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+<RadzenTabs TabPosition="TabPosition.Left" 
+RenderMode="TabRenderMode.Client"
+tabindex="@tabIndex"
+            SelectedIndexChanged="@OnTableChange" >
     <Tabs>
         <RadzenTabsItem Text="Proc">
 
@@ -150,6 +159,18 @@
   IList<ProcInfo> selectedItems;
   IList<TableInfo> selectedTable;
   ProcInfo selected_pi;
+
+
+  string dbType { get; set; }
+  IList<string> DBNames;
+
+  string projectName { get; set; }
+  IList<string> ProjectNames;
+
+  
+  int tabIndex { get; set; } = 0;
+
+
   
   public IEnumerable<ProcInfo> data { get; set; }
   public IEnumerable<TableInfo> dataTb { get; set; }
@@ -160,21 +181,39 @@
 
 
   protected async Task OnLoad() {
-    await LoadProc();
-    await LoadTable();
+    if (tabIndex == 0) {
+      await LoadProc();
+    }
+    else if (tabIndex == 1) {
+      await LoadTable();
+    }
+    else if (tabIndex == 2) {
+    }
   }
 
+  Dictionary<string, string> getParams(){
+    return new Dictionary<string, string>() {
+    {"db",dbType},
+    {"dbnick",projectName},
+    };
+  }
 
   protected async Task LoadProc() {
+
+    Dictionary<string, string> dic = getParams();
+    dic.Add("stp", "proclist");
+
     isLoading = true;
-    data = await JsiniService.GetList<ProcInfo>("proclist", new Dictionary<string, string>() { });
+    data = await JsiniService.GetList<ProcInfo>(dic);
     isLoading = false;
   }
 
   
   protected async Task LoadTable() {
+    Dictionary<string, string> dic = getParams();
+    dic.Add("stp", "tablelist");
     isLoading2 = true;
-    dataTb = await JsiniService.GetList<TableInfo>("tablelist", new Dictionary<string, string>() { });
+    dataTb = await JsiniService.GetList<TableInfo>(dic);
     isLoading2 = false;
   }
 
@@ -183,7 +222,9 @@
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
-    await OnLoad();
+    DBNames = new List<string> { "MSSQL", "MYSQL", "ORACLE", "POSTGRESQL" };
+    ProjectNames = new List<string> { "hanju_dev", "hanju_prod" };
+    //await OnLoad();
   }
 
 
@@ -191,14 +232,21 @@
   async void OnRowSelect(TableInfo tableInfo) {
 
 
-    
+
+    Dictionary<string, string> dic = getParams();
+    dic.Add("stp", "columnsOftable");
+    dic.Add("table_name", tableInfo.TableName);
     isLoading3 = true;
-    dataCol = await JsiniService.GetList<ColumnInfo>("columnsOftable", new Dictionary<string, string>() {
-    {"sva", tableInfo.TableName}
-    });
+    dataCol = await JsiniService.GetList<ColumnInfo>(dic);
     isLoading3 = false;
     StateHasChanged();
 
+  }
+
+
+  async void OnTableChange(int index) {
+    tabIndex = index;
+    //await OnLoad();
   }
 
 
