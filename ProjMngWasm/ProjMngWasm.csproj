@@ -10,10 +10,20 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.13" PrivateAssets="all" />
-    <PackageReference Include="Newtonsoft.Json" Version="*" />
-    <PackageReference Include="Radzen.Blazor" Version="*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Radzen.Blazor" Version="6.1.4" />
 
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+
+
+
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="6.0.36" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Razor" Version="6.0.36" />
+    <PackageReference Include="MetadataReferenceService.BlazorWasm" Version="0.0.1" />
+    
+    
+    
   </ItemGroup>
 
 </Project>

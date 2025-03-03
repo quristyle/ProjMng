@@ -1,0 +1,206 @@
+﻿@page "/dbtool";
+@using ProjMngWasm.Models;
+@using ProjMngWasm.Models.Develop
+@using ProjMngWasm.Services;
+
+<RadzenCard class="rz-my-6">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
+    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
+    </RadzenStack>
+  </RadzenStack>
+</RadzenCard>
+
+
+
+
+<RadzenTabs TabPosition="TabPosition.Left" RenderMode="TabRenderMode.Client">
+    <Tabs>
+        <RadzenTabsItem Text="Proc">
+
+
+
+
+<RadzenCard class="rz-my-6">
+
+  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+    <RadzenColumn Size="5">
+
+      <RadzenDataGrid @bind-Value=@selectedItems
+      Style ="height: 500px"
+      Data="@data"
+                      TItem="ProcInfo"
+      IsLoading=@isLoading
+      FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+      LogicalFilterOperator="LogicalFilterOperator.And"                      
+      AllowFiltering="true" 
+      AllowColumnResize="true" 
+      FilterMode="FilterMode.Simple"
+      SelectionMode="DataGridSelectionMode.Single"
+      AllowPaging="false" 
+      AllowSorting="true"
+      PagerHorizontalAlign="HorizontalAlign.Left"
+
+      ShowPagingSummary="true">
+        <Columns>
+          <RadzenDataGridColumn title="ProcName" Property="ProcedureName" />
+          <RadzenDataGridColumn title="Desc" Property="Description" />
+        </Columns>
+      </RadzenDataGrid>
+
+    </RadzenColumn>
+    
+    <RadzenColumn Size="7">
+      <pre Style="height: 500px" >
+        @selectedItems?[0].Routine_Definition
+      </pre>
+
+    </RadzenColumn>
+  </RadzenRow>
+
+</RadzenCard>
+
+
+
+    </RadzenTabsItem>
+    <RadzenTabsItem Text="Table">
+
+
+
+
+
+      <RadzenCard class="rz-my-6">
+
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
+          <RadzenColumn Size="5">
+
+            <RadzenDataGrid @bind-Value=@selectedTable
+                            Style="height: 500px"
+                            Data="@dataTb"
+                            TItem="TableInfo"
+                            IsLoading=@isLoading2
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            LogicalFilterOperator="LogicalFilterOperator.And"
+                            AllowFiltering="true"
+                            AllowColumnResize="true"
+                            FilterMode="FilterMode.Simple"
+                            SelectionMode="DataGridSelectionMode.Single"
+                            AllowPaging="false"
+                            AllowSorting="true"
+                            PagerHorizontalAlign="HorizontalAlign.Left"
+                            RowSelect="@OnRowSelect"
+                            ShowPagingSummary="true">
+              <Columns>
+                <RadzenDataGridColumn title="TableName" Property="TableName" />
+                <RadzenDataGridColumn title="Desc" Property="Description" />
+              </Columns>
+            </RadzenDataGrid>
+
+          </RadzenColumn>
+
+
+
+           <RadzenColumn Size="7">
+
+            <RadzenDataGrid Style="height: 500px"
+                            Data="@dataCol"
+                            TItem="ColumnInfo"
+                            IsLoading=@isLoading3
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                            LogicalFilterOperator="LogicalFilterOperator.And"
+                            AllowFiltering="true"
+                            AllowColumnResize="true"
+                            FilterMode="FilterMode.Simple"
+                            SelectionMode="DataGridSelectionMode.Single"
+                            AllowPaging="false"
+                            AllowSorting="true"
+                            PagerHorizontalAlign="HorizontalAlign.Left"
+                            ShowPagingSummary="true">
+              <Columns>
+                <RadzenDataGridColumn title="ColunmName" Property="ColunmName" />
+                <RadzenDataGridColumn title="Desc" Property="Description" />
+              </Columns>
+            </RadzenDataGrid>
+
+          </RadzenColumn>
+
+
+
+        </RadzenRow>
+
+      </RadzenCard>
+
+
+
+
+
+    </RadzenTabsItem>
+    <RadzenTabsItem Text="Razer">
+
+    </RadzenTabsItem>
+  </Tabs>
+</RadzenTabs>
+
+
+@code {
+
+
+  [Inject] protected IJsiniService JsiniService { get; set; }
+  
+  IList<ProcInfo> selectedItems;
+  IList<TableInfo> selectedTable;
+  ProcInfo selected_pi;
+  
+  public IEnumerable<ProcInfo> data { get; set; }
+  public IEnumerable<TableInfo> dataTb { get; set; }
+  public IEnumerable<ColumnInfo> dataCol { get; set; }
+  bool isLoading = false;
+  bool isLoading2 = false;
+  bool isLoading3 = false;
+
+
+  protected async Task OnLoad() {
+    await LoadProc();
+    await LoadTable();
+  }
+
+
+  protected async Task LoadProc() {
+    isLoading = true;
+    data = await JsiniService.GetList<ProcInfo>("proclist", new Dictionary<string, string>() { });
+    isLoading = false;
+  }
+
+  
+  protected async Task LoadTable() {
+    isLoading2 = true;
+    dataTb = await JsiniService.GetList<TableInfo>("tablelist", new Dictionary<string, string>() { });
+    isLoading2 = false;
+  }
+
+
+
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    await OnLoad();
+  }
+
+
+
+  async void OnRowSelect(TableInfo tableInfo) {
+
+
+    
+    isLoading3 = true;
+    dataCol = await JsiniService.GetList<ColumnInfo>("columnsOftable", new Dictionary<string, string>() {
+    {"sva", tableInfo.TableName}
+    });
+    isLoading3 = false;
+    StateHasChanged();
+
+  }
+
+
+}
+

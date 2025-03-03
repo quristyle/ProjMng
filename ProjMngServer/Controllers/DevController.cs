@@ -15,13 +15,13 @@ namespace ProjMngServer.Controllers;
 
 
   [HttpPost]
-  [Route("body")]
   public ActionResult<Dictionary<string, object>> PostBody([FromBody] Dictionary<string, object> parameters) {
     var data = _devService.GetData(parameters);
     return Ok(data);
   }
 
   [HttpPost]
+  [Route("multy")]
   public ActionResult<Dictionary<string, object>> PostForm([FromForm] IFormCollection formData) {
     var parameters = formData.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value.ToString());
     var data = _devService.GetData(parameters);
