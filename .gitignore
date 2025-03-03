@@ -1478,3 +1478,6 @@ ProjMngServer/obj/
 /ProjMngWasm/Properties/launchSettings.json
 /.vs/ProjectEvaluation
 /ProjMng.slnLaunch.user
+/ProjMngServer/appsettings.json
+/ProjModel/bin/Debug/net8.0
+/ProjModel/obj
