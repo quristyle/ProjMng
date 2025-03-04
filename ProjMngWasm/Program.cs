@@ -29,14 +29,14 @@ builder.Services.AddHttpClient<IUMSService, UMSService>(client => {
 
 
 builder.Services.AddHttpClient<IJsiniService, JsiniService>(client => {
-  client.BaseAddress = new Uri("http://localhost:5267");
+  //client.BaseAddress = new Uri("http://localhost:5267");
+  client.BaseAddress = new Uri("https://api.jsini.co.kr");
 });
 
-#elif DEBUG
+#else
 
 builder.Services.AddHttpClient<IJsiniService, JsiniService>(client => {
-  client.BaseAddress = new Uri("http://api.jsini.co.kr");
-  //client.BaseAddress = new Uri("http://localhost:5267");
+  client.BaseAddress = new Uri("https://api.jsini.co.kr");
 });
 
 #endif
