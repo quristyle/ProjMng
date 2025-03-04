@@ -6,23 +6,25 @@
 <RadzenCard class="rz-my-6">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            ID
+                       
+      <RadzenLabel Text="UI ID" />
             <RadzenText >@selectedItems?[0]["a"]</RadzenText>
 </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            Menu Name
+                       
+      <RadzenLabel Text="Menu Name" />
             <RadzenText >@selectedItems?[0]["d"]</RadzenText>
 </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            Save
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px"> 
+      <RadzenLabel Text="Save" />
         <RadzenButton Click="@OnSave" Text="complete"></RadzenButton>        
  </RadzenStack>
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenLabel Text="User" Component="DropDownTextValueProperties" />
-      <RadzenDropDown @bind-value="srtype" TextProperty="@nameof(CommonCode.Name)" ValueProperty="@nameof(CommonCode.Code)" Data=@_workList>
-        </RadzenDropDown>
+      <QuriDropDown @bind-value="srtype" CodeId="projuser" > </QuriDropDown>
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenLabel Text="Search" />
             <RadzenButton Click="@OnLoadWrk" Text="Load Work"></RadzenButton>
         </RadzenStack>
     </RadzenStack>
@@ -32,9 +34,9 @@
     <RadzenColumn Size="12" class=" rz-text-align-center rz-p-2">
         
 
-      <RadzenDataGrid Data="@data2" @bind-Value=@selectedItems  Style="height: 500px"
+      <RadzenDataGrid Data="@data2" @bind-Value=@selectedItems  Style="height: 700px"
   TItem="IDictionary<string, object>" 
-  ColumnWidth="150px"
+  ColumnWidth="100px"
       FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
       LogicalFilterOperator="LogicalFilterOperator.And"                      
       AllowFiltering="true" 
