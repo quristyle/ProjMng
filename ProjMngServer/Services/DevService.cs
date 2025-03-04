@@ -54,6 +54,12 @@ namespace ProjMngServer.Services {
 
     public static Dictionary<string, string> db_constring = new Dictionary<string, string>();
 
+    string mssqlConstrFormat = @"Server={0},{1};Database={2};User Id={3};Password={4};{5}";
+    //Server=mitddns02.iptime.org,14344;Database=mitERP_HANJU;User Id=sa;Password=mit0104!;TrustServerCertificate=True
+    string postgresqlConstrFormat = @"Host={0};Port={1};Database={2};Username={3};Password={4}";
+    //Host=jsini.co.kr;Port=15432;Database=jsini;Username=jsini;Password=jsini
+    string mysqlConstrFormat = @"Server={0},{1};Database={2};User Id={3};Password={4};{5}";
+
     Devsqlresp GetQuery(string dsl_type = "MSSQL", string dsl_cd = "proclist", string db_nick= "hanju_dev") {
       if (string.IsNullOrEmpty(dsl_type)) dsl_type = "MSSQL";
       if (string.IsNullOrEmpty(dsl_cd)) dsl_cd = "proclist";
@@ -80,16 +86,27 @@ select d.*
       string result = db_constring.TryGetValue(db_nick, out var dbValue) ? dbValue.ToString() : string.Empty;
 
 
-      if (string.IsNullOrEmpty(result)) {
+      if (string.IsNullOrEmpty(result)) { // 없으면 가져온다.
 
         var connectionString = _configuration.GetConnectionString("jsini");
         string query = @"
-select 'Server=mitddns02.iptime.org,14344;Database=mitERP_HANJU;User Id=sa;Password=mit0104!;TrustServerCertificate=True' as constring 
+select db_ip, db_port, db_database, db_id, db_pwd, db_cert, db_comm, db_nick, db_type
   from projmng.devdbinfo d 
  where db_nick = '" + db_nick + @"'
 ";
         using (IDbConnection db = new NpgsqlConnection(connectionString)) {
-          result = db.Query<string>(sql: query).ToList()[0];
+          DbInfo dbinfo = db.Query<DbInfo>(sql: query).ToList().FirstOrDefault();
+          switch (dbinfo.Db_type) {
+            case "MSSQL":
+              result = string.Format(mssqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd, dbinfo.Db_cert);
+              break;
+            case "POSTGRESQL":
+              result = string.Format(postgresqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd);
+              break;
+            case "MYSQL":
+              result = string.Format(mysqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd);
+              break;
+          }
           db_constring[db_nick] = result;
         }
       }
@@ -110,7 +127,7 @@ select 'Server=mitddns02.iptime.org,14344;Database=mitERP_HANJU;User Id=sa;Passw
       string sta = param.TryGetValue("sta", out var staValue) && staValue != null ? staValue.ToString() : string.Empty;
       string sob =   param.TryGetValue("sob", out var sobValue) && sobValue != null ? sobValue.ToString() : string.Empty;
       string proj =              param.TryGetValue("proj", out var projValue) && projValue != null ? projValue.ToString() : string.Empty;
-      string dbNick =           param.TryGetValue("dbnick", out var dbNickValue) && projValue != null ? dbNickValue.ToString() : string.Empty;
+      string dbNick =           param.TryGetValue("dbnick", out var dbNickValue) && dbNickValue != null ? dbNickValue.ToString() : string.Empty;
       string sva =          param.TryGetValue("sva", out var svaValue) && svaValue != null ? svaValue.ToString() : string.Empty;
 
 
