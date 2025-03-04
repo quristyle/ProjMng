@@ -8,6 +8,7 @@ using ProjModel;
 using System.Security.Cryptography;
 using Npgsql;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace ProjMngServer.Services {
   public class DevService : IDevService {
@@ -43,9 +44,11 @@ namespace ProjMngServer.Services {
             parameters.Add(str.Replace("@", ""), param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty);
           }
 
+          Debug.WriteLine("exsit prames run  " );
           return db.Query(sql: dsr.Dsl_query, param : parameters);
         }
         else {
+          Debug.WriteLine("not exsit prames  ");
           return db.Query(sql: dsr.Dsl_query);
         }
 
@@ -64,7 +67,17 @@ namespace ProjMngServer.Services {
       if (string.IsNullOrEmpty(dsl_type)) dsl_type = "MSSQL";
       if (string.IsNullOrEmpty(dsl_cd)) dsl_cd = "proclist";
       if (string.IsNullOrEmpty(db_nick)) db_nick = "hanju_dev";
+
+      Debug.WriteLine("dsl_type: " + dsl_type);
+      Debug.WriteLine("dsl_cd: " + dsl_cd);
+      Debug.WriteLine("db_nick: " + db_nick);
+
       var connectionString = _configuration.GetConnectionString("jsini");
+
+
+      Debug.WriteLine("connectionString: " + connectionString);
+
+
       string query = @"
 select d.* 
   from projmng.devsqlresp d 
@@ -73,10 +86,21 @@ select d.*
 ";
       Devsqlresp dsr = null;
       using (IDbConnection db = new NpgsqlConnection(connectionString)) {
-        dsr= db.Query< Devsqlresp>(sql: query).ToList()[0];
+        dsr= db.Query< Devsqlresp>(sql: query).ToList().FirstOrDefault();
+
+
+
+        Debug.WriteLine("dsr.Dsl_query: " + dsr.Dsl_query);
+        Debug.WriteLine("dsr.Dsl_cd: " + dsr.Dsl_cd);
+        Debug.WriteLine("dsr.Dsl_type: " + dsr.Dsl_type);
+
+
+
+
       }
 
       dsr.DbConnectionString = GetConstring(db_nick);
+      Debug.WriteLine("dsr.DbConnectionString: " + dsr.DbConnectionString);
 
       return dsr;
     }
