@@ -6,10 +6,10 @@
 <RadzenCard class="rz-my-6">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <RadzenDropDown @bind-Value=@dbType Data=@DBNames ></RadzenDropDown>
+      <RadzenDropDown @bind-Value=@projectName Data=@ProjectNames></RadzenDropDown>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <RadzenDropDown @bind-Value=@projectName Data=@ProjectNames></RadzenDropDown>
+      <RadzenDropDown @bind-Value=@dbType Data=@DBNames></RadzenDropDown>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
@@ -36,10 +36,10 @@ tabindex="@tabIndex"
     <RadzenColumn Size="5">
 
       <RadzenDataGrid @bind-Value=@selectedItems
-      Style ="height: 500px"
+      Style ="height: 900px"
       Data="@data"
                       TItem="ProcInfo"
-      IsLoading=@isLoading
+                            IsLoading=@isLoading
       FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
       LogicalFilterOperator="LogicalFilterOperator.And"                      
       AllowFiltering="true" 
@@ -60,7 +60,7 @@ tabindex="@tabIndex"
     </RadzenColumn>
     
     <RadzenColumn Size="7">
-      <pre Style="height: 500px" >
+      <pre Style="height: 900px" >
         @selectedItems?[0].Routine_Definition
       </pre>
 

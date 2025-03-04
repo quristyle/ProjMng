@@ -23,4 +23,13 @@
     public string Db_type { get; set; }
   }
 
-}
+  
+
+
+  public class CommonCode {
+
+    public string Code { get; set; }
+    public string Name { get; set; }
+  }
+
+  }

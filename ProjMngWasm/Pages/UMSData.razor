@@ -1,6 +1,7 @@
 ﻿@page "/umsw";
 @using ProjMngWasm.Models;
 @using ProjMngWasm.Services;
+@using ProjModel;
 
 <RadzenCard class="rz-my-6">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
@@ -16,9 +17,10 @@
             Save
         <RadzenButton Click="@OnSave" Text="complete"></RadzenButton>        
  </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            Choice
-  <RadzenTextBox  @bind-value="srtype" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+      <RadzenLabel Text="User" Component="DropDownTextValueProperties" />
+      <RadzenDropDown @bind-value="srtype" TextProperty="@nameof(CommonCode.Name)" ValueProperty="@nameof(CommonCode.Code)" Data=@_workList>
+        </RadzenDropDown>
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             <RadzenButton Click="@OnLoadWrk" Text="Load Work"></RadzenButton>
@@ -33,9 +35,12 @@
       <RadzenDataGrid Data="@data2" @bind-Value=@selectedItems  Style="height: 500px"
   TItem="IDictionary<string, object>" 
   ColumnWidth="150px"
-                AllowFiltering="true" 
-                FilterPopupRenderMode="PopupRenderMode.OnDemand" 
-                FilterMode="FilterMode.Advanced" 
+      FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+      LogicalFilterOperator="LogicalFilterOperator.And"                      
+      AllowFiltering="true" 
+      AllowColumnResize="true" 
+      FilterMode="FilterMode.Simple"
+      SelectionMode="DataGridSelectionMode.Single"
                 AllowPaging="false" 
                 AllowSorting="true"
                 
@@ -63,9 +68,19 @@
 </RadzenRow>
 
 @code {
-[Parameter] public string abcde{get;set;}
+  IEnumerable<CommonCode> _workList ;
+  public IDictionary<string, string> workChoice = new Dictionary<string, string>() { { "11", "quristyle all" }, { "12", "quristyle wait" }, { "13", "ui user" } };
 
 public string srtype { get; set; } = "12";
+
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    _workList = workChoice.Select(p => new CommonCode { Name = p.Value, Code = p.Key }).ToList();
+    await OnLoadWrk();
+  }
+
+
 
 [Inject] protected IUMSService UmsService { get; set; }
 
@@ -94,8 +109,7 @@ IList<IDictionary<string, object>> selectedItems;
 public IEnumerable<IDictionary<string, object>> data2 { get; set; }
   
 public IDictionary<string, Type> cols { get; set; } = new Dictionary<string, Type>();
-protected override async Task OnInitializedAsync() {
-    await base.OnInitializedAsync();
-    await OnLoadWrk();
-  }
+
+
+
 }
