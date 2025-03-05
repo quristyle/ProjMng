@@ -6,7 +6,7 @@
 <RadzenCard class="rz-my-6">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <RadzenDropDown @bind-Value=@projectName Data=@ProjectNames></RadzenDropDown>
+      <QuriDropDown @bind-value="projectName" CodeId="projlist" > </QuriDropDown>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenDropDown @bind-Value=@dbType Data=@DBNames></RadzenDropDown>
@@ -153,8 +153,70 @@ tabindex="@tabIndex"
     @* table end *@
 
 
-    <RadzenTabsItem Text="Razer">
+    <RadzenTabsItem Text="Data">
     </RadzenTabsItem>
+
+
+    <RadzenTabsItem Text="Prop">
+
+<RadzenCard class="rz-my-6">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
+    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <RadzenText @bind-value="compnentTag" />
+    </RadzenStack>
+  </RadzenStack>
+</RadzenCard>
+
+
+<RadzenCard class="rz-my-6">
+
+  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+    
+    <RadzenColumn Size="7">
+            <pre Style="height:60vh;">
+        @SelectedTableProp
+      </pre>
+
+    </RadzenColumn>
+  </RadzenRow>
+
+</RadzenCard>
+
+
+
+
+    </RadzenTabsItem>
+
+    <RadzenTabsItem Text="Razer">
+
+
+
+
+<RadzenCard class="rz-my-6">
+
+  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+    
+    <RadzenColumn Size="7">
+            <pre Style="height:60vh;">
+        @SelectedTableGridColum
+      </pre>
+
+    </RadzenColumn>
+  </RadzenRow>
+
+</RadzenCard>
+
+
+
+
+
+      
+
+
+
+    </RadzenTabsItem>
+
+
 
   </Tabs>
 </RadzenTabs>
@@ -169,12 +231,17 @@ tabindex="@tabIndex"
   IList<TableInfo> selectedTable;
   ProcInfo selected_pi;
 
+  string SelectedTableProp;
+  string SelectedTableGridColum;
+
+
+string compnentTag = "RadzenDataGridColumn";
 
   string dbType { get; set; }
   IList<string> DBNames;
 
   string projectName { get; set; } = "hanju_prod";
-  IList<string> ProjectNames;
+
 
   
   int tabIndex { get; set; } = 0;
@@ -232,7 +299,6 @@ tabindex="@tabIndex"
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
     DBNames = new List<string> { "MSSQL", "MYSQL", "ORACLE", "POSTGRESQL" };
-    ProjectNames = new List<string> { "hanju_dev", "hanju_prod" };
     //await OnLoad();
   }
 
@@ -247,6 +313,15 @@ tabindex="@tabIndex"
     dic.Add("table_name", tableInfo.TableName);
     isLoading3 = true;
     dataCol = await JsiniService.GetList<ColumnInfo>(dic);
+
+    SelectedTableProp = "";
+    SelectedTableGridColum = "";
+    foreach(var dr in dataCol){
+      SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}"+Environment.NewLine;
+      SelectedTableGridColum += $"<{compnentTag} title=\"{dr.ColunmName}\" Property=\"{dr.ColunmName}\" />"+Environment.NewLine;
+    }
+
+
     isLoading3 = false;
     StateHasChanged();
 

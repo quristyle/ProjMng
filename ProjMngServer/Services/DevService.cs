@@ -24,8 +24,12 @@ namespace ProjMngServer.Services {
     public IEnumerable<dynamic> DevExecuteQuery(Devsqlresp dsr, Dictionary<string, string> param) {
       //var connectionString = _configuration.GetConnectionString(dsr.DbConnectionString);
 
-      using (IDbConnection db = new SqlConnection(dsr.DbConnectionString)) {
+if(dsr.Dsl_type == "POSTGRESQL" ){
 
+
+
+
+      using (IDbConnection db = new NpgsqlConnection(dsr.DbConnectionString)) {
 
         var matches = Regex.Matches(dsr.Dsl_query, @"@\w+");
         string[] kkk = matches.Select(m => m.Value).ToArray();
@@ -53,7 +57,48 @@ namespace ProjMngServer.Services {
         }
 
       }
+}
+      else{
+
+
+      using (IDbConnection db = new SqlConnection(dsr.DbConnectionString)) {
+
+        var matches = Regex.Matches(dsr.Dsl_query, @"@\w+");
+        string[] kkk = matches.Select(m => m.Value).ToArray();
+        if (kkk != null && kkk.Length > 0) {
+          Dictionary<string,string> dic = new Dictionary<string,string>(); 
+
+          //var dic = new { DbNick = "" };
+
+          foreach (string str in kkk) {
+            dic.Add(str.Replace("@", ""),  (param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty)     );
+          }
+
+
+          var parameters = new DynamicParameters();
+          foreach (string str in kkk) {
+            parameters.Add(str.Replace("@", ""), param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty);
+          }
+
+          Debug.WriteLine("exsit prames run  " );
+          return db.Query(sql: dsr.Dsl_query, param : parameters);
+        }
+        else {
+          Debug.WriteLine("not exsit prames  ");
+          return db.Query(sql: dsr.Dsl_query);
+        }
+
+      }
+
+      }
+
+
+
     }
+
+
+
+
 
     public static Dictionary<string, string> db_constring = new Dictionary<string, string>();
 

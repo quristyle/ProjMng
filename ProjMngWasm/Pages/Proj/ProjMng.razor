@@ -1,0 +1,73 @@
+﻿@page "/projmng";
+@using ProjMngWasm.Models;
+@using ProjMngWasm.Services;
+@using ProjModel;
+
+<RadzenCard class="rz-my-6">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      <QuriDropDown @bind-value="srtype" CodeId="projuser" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenButton Click="@OnLoadWrk" Text="Search" />
+        </RadzenStack>
+
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+    <RadzenColumn Size="12" >
+        
+      <RadzenDataGrid Data="@data" Style="height: 700px"
+  TItem="ProjectInfo" 
+      FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+      LogicalFilterOperator="LogicalFilterOperator.And"                      
+      AllowFiltering="true" 
+      AllowColumnResize="true" 
+      FilterMode="FilterMode.Simple"
+      SelectionMode="DataGridSelectionMode.Single"
+                AllowPaging="false" 
+                AllowSorting="true"
+                 PagerHorizontalAlign="HorizontalAlign.Left" 
+                  ShowPagingSummary="true">
+
+  <Columns>
+    
+       
+                <RadzenDataGridColumn title="Project ID" Property="Prj_rid" />
+    
+  </Columns>
+</RadzenDataGrid>
+
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+ 
+public string srtype { get; set; }
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    await OnLoadWrk();
+  }
+
+
+
+[Inject] protected IJsiniService JsiniService { get; set; }
+
+public IEnumerable<ProjectInfo> data { get; set; }
+  
+protected async Task OnLoadWrk() {
+  data = await JsiniService.GetList<ProjectInfo>(new Dictionary<string, string>() { { "SRTP", srtype } });
+  
+}
+
+protected async Task OnSave() {
+  //cols.Clear();
+  //data2 = await UmsService.GetList("p_work", new Dictionary<string, object>() { { "SRTP", srtype }, { "ID", selectedItems?[0]["a"] }, { "EDT", DateTime.Now.ToString("yyyy-MM-dd") } });
+}
+
+
+}

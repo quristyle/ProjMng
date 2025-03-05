@@ -18,11 +18,22 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   { "15", "ui userAll " } ,
   }; //No longer needed here
 
+  IDictionary<string, string> projlist = new Dictionary<string, string>() { 
+  { "hanju_dev", "hanju_dev" }, 
+  { "hanju_prod", "hanju_prod" }, 
+  { "funeralfr", "funeralfr" }, 
+  { "jsini", "jsini" }, 
+  }; //No longer needed here
+
 
   protected override async Task OnInitializedAsync()    {
         await base.OnInitializedAsync();
         TextProperty="Value" ;
         ValueProperty="Key";
+
+        GlobalDic.Add("projuser", codeList);
+
+        GlobalDic.Add("projlist", projlist);
     }
 
     protected override  async void OnParametersSet()    {
@@ -37,7 +48,6 @@ async Task LoadData(){
             if (!GlobalDic.ContainsKey(_codeId))            {
                 // If the CodeId doesn't exist, provide a default or empty list
                 // 존재 하지 ᄋ않으면 서버에서 구해온다.
-        GlobalDic.Add("projuser", codeList);
                 Data = new List<KeyValuePair<string, string>>();
             }
             else            {
