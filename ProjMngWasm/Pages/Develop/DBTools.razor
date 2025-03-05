@@ -20,7 +20,7 @@
 
 
 
-<RadzenTabs TabPosition="TabPosition.Left" 
+<RadzenTabs TabPosition="TabPosition.Top" 
 RenderMode="TabRenderMode.Client"
 tabindex="@tabIndex"
             SelectedIndexChanged="@OnTableChange" >
@@ -35,8 +35,8 @@ tabindex="@tabIndex"
   <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
     <RadzenColumn Size="5">
 
-      <RadzenDataGrid @bind-Value=@selectedItems
-      Style ="height: 900px"
+            <RadzenDataGrid @bind-Value=@selectedItems
+                            Style="height:60vh;"
       Data="@data"
                       TItem="ProcInfo"
                             IsLoading=@isLoading
@@ -60,7 +60,7 @@ tabindex="@tabIndex"
     </RadzenColumn>
     
     <RadzenColumn Size="7">
-      <pre Style="height: 900px" >
+            <pre Style="height:60vh;">
         @selectedItems?[0].Routine_Definition
       </pre>
 
@@ -72,6 +72,8 @@ tabindex="@tabIndex"
 
 
     </RadzenTabsItem>
+
+    @* table *@
     <RadzenTabsItem Text="Table">
 
 
@@ -80,11 +82,11 @@ tabindex="@tabIndex"
 
       <RadzenCard class="rz-my-6">
 
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
-          <RadzenColumn Size="5">
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+          <RadzenColumn Size="4">
 
             <RadzenDataGrid @bind-Value=@selectedTable
-                            Style="height: 500px"
+                            Style="height:60vh;"
                             Data="@dataTb"
                             TItem="TableInfo"
                             IsLoading=@isLoading2
@@ -109,25 +111,29 @@ tabindex="@tabIndex"
 
 
 
-           <RadzenColumn Size="7">
+           <RadzenColumn Size="8">
 
-            <RadzenDataGrid Style="height: 500px"
+            <RadzenDataGrid 
+                            Style="height:60vh;"
                             Data="@dataCol"
                             TItem="ColumnInfo"
                             IsLoading=@isLoading3
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.And"
-                            AllowFiltering="true"
                             AllowColumnResize="true"
-                            FilterMode="FilterMode.Simple"
                             SelectionMode="DataGridSelectionMode.Single"
                             AllowPaging="false"
                             AllowSorting="true"
+                            
                             PagerHorizontalAlign="HorizontalAlign.Left"
                             ShowPagingSummary="true">
               <Columns>
                 <RadzenDataGridColumn title="ColunmName" Property="ColunmName" />
-                <RadzenDataGridColumn title="Desc" Property="Description" />
+                <RadzenDataGridColumn title="Desc" Property="Description" Width="150px" />
+                <RadzenDataGridColumn title="Type" Property="Type_NM" />
+                <RadzenDataGridColumn title="Length" Property="Max_LENGTH" />
+                <RadzenDataGridColumn title="Null" Property="NullAble" />
+                <RadzenDataGridColumn title="Ident" Property="Ident" />
               </Columns>
             </RadzenDataGrid>
 
@@ -144,9 +150,12 @@ tabindex="@tabIndex"
 
 
     </RadzenTabsItem>
-    <RadzenTabsItem Text="Razer">
+    @* table end *@
 
+
+    <RadzenTabsItem Text="Razer">
     </RadzenTabsItem>
+
   </Tabs>
 </RadzenTabs>
 
@@ -164,7 +173,7 @@ tabindex="@tabIndex"
   string dbType { get; set; }
   IList<string> DBNames;
 
-  string projectName { get; set; }
+  string projectName { get; set; } = "hanju_prod";
   IList<string> ProjectNames;
 
   

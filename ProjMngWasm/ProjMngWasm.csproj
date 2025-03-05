@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.13" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Radzen.Blazor" Version="6.1.4" />
+    <PackageReference Include="Radzen.Blazor" Version="6.1.6" />
 
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
 
