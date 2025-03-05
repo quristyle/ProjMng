@@ -60,8 +60,7 @@ public string srtype { get; set; }
 public IEnumerable<ProjectInfo> data { get; set; }
   
 protected async Task OnLoadWrk() {
-  data = await JsiniService.GetList<ProjectInfo>(new Dictionary<string, string>() { { "SRTP", srtype } });
-  
+  data = await JsiniService.GetList<ProjectInfo>(new Dictionary<string, string>() { { "SRTP", "projmng" } });  
 }
 
 protected async Task OnSave() {

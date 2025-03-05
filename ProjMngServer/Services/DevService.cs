@@ -119,9 +119,7 @@ if(dsr.Dsl_type == "POSTGRESQL" ){
 
       var connectionString = _configuration.GetConnectionString("jsini");
 
-
       Debug.WriteLine("connectionString: " + connectionString);
-
 
       string query = @"
 select d.* 
@@ -133,13 +131,9 @@ select d.*
       using (IDbConnection db = new NpgsqlConnection(connectionString)) {
         dsr= db.Query< Devsqlresp>(sql: query).ToList().FirstOrDefault();
 
-
-
         Debug.WriteLine("dsr.Dsl_query: " + dsr.Dsl_query);
         Debug.WriteLine("dsr.Dsl_cd: " + dsr.Dsl_cd);
         Debug.WriteLine("dsr.Dsl_type: " + dsr.Dsl_type);
-
-
 
 
       }
@@ -150,21 +144,23 @@ select d.*
       return dsr;
     }
 
+
+
+string db_nick_key = "db_nick";
+string dbConQuery = @"
+select db_ip, db_port, db_database, db_id, db_pwd, db_cert, db_comm, db_nick, db_type
+  from projmng.devdbinfo d 
+ where db_nick = @db_nick
+";
     string GetConstring(string db_nick) {
 
       string result = db_constring.TryGetValue(db_nick, out var dbValue) ? dbValue.ToString() : string.Empty;
 
-
       if (string.IsNullOrEmpty(result)) { // 없으면 가져온다.
 
         var connectionString = _configuration.GetConnectionString("jsini");
-        string query = @"
-select db_ip, db_port, db_database, db_id, db_pwd, db_cert, db_comm, db_nick, db_type
-  from projmng.devdbinfo d 
- where db_nick = '" + db_nick + @"'
-";
         using (IDbConnection db = new NpgsqlConnection(connectionString)) {
-          DbInfo dbinfo = db.Query<DbInfo>(sql: query).ToList().FirstOrDefault();
+          DbInfo dbinfo = db.Query<DbInfo>(sql: dbConQuery, param: new Dictionary<string,string>(){ {db_nick_key,db_nick} } ).ToList().FirstOrDefault();
           switch (dbinfo.Db_type) {
             case "MSSQL":
               result = string.Format(mssqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd, dbinfo.Db_cert);
