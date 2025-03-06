@@ -1,9 +1,7 @@
 ﻿@page "/umsw";
-@using ProjMngWasm.Models;
-@using ProjMngWasm.Services;
-@using ProjModel;
+@inherits BaseComponent
 
-<RadzenCard class="rz-my-6">
+<RadzenCard >
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
         <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                        
@@ -84,7 +82,6 @@ public string srtype { get; set; } = "12";
 
 
 
-[Inject] protected IUMSService UmsService { get; set; }
 
 protected async Task OnLoadWrk() {
   cols.Clear();

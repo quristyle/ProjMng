@@ -1,7 +1,5 @@
 ﻿@page "/projmng";
-@using ProjMngWasm.Models;
-@using ProjMngWasm.Services;
-@using ProjModel;
+@inherits BaseComponent
 
 <RadzenCard class="rz-my-6">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
@@ -10,8 +8,9 @@
       <QuriDropDown @bind-value="srtype" CodeId="projuser" />
         </RadzenStack>
 
-        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
             <RadzenButton Click="@OnLoadWrk" Text="Search" />
+            <RadzenButton Click="@OnSave" Text="Save" />
         </RadzenStack>
 
     </RadzenStack>
@@ -21,7 +20,7 @@
     <RadzenColumn Size="12" >
         
       <RadzenDataGrid Data="@data" Style="height: 700px"
-  TItem="ProjectInfo" 
+  TItem="IDictionary<string, object>" 
       FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
       LogicalFilterOperator="LogicalFilterOperator.And"                      
       AllowFiltering="true" 
@@ -32,11 +31,16 @@
                 AllowSorting="true"
                  PagerHorizontalAlign="HorizontalAlign.Left" 
                   ShowPagingSummary="true">
-
   <Columns>
     
-       
-                <RadzenDataGridColumn title="Project ID" Property="Prj_rid" />
+        @foreach (var column in cols)        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @context[@column.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
     
   </Columns>
 </RadzenDataGrid>
@@ -48,19 +52,28 @@
  
 public string srtype { get; set; }
 
+public IDictionary<string, Type> cols { get; set; } = new Dictionary<string, Type>();
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
     await OnLoadWrk();
   }
 
 
-
-[Inject] protected IJsiniService JsiniService { get; set; }
-
-public IEnumerable<ProjectInfo> data { get; set; }
+public IEnumerable<IDictionary<string, object>> data { get; set; }
   
 protected async Task OnLoadWrk() {
-  data = await JsiniService.GetList<ProjectInfo>(new Dictionary<string, string>() { { "SRTP", "projmng" } });  
+  cols.Clear();
+  data = await JsiniService.GetList<IDictionary<string, object>>(new Dictionary<string, string>() { { "stp", "sp_projdblist" } });  
+
+  if (data != null && data.Any()){
+    foreach( var dd in data ){
+      foreach( var d in dd ){
+       cols.Add( d.Key, typeof(string) );
+      }
+      break;
+    }
+  }
+
 }
 
 protected async Task OnSave() {
