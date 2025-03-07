@@ -146,7 +146,7 @@ select d.*
 
 
 
-string db_nick_key = "db_nick";
+string db_nick_key = "@db_nick";
 string dbConQuery = @"
 select db_ip, db_port, db_database, db_id, db_pwd, db_cert, db_comm, db_nick, db_type
   from projmng.devdbinfo d 
@@ -160,7 +160,10 @@ select db_ip, db_port, db_database, db_id, db_pwd, db_cert, db_comm, db_nick, db
 
         var connectionString = _configuration.GetConnectionString("jsini");
         using (IDbConnection db = new NpgsqlConnection(connectionString)) {
-          DbInfo dbinfo = db.Query<DbInfo>(sql: dbConQuery, param: new Dictionary<string,string>(){ {db_nick_key,db_nick} } ).ToList().FirstOrDefault();
+
+          var parameters = new DynamicParameters();
+          parameters.Add(db_nick_key, db_nick);
+          DbInfo dbinfo = db.Query<DbInfo>(sql: dbConQuery, param: parameters).ToList().FirstOrDefault();
           switch (dbinfo.Db_type) {
             case "MSSQL":
               result = string.Format(mssqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd, dbinfo.Db_cert);
