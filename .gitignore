@@ -1481,3 +1481,5 @@ ProjMngServer/obj/
 /ProjMngServer/appsettings.json
 /ProjModel/bin/Debug/net8.0
 /ProjModel/obj
+/ProjMngNomal/bin/Debug/net8.0
+/ProjMngNomal/obj
