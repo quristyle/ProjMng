@@ -4,7 +4,7 @@ using Radzen.Blazor;
 
 namespace ProjMngWasm.Compnents;
 
-public class QuriDropDown<CommonCode> : RadzenDropDown<CommonCode> {
+public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
   public string _codeId;
   [Parameter] public string CodeId{get{ return _codeId; }set{ _codeId = value; LoadData();}}
