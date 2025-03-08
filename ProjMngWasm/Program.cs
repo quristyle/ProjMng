@@ -53,6 +53,8 @@ builder.Services.AddSingleton<GitHubService>();
 
 
 
+//builder.UseStaticWebAssets(); // wahs 에서는 필요 없다.
+
 var app = builder.Build();
 
    //         await builder.Build().RunAsync();
