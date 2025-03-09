@@ -1483,3 +1483,6 @@ ProjMngServer/obj/
 /ProjModel/obj
 /ProjMngNomal/bin/Debug/net8.0
 /ProjMngNomal/obj
+/ProjMngVuejs/obj/Debug
+/ProjMngVuejs/.vscode
+/ProjMngVuejs/projmngvuejs.esproj.user
