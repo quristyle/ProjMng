@@ -1,3 +1,0 @@
-developer
-
-help project
