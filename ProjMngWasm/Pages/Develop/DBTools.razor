@@ -60,9 +60,9 @@ tabindex="@tabIndex"
     </RadzenColumn>
     
     <RadzenColumn Size="7">
-            <pre Style="height:60vh;">
-        @selectedItems?[0].Routine_Definition
-      </pre>
+
+      <Monaco Value="@selectedItems?[0].Routine_Definition" Language="pgsql" />
+
 
     </RadzenColumn>
   </RadzenRow>
@@ -251,7 +251,7 @@ string compnentTag = "RadzenDataGridColumn";
   string dbType { get; set; }
   IList<string> DBNames;
 
-  string projectName { get; set; } = "hanju_prod";
+  string projectName { get; set; } = "hanju_dev";
 
 
   
@@ -292,6 +292,10 @@ string compnentTag = "RadzenDataGridColumn";
 
     isLoading = true;
     data = await JsiniService.GetList<ProcInfo>(dic);
+
+    if (data != null && data.ToList().Count > 0 ){
+      selectedItems = new List<ProcInfo>(){ data.ToList().FirstOrDefault() };
+    }
     isLoading = false;
   }
 
@@ -310,7 +314,7 @@ string compnentTag = "RadzenDataGridColumn";
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
     DBNames = new List<string> { "MSSQL", "MYSQL", "ORACLE", "POSTGRESQL" };
-    //await OnLoad();
+    await OnLoad();
   }
 
 

@@ -20,30 +20,90 @@
     /* Web Font Load */
     @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
     @import url('https://fonts.googleapis.com/css2?family=Play&family=Teko:wght@400;600&display=swap');
-
-    * {
-      font-family: Play, 'Starcraft', sans-serif, Tahoma, Verdana, Arial;
-    }
   </style>
+
+
+
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="/lib/monaco/editor/editor.main.css">
+
+
+
 
 </head>
 
 <body>
-  <div id="app">
-    <svg class="loading-progress">
-      <circle r="40%" cx="50%" cy="50%" />
-      <circle r="40%" cx="50%" cy="50%" />
-    </svg>
-    <div class="loading-progress-text"></div>
+
+
+
+
+
+  <div id="app" style="margin: 0 auto; width: 100vw; height: 100vh">
+    <div class="text-center pt-3" style="color: white; font-size: 16pt; z-index: 9999; position: relative;">
+      Loading...
+    </div>
+    <div class="text-center mt-3" style="z-index: 9999; position: relative;">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+            style="font-size: 16pt; width: 36px; height: 36px; color: white" />
+    </div>
+    <div class="text-center">
+      <img src="/images/junsystem.gif" style="width: 30rem; position: absolute; top: calc(50% - 15rem); left: calc(50% - 14.5rem);" />
+    </div>
+
+
+
+
+
   </div>
 
+
+
+
   <div id="blazor-error-ui">
-    An unhandled error has occurred.
+    <!--An unhandled error has occurred.-->
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
   </div>
   <script src="_framework/blazor.webassembly.js"></script>
   <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+
+
+
+
+
+
+  <script async src="/lib/monaco/loader.js"></script>
+  <script async src="/lib/monaco/editor/editor.main.js"></script>
+
+  <script async="async" type="text/javascript" src="/lib/monaco/basic-languages/pgsql/pgsql.js"></script>
+
+
+  <script>
+    var instances = {};
+    function createEditor(element, id, ref, options) {
+      var instance = monaco.editor.create(element, options);
+      instance.onDidChangeModelContent(function () {
+        ref.invokeMethodAsync('OnChangeAsync', instance.getValue());
+      });
+      instances[id] = instance;
+      return instance;
+    }
+
+    function copy(id) {
+      var text = instances[id].getValue();
+      navigator.clipboard.writeText(text);
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
 </body>
 
 </html>
