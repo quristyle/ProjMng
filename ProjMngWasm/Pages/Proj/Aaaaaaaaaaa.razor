@@ -1,5 +1,4 @@
-﻿@page "/";
-@page "/projmng";
+﻿@page "/aaaaaaaaaaaaaaa";
 
 @inherits BaseComponent
 
@@ -7,7 +6,7 @@
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-      <RadzenTextBox @bind-Value="srtype" />
+      <QuriDropDown TValue="string" CodeId="projlist" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
@@ -38,93 +37,32 @@
     ShowPagingSummary="true">
       <Columns>
 
-        @foreach (var col in cols)        {
-          <RadzenDataGridColumn @key=@col.Key 
-                                 Title="@col.Key"                               
-                                Type=@GetType(col.Value)
-                                Property="@PropertyAccess.GetDynamicPropertyExpression( col.Key, GetType(col.Value) )"
-          
-          
-          
-          >
+        @foreach (var column in cols)        {
+          <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+          Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
 
+          
+                
+                
             <EditTemplate Context="order">
 
-              @* 뭔가 타입에 맞는 컨트롤을 지정하기전에 수정불가 항목을 처리할 로직을 여기서 정의 *@
+              @if (column.Key != "db_rid") {
+              <RadzenTextBox Change="@(args => order[@column.Key] = args)" Value=@(order.TryGetValue(@column.Key, out object k)?k.ToString():"") Name="@column.Key" aria-label="Enter {column.Key}" />
+                
+              } else {
+                
+                <RadzenLabel Text=@(order.TryGetValue(@column.Key, out object k)?k.ToString():"") />
+                
+           
 
-              @if (col.Value == "System.DateTime") {
-                  <RadzenDatePicker @bind-Value=@order[col.Key] DateFormat="yyyy-MM-dd"      />
-                } 
-                @* else if (col.Value == "System.Int32") { *@
-
-                @* <RadzenNumeric @bind-Value=@order[col.Key] /> *@
-
-                @* } *@
-                else {
-
-
-                <RadzenTextBox Change="@(args => order[@col.Key] = args)"
-                               Value=@(order.TryGetValue(@col.Key, out object k)?k.ToString():"")
-                               Name="@col.Key" aria-label="Enter {col.Key}" />
-            
-                }
+              }
             </EditTemplate>
               
 
               
 
             <Template>
-
-
-              @if (col.Value == "System.DateTime") {
-
-                if (context[@col.Key] != null && !string.IsNullOrWhiteSpace(context[@col.Key]?.ToString()) && context[@col.Key].GetType() == typeof(DateTime)
-                //DateTime.TryParseExact((context[@col.Key] + ""), "yyyy-MM-dd'T'HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out DateTime vrst)
-
-
-
-                //DateTimeOffset
-                
-                
-                
-                
-                
-                
-                
-                
-               // DateTime.TryParseExact((context[@col.Key]+"").Replace("T",""),"yyyy-MM-ddHH:mm:ss", null, System.Globalization.DateTimeStyles.None , out DateTime vrst) 
-                
-                
-){
-                  //@vrst.ToString("yyyy-MM-dd");
-
-                  
-                @(((DateTime)context[@col.Key]).ToString("yyyy-MM-dd"))
-
-                }
-                else{
-                  
-                @context[@col.Key]
-
-                }
-
-
-              } 
-              @* else if (col.Value == "System.Int32") { *@
-
-
-              @*   @(((int)context[@col.Key])) *@
-
-              @* } *@
-              else {
-
-                @* @PropertyAccess.GetDynamicPropertyExpression(col.Key, GetType(col.Value)) *@
-
-              @context[@col.Key]
-
-              }
-
-
+              @context[@column.Key]
             </Template>
           </RadzenDataGridColumn>
         }
@@ -161,14 +99,14 @@
 
   DataGridEditMode editMode = DataGridEditMode.Single;
 
-  public IDictionary<string, string> cols { get; set; } = new Dictionary<string, string>();
+  public IDictionary<string, Type> cols { get; set; } = new Dictionary<string, Type>();
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
     await OnLoadWrk();
   }
 
 
-  public IEnumerable<Dictionary<string, object>> data { get; set; }
+  public IEnumerable<IDictionary<string, object>> data { get; set; }
 
 
 
@@ -185,53 +123,22 @@
 
   protected async Task OnLoadWrk() {
     cols.Clear();
+    var rd = await JsiniService.GetList<IDictionary<string, object>>(new Dictionary<string, string>() { { "stp", "sp_projdblist" } });
 
-    //ResultInfo<IDictionary<string, object>>
+    data = rd.Data;
 
-
-    var dd = await JsiniService.GetList<Dictionary<string, object>>(new Dictionary<string, string>() { { "stp", "sp_projlist" } });
-
-    data = dd.Data;
-    cols = dd.Cols;
-
-
-  }
-
-
-  protected void ChangeDataType( ResultInfo<Dictionary<string, object>> res ){
-
-    var data = res.Data;
-    var cols = res.Cols;
-
-    foreach( var c in cols){
-      if( c.Value == "System.Int32"){
-      
-        string ckey = c.Key;
-        
-        foreach (var d in data) {
-
-          d[ckey] = int.Parse(d[ckey]?.ToString());
-
+    if (data != null && data.Any()){
+      foreach( var dd in data ){
+        foreach( var d in dd ){
+          cols.Add( d.Key, typeof(string) );
         }
-
-
-
+        break;
       }
     }
 
   }
 
 
-  protected Type GetType( string clsStr ){
-    Type type = Type.GetType(clsStr);
-
-    // if (clsStr == "System.DateTime") {      type = typeof(DateTime);    } 
-    // else if (clsStr == "System.Int32") {      type = typeof(int);    } 
-    // else if (clsStr == "System.Double") {      type = typeof(double);    } 
-    // else if (clsStr == "System.Boolean") {      type = typeof(bool);    }
-
-    return type;
-  }
 
 
 
@@ -340,7 +247,7 @@
 
 
   async Task DataSave(IDictionary<string, object> order) {
-    var req = JoinDictionaries(order, new Dictionary<string, string>() { { "stp", "sp_projsave" } });
+    var req = JoinDictionaries(order, new Dictionary<string, string>() { { "stp", "sp_projdbsave" } });
 
     var saveobj = await JsiniService.GetList<IDictionary<string, object>>(req);
 
@@ -356,15 +263,7 @@
 
     foreach (var key in allKeys) {
       if (dict1.ContainsKey(key)) {
-
-        if ( dict1[key].GetType() == typeof(DateTime)){
-
-          result[key] = ((DateTime)dict1[key]).ToString("yyyyMMdd");
-
-        } else {
-          result[key] = dict1[key] + "";
-        }
-
+        result[key] = dict1[key]+"";
       } else if (dict2.ContainsKey(key)) {
         result[key] = dict2[key];
       }

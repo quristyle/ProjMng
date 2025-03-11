@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Components.Authorization;
+ï»¿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ProjMngWasm;
+using ProjMngWasm.Commons;
 using ProjMngWasm.Services;
 using Radzen;
 
@@ -24,6 +25,12 @@ builder.Services.AddRadzenQueryStringThemeService();
 builder.Services.AddHttpClient<IUMSService, UMSService>(client => {
                 client.BaseAddress = new Uri("https://nums.api.hanjucorp.co.kr");            });
 
+
+
+builder.Services.AddHttpClient<IDevService, DevService>(client => {
+  client.BaseAddress = new Uri("http://localhost:5267");
+  //client.BaseAddress = new Uri("https://api.jsini.co.kr");
+});
 
 #if DEBUG
 
@@ -48,12 +55,13 @@ builder.Services.AddHttpClient<IFuneralService, FuneralService>(client => {
 
 builder.Services.AddScoped<ExampleService>();
 builder.Services.AddSingleton<GitHubService>();
+builder.Services.AddSingleton<AppData>();
 
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://nums.hanjucorp.co.kr") });
 
 
 
-//builder.UseStaticWebAssets(); // wahs ¿¡¼­´Â ÇÊ¿ä ¾ø´Ù.
+//builder.UseStaticWebAssets(); // wahs ì—ì„œëŠ” í•„ìš” ì—†ë‹¤.
 
 var app = builder.Build();
 

@@ -2,14 +2,19 @@
 @using ProjMngWasm.Models;
 @using ProjMngWasm.Models.Develop
 @using ProjMngWasm.Services;
+@using System.Diagnostics.CodeAnalysis
+
+
+<PageTitle>개발자 Tool</PageTitle>
+
 
 <RadzenCard class="rz-my-6">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <QuriDropDown @bind-Value="projectName" CodeId="projlist" > </QuriDropDown>
+      <QuriDropDown @bind-Value="projectName" CodeId="projdb2"> </QuriDropDown>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <RadzenDropDown @bind-Value=@dbType Data=@DBNames></RadzenDropDown>
+      <QuriDropDown @bind-Value="dbType" CodeId="dbType" > </QuriDropDown>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
@@ -61,7 +66,14 @@ tabindex="@tabIndex"
     
     <RadzenColumn Size="7">
 
-      <Monaco Value="@selectedItems?[0].Routine_Definition" Language="pgsql" />
+
+            <StandaloneCodeEditor @ref="_editor"
+    CssClass="code-editor"
+            ConstructionOptions="EditorConstructionOptions" />
+
+
+
+
 
 
     </RadzenColumn>
@@ -232,26 +244,46 @@ tabindex="@tabIndex"
   </Tabs>
 </RadzenTabs>
 
-
 @code {
 
 
-  [Inject] protected IJsiniService JsiniService { get; set; }
-  
-  IList<ProcInfo> selectedItems;
+  [Inject] protected IDevService DevService { get; set; }
+
+  [AllowNull]  private StandaloneCodeEditor _editor;
+
+
+  //_editor
+
+  IList<ProcInfo> _selectedItems { get; set; } = new List<ProcInfo>() { new ProcInfo() { Routine_Definition = "empty" } };
+  IList<ProcInfo> selectedItems { get { return _selectedItems; } set { _selectedItems = value; _editor.SetValue(_selectedItems[0]?.Routine_Definition); } }
   IList<TableInfo> selectedTable;
   ProcInfo selected_pi;
+
+  // string _selectedString;
+  // string SelectedString { get { return selectedItems?[0].Routine_Definition; } set{ _selectedString = value; } }
 
   string SelectedTableProp;
   string SelectedTableGridColum;
 
 
+
+  
+  private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor) {
+    return new StandaloneEditorConstructionOptions {
+        AutomaticLayout = true,
+        Language = "pgsql",
+        Theme= "vs-dark",
+        StickyScroll = new EditorStickyScrollOptions(){
+          Enabled = false,
+        }
+      };
+  }
+
 string compnentTag = "RadzenDataGridColumn";
 
   string dbType { get; set; }
-  IList<string> DBNames;
 
-  string projectName { get; set; } = "hanju_dev";
+  string projectName { get; set; } //= "hanju_dev";
 
 
   
@@ -291,7 +323,7 @@ string compnentTag = "RadzenDataGridColumn";
     dic.Add("stp", "proclist");
 
     isLoading = true;
-    data = await JsiniService.GetList<ProcInfo>(dic);
+    data = await DevService.GetList<ProcInfo>(dic);
 
     if (data != null && data.ToList().Count > 0 ){
       selectedItems = new List<ProcInfo>(){ data.ToList().FirstOrDefault() };
@@ -304,7 +336,7 @@ string compnentTag = "RadzenDataGridColumn";
     Dictionary<string, string> dic = getParams();
     dic.Add("stp", "tablelist");
     isLoading2 = true;
-    dataTb = await JsiniService.GetList<TableInfo>(dic);
+    dataTb = await DevService.GetList<TableInfo>(dic);
     isLoading2 = false;
   }
 
@@ -313,8 +345,7 @@ string compnentTag = "RadzenDataGridColumn";
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
-    DBNames = new List<string> { "MSSQL", "MYSQL", "ORACLE", "POSTGRESQL" };
-    await OnLoad();
+    //await OnLoad();
   }
 
 
@@ -327,13 +358,13 @@ string compnentTag = "RadzenDataGridColumn";
     dic.Add("stp", "columnsOftable");
     dic.Add("table_name", tableInfo.TableName);
     isLoading3 = true;
-    dataCol = await JsiniService.GetList<ColumnInfo>(dic);
+    dataCol = await DevService.GetList<ColumnInfo>(dic);
 
     SelectedTableProp = "";
     SelectedTableGridColum = "";
     foreach(var dr in dataCol){
-      SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}"+Environment.NewLine;
-      SelectedTableGridColum += $"<{compnentTag} title=\"{dr.ColunmName}\" Property=\"{dr.ColunmName}\" />"+Environment.NewLine;
+      SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}"+System.Environment.NewLine;
+      SelectedTableGridColum += $"<{compnentTag} title=\"{dr.ColunmName}\" Property=\"{dr.ColunmName}\" />" + System.Environment.NewLine;
     }
 
 
@@ -351,3 +382,10 @@ string compnentTag = "RadzenDataGridColumn";
 
 }
 
+
+
+    <style>
+  .code-editor{
+    height: 60vh;
+  }
+      </style>

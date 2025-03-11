@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -7,25 +7,17 @@
   <title>ProjMngWasm</title>
   <base href="/" />
   <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
-  <!--<link rel="stylesheet" href="css/app.css" />-->
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <!--<link href="ProjMngWasm.styles.css" rel="stylesheet" />-->
+  <link rel="icon" type="image/png" href="favicon.ico" />
   <link rel="stylesheet" href="css/site.css" />
 
   <link href="https://fonts.cdnfonts.com/css/starcraft" rel="stylesheet">
   <link rel="preload" href="/fonts/MaterialSymbolsOutlined.woff2" as="font" type="font/woff2">
-  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.min.css">
 
   <style>
     /* Web Font Load */
     @import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
     @import url('https://fonts.googleapis.com/css2?family=Play&family=Teko:wght@400;600&display=swap');
   </style>
-
-
-
-  <link rel="stylesheet" data-name="vs/editor/editor.main" href="/lib/monaco/editor/editor.main.css">
-
 
 
 
@@ -58,7 +50,7 @@
 
 
 
-  <div id="blazor-error-ui">
+  <div id="blazor-error-ui" style="display:none;visibility:hidden;position:absolute;left:999999;top:999999999999999;" >
     <!--An unhandled error has occurred.-->
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
@@ -66,42 +58,9 @@
   <script src="_framework/blazor.webassembly.js"></script>
   <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
 
-
-
-
-
-
-  <script async src="/lib/monaco/loader.js"></script>
-  <script async src="/lib/monaco/editor/editor.main.js"></script>
-
-  <script async="async" type="text/javascript" src="/lib/monaco/basic-languages/pgsql/pgsql.js"></script>
-
-
-  <script>
-    var instances = {};
-    function createEditor(element, id, ref, options) {
-      var instance = monaco.editor.create(element, options);
-      instance.onDidChangeModelContent(function () {
-        ref.invokeMethodAsync('OnChangeAsync', instance.getValue());
-      });
-      instances[id] = instance;
-      return instance;
-    }
-
-    function copy(id) {
-      var text = instances[id].getValue();
-      navigator.clipboard.writeText(text);
-    }
-  </script>
-
-
-
-
-
-
-
-
-
+  <script src="_content/BlazorMonaco/jsInterop.js"></script>
+  <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
+  <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
 
 
 </body>

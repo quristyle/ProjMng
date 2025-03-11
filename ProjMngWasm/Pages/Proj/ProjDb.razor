@@ -1,0 +1,64 @@
+﻿@page "/projdb";
+
+@inherits BaseComponent
+
+<RadzenCard class="rz-my-6">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown TValue="string" CodeId="projlist" @bind-Value=srtype IsAll=true />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="12" >
+
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent ReqData=Data />
+
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+  public string srtype { get; set; }="";
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    await OnLoadWrk();
+  }
+
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+
+  protected async Task OnLoadWrk() {
+    Data = await JsiniService.GetList<Dictionary<string, object>>(new Dictionary<string, string>() { 
+    { "stp", "sp_projdblist" }
+    , { "proj_rid", srtype }
+    });
+  }
+
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var req = JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbsave" } });
+
+    var saveobj = await JsiniService.GetList<IDictionary<string, object>>(req);
+  }
+
+
+
+  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
+    var req = JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbdel" } });
+
+    var saveobj = await JsiniService.GetList<IDictionary<string, object>>(req);
+  }
+
+
+
+}
