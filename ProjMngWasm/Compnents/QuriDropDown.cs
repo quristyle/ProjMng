@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using ProjMngWasm.Commons;
 using ProjMngWasm.Services;
+using ProjModel;
 using Radzen.Blazor;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjMngWasm.Compnents;
 
 public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
-
   [Inject] protected IJsiniService JsiniService { get; set; }
-
   [Inject]  AppData appData { get; set; }
 
   public string _codeId;
   private string _previousCodeId;
-  [Parameter] public string CodeId { get { return _codeId; } set {
+  [Parameter] public string CodeId { 
+    get { return _codeId; } 
+    set {
       if (_codeId != value) {
         _codeId = value;
-        LoadItems();
+        //LoadItems();
       }
     }
   }
@@ -29,30 +26,34 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
 
   string _etc0;
-  [Parameter] public string Etc0 { get { return _etc0; } set {
+  [Parameter] public string Etc0 { 
+    get { return _etc0; } 
+    set {
       if (_etc0 != value) {
         _etc0 = value;
         if (!string.IsNullOrWhiteSpace(value)) {
-          LoadItems(true);
+          //LoadItems(true);
         }
       }
     }
   }
 
-  Dictionary<string, string> codeList = new Dictionary<string, string>() { { "11", "quristyle all" },
-  { "12", "quristyle wait" },
-  { "13", "ui userAll complete" } ,
-  { "14", "ui userAll wait" } ,
-  { "15", "ui userAll " } ,
-  }; //No longer needed here
+  //Dictionary<string, string> codeList = new Dictionary<string, string>() { { "11", "quristyle all" },
+  //{ "12", "quristyle wait" },
+  //{ "13", "ui userAll complete" } ,
+  //{ "14", "ui userAll wait" } ,
+  //{ "15", "ui userAll " } ,
+  //}; //No longer needed here
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
-    TextProperty = "Value";
-    ValueProperty = "Key";
+    //TextProperty = "Cd_Name";
+    //ValueProperty = "Cd_Id";
+    //TextProperty = "Cd_Name";
+    //ValueProperty = "Cd_Id";
 
 
-    
+
     //appData.GlobalDic.Add("projuser", codeList);
   }
 
@@ -67,11 +68,11 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     base.OnParametersSet();
     if (_previousCodeId != _codeId) {
       _previousCodeId = _codeId;
-      //await LoadItems();
+      await LoadItems();
     }
   }
 
-  bool isFrist = true;
+  //bool isFrist = true;
   async Task LoadItems(bool isRelod = false) {
 
 
@@ -82,7 +83,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     //}
 
 
-    List<KeyValuePair<string, string>> tmp = new List<KeyValuePair<string, string>>();
+    IEnumerable<CommonCode> tmp = new List<CommonCode>();
 
     if (!string.IsNullOrEmpty(_codeId)) {
       // isRelod
@@ -93,14 +94,14 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         Console.WriteLine($"isRelod LoadItems : {_codeId} etc0 : {_etc0}");
 
         // dictionary는 _codeId에 해당하는 Dictionary<string, string>입니다.
-        tmp = dictionary.ToList();
+        tmp = dictionary.AsEnumerable();
       }
       else if (string.IsNullOrWhiteSpace(_etc0) && appData.GlobalDic.TryGetValue(_codeId, out var dictionary2)) {
         // dictionary는 _codeId에 해당하는 Dictionary<string, string>입니다.
 
         Console.WriteLine($"Finder LoadItems : {_codeId} etc0 : {_etc0}");
 
-        tmp = dictionary2.ToList();
+        tmp = dictionary2.AsEnumerable();
       }
       else {
 
@@ -114,29 +115,43 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
                 { "etc0", Etc0 }
             });
 
-        Dictionary<string, string> dic = new Dictionary<string, string>();
+
+        List<CommonCode> dic = new List<CommonCode>();
         foreach (var d in data.Data) {
-          dic.Add(d["cd_id"], d["cd_name"]);
+
+          dic.Add(
+
+            new CommonCode() {
+              Cd_Id = d["cd_id"],
+              Cd_Name = d["cd_name"],
+              Cd_Desc = d["cd_desc"],
+              //Others = d,
+            }
+
+            );
         }
 
         if(!appData.GlobalDic.ContainsKey(_codeId)) {
           appData.GlobalDic.Add(_codeId, dic);
         }
-        tmp = dic.ToList();
+        tmp = dic.AsEnumerable();
+
+        //tmp = Enumerable.Range(0, 100).Select(i => new CommonCode() { Cd_Id = $"ID{i}", Cd_Name = $"Name{i}" });
+
       }
     }
     else {
       // If CodeId is empty or GlobalDic is null, provide a default or empty list
-      tmp = new List<KeyValuePair<string, string>>();
+      tmp = (new List<CommonCode>()).AsEnumerable();
     }
 
     if (IsAll) {
-      tmp.Insert(0, new KeyValuePair<string, string>("", "All"));
+      //tmp.Insert(0, new CommonCode() { Cd_Id="", Cd_Name="All", Cd_Desc="All items" });
       
     }
 
     Data = tmp;
-    if (!IsAll && tmp.Count > 0) {
+    //if (!IsAll && tmp.Count > 0) {
       /*
       var dt =  base.LoadData;
 
@@ -155,7 +170,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
       StateHasChanged();
       */
-    }
+    //}
   }
 
 

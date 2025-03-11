@@ -41,6 +41,23 @@
 
     public string Code { get; set; }
     public string Name { get; set; }
+    public string Cd_Id { get; set; }
+    public string Cd_Name { get; set; }
+    public string Cd_Desc { get; set; }
+    public Dictionary<string,string> Others { get; set; }
+
+
+    public override bool Equals(object o) {
+      var other = o as CommonCode;
+
+      return other?.Cd_Id == Cd_Id;
+    }
+
+
+    public override string ToString() {
+      return Cd_Name;
+    }
+
   }
 
   }

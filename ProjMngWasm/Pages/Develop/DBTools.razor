@@ -11,10 +11,52 @@
 <RadzenCard class="rz-my-6">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <QuriDropDown @bind-Value="projectName" CodeId="projdb2"> </QuriDropDown>
+      <QuriDropDown @bind-Value="projectName" CodeId="projlist"> </QuriDropDown>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <QuriDropDown @bind-Value="dbType" CodeId="dbType" > </QuriDropDown>
+
+
+
+
+      <QuriDropDown TValue="CommonCode" @bind-Value="dbType" CodeId="projdb" Name="db infomations"
+      
+      > </QuriDropDown>
+
+
+
+
+
+
+
+
+
+
+      <RadzenDropDown Data=@datax TValue="MyObject" @bind-Value=@singleValue
+                      TextProperty=@nameof(MyObject.Name) 
+                      AllowClear="true" AllowFiltering="true" Style="width: 100%; max-width: 400px;" Name="DropDownCustomObjects">
+      </RadzenDropDown>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
@@ -247,9 +289,53 @@ tabindex="@tabIndex"
 @code {
 
 
+
+  class MyObject {
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public override bool Equals(object o) {
+      var other = o as MyObject;
+
+      return other?.Id == Id;
+    }
+
+    public override string ToString() {
+      return $"Id: {Id}, Name: {Name}";
+    }
+
+    public override int GetHashCode() {
+      return base.GetHashCode();
+    }
+  }
+
+  MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
+  IEnumerable<MyObject> datax = Enumerable.Range(0, 100).Select(i => new MyObject() { Id = i, Name = $"Name{i}" });
+
+
+
+
+  CommonCode dbType = new CommonCode(){ Cd_Id="aaaa", Cd_Name="AAAAAAA"};
+
+
+
+
+
+
+
+
+
+
+
   [Inject] protected IDevService DevService { get; set; }
 
   [AllowNull]  private StandaloneCodeEditor _editor;
+
+
+  //public RadzenDropDown testDbType{get;set;}
+  
+  //string testDbType { get; set; }
+  IEnumerable<CommonCode> dbTypeList { get; set; }
 
 
   //_editor
@@ -281,9 +367,8 @@ tabindex="@tabIndex"
 
 string compnentTag = "RadzenDataGridColumn";
 
-  string dbType { get; set; }
 
-  string projectName { get; set; } //= "hanju_dev";
+ public string projectName { get; set; } //= "hanju_dev";
 
 
   
@@ -300,6 +385,21 @@ string compnentTag = "RadzenDataGridColumn";
 
 
   protected async Task OnLoad() {
+    
+    Console.WriteLine($"dbType {dbType}");
+    Console.WriteLine($"dbType.id {dbType.Cd_Id}");
+    Console.WriteLine($"dbType.name {dbType.Cd_Name}");
+    //singleValue
+
+    if (dbType == null){
+      Console.WriteLine("DbType 선택 필수");
+      return;
+    }
+
+   // Console.WriteLine($" testDbType : {testDbType?.SelectedItem}");
+
+    return;
+
     if (tabIndex == 0) {
       await LoadProc();
     }
@@ -311,9 +411,18 @@ string compnentTag = "RadzenDataGridColumn";
   }
 
   Dictionary<string, string> getParams(){
+
+
+
+
+
+
+
+
+
     return new Dictionary<string, string>() {
-    {"db",dbType},
-    {"dbnick",projectName},
+    //{"db",dbType.Others["db_type"]},
+    //{"dbnick",dbType.Others["db_nick"]},
     };
   }
 
