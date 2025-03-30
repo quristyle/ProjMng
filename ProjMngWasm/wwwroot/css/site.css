@@ -1,13 +1,23 @@
-@font-face {
+﻿/*@font-face {
   font-family: 'ChosunKm';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/ChosunKm.woff') format('woff');
 }
+*/
 
+/*@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css");*/
+
+
+:root {
+  --rz-layout-body-padding: 0.04rem 0 0 0.04rem !important;
+  --rz-body-font-size: 0.825rem !important;
+  --rz-tabs-padding: 0.25rem !important;
+}
 
 * {
-  font-family: Play, 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
+  font-family: Play, 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
+  font-weight: 100;
 }
 
 
@@ -110,9 +120,9 @@ text-decoration: none;
 /* next-demos */
 
 body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    --rz-body-font-size: 1rem;
+/*    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;*/
+    --rz-body-font-size: 0.825rem;
 }
 
 .light {
@@ -601,4 +611,24 @@ svg.illustration {
     inset-inline-start: 0;
     width: 100%;
     height: 100%;
+}
+
+
+
+
+
+
+
+
+/* 코드 에디터 */
+.code-editor {
+  height: 60vh;
+}
+
+/* notification */
+.rz-notification-content {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  font-size: 0.7rem;
+  margin: 1rem 0 0.6rem 0;
 }

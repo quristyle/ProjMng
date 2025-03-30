@@ -1,0 +1,84 @@
+﻿@page "/db-logic"
+@{
+  /* description : DB Type 별 로직
+  * title : DB Logic
+          * sort : 2
+          * credt : 2021-09-01
+          * author : quristyle
+          */
+}
+
+@using System.Diagnostics.CodeAnalysis
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown @bind-Value="dbType" CodeId="dbType" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+      <RadzenButton Click="@OnSaveWrk" Text="Save" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="3" >
+
+    <QuriDynamicGrid ReqData=Data @bind-SItems=SelectedItems HiddenCols="dsl_id,dsl_type,dsl_query,comm"  />
+
+  </RadzenColumn>  
+  
+  <RadzenColumn Size="9">
+    <StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="appData.FnPgsqlOtion" />
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+  CommonCode? dbType { get; set; }
+  private StandaloneCodeEditor? _editor;
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+  }
+  
+  IList<IDictionary<string, object>> _selectedItems { get; set; } = new List<IDictionary<string, object>>() { new Dictionary<string, object>() { { "dsl_query", "empty" } } };
+
+  public IList<IDictionary<string, object>> SelectedItems { 
+    get { return _selectedItems; } 
+    set { _selectedItems = value; 
+      Console.WriteLine($" page selecteditems set : {value}");
+      _editor.SetValue(_selectedItems[0]?["dsl_query"]+""); 
+    } 
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+  
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>("sp_projdbrspolist", new Dictionary<string, string>() {      
+     { "dsl_type", dbType?.Code??string.Empty }
+    });
+  }
+  protected async Task OnSaveWrk() {
+    // Task<string>을 string으로 받기 위해 await 사용
+    string editorValue = await _editor.GetValue();
+    _selectedItems[0]["dsl_query"] = editorValue;
+    var req = WasmUtil.JoinDictionaries(_selectedItems[0], new Dictionary<string, string>() {
+     { "dsl_type", dbType?.Code??string.Empty }
+    });
+
+    Data = await DbSave<Dictionary<string, object>>("sp_projdbrspolist", req);
+
+    await SysCont<Dictionary<string, object>>("refresh_appdata", req);
+
+
+
+
+  }
+
+}

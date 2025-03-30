@@ -1,0 +1,53 @@
+﻿@page "/proj-scaner";
+@page "/"
+@inherits PageBaseComponent
+@* description : Blazor Scanner *@
+<PageTitle>Jsini | Scaner - </PageTitle>
+
+<RadzenCard class="rz-my-6">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="12" >
+
+    <QuriDynamicGrid 
+    ReqData=Data
+    SaveBtnEvent=SaveBtnEvent
+                     IsEdit=true />
+
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+  CommonCode srtype { get; set; }
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    //await OnLoadWrk();
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+  protected async Task OnLoadWrk() {
+    Data = await MdCont<Dictionary<string, object>>("md_blazor_scan",new Dictionary<string, string>() {
+      // { "stp", "md_blazor_scan" }
+    });
+  }
+
+  private async Task SaveBtnEvent(IDictionary<string, object> args) {
+    var req = WasmUtil.JoinDictionaries(args, new Dictionary<string, string>() { });
+    await DbSave<Dictionary<string, object>>("sp_dev_program_exec", req);
+  }
+}

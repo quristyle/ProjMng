@@ -1,7 +1,7 @@
-﻿@page "/projmng";
+﻿@page "/dblogic-item";
 @{ 
-  /* description : 프로젝트 목록 관리
-   * title : 프로젝트
+  /* description : db logic items
+   * title : DbLogicItem
   * sort : 1
   * credt : 2021-09-01
   * author : quristyle
@@ -14,7 +14,6 @@
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-      <RadzenTextBox @bind-Value="srtype" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
@@ -46,11 +45,11 @@
   public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
-    Data = await DbCont<Dictionary<string, object>>("sp_projlist", new Dictionary<string, string>() { });
+    Data = await DbCont<Dictionary<string, object>>("sp_devsqlresp_base_exec", new Dictionary<string, string>() { });
   }
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {
-    var saveobj = await DbSave<IDictionary<string, object>>("sp_projdbsave", dic);
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_devsqlresp_base_exec", dic);
   }
 
 }

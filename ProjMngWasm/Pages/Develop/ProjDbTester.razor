@@ -1,0 +1,89 @@
+﻿@page "/projdb-tester";
+@{
+  /* description : DB 정보 테스트
+  * title : DB Query
+  * sort : 3
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown @bind-Value="srtype" CodeId="projlist" />
+      <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@srtype?.Code IsEtcFix=true />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Excute" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+  
+<RadzenSplitter Orientation="Orientation.Vertical"style=" border: 1px solid rgba(0,0,0,.08); height:90vh;">
+
+
+  <RadzenSplitterPane  Size="50%" Min="10%" Max="90%">
+
+      <StandaloneCodeEditor @ref="_editor"
+                            CssClass="code-editor"
+                          OnKeyDown=OnKeyDown
+                            ConstructionOptions="appData.FnPgsqlOtion" />
+
+    </RadzenSplitterPane>
+
+  <RadzenSplitterPane Size="50%" Min="10%" Max="90%">
+    <QuriDynamicGrid ReqData=Data />
+    </RadzenSplitterPane>
+
+    </RadzenSplitter>
+
+
+
+@code {
+
+  public CommonCode? srtype { get; set; }
+  CommonCode? dbType { get; set; }
+  private StandaloneCodeEditor? _editor;
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+  }
+
+  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+
+
+  protected async Task OnKeyDown(KeyboardEvent e) {
+
+    if (e.CtrlKey && e.KeyCode == KeyCode.Enter) {
+
+      await OnLoadWrk();
+
+    }
+
+
+  }
+
+  protected async Task OnLoadWrk() {
+
+      string query = await _editor.GetValue();
+
+      Data = await JsContQuery<Dictionary<string, object>>(dbType, query.Trim());
+
+
+
+
+  }
+
+
+
+
+
+}

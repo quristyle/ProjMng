@@ -3,23 +3,16 @@ using ProjModel;
 
 namespace ProjMngWasm.Services;
 
-public class JsiniService : BaseService {
+public class SysService : BaseService {
 
-  public JsiniService(IHttpClientFactory httpClientFactory) : base(httpClientFactory.CreateClient("jsini")) { }
+  public SysService(IHttpClientFactory httpClientFactory) : base(httpClientFactory.CreateClient("jsini")) { }
   public async Task<ResultInfo<T>> GetList<T>(string proc_name, IDictionary<string, string> dic, string proc_type = "srch", bool isFast = false) {
 
     if (string.IsNullOrEmpty(proc_name) || proc_name.Length < 3) {
       // 규칙위반
     }
     string calltype = proc_name.Substring(0, 2).ToLower();
-    string targetUrl = TargetUrl;
-    if (calltype == "sp") {
-      targetUrl = TargetUrl;
-      if (isFast) {
-        targetUrl = TargetUrlFast;
-      }
-    }
-    else if (calltype == "md") { targetUrl = TargetUrlMedia; }
+    string targetUrl = "api/Sys";
 
     Dictionary<string, string> req = new Dictionary<string, string>() {
       { "req_cname", proc_name }

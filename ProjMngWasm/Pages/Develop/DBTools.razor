@@ -1,62 +1,27 @@
 ﻿@page "/dbtool";
+@{
+  /* description : 개발자 DataBase Tools
+  * title : Dev DB Tool
+  * sort : 1
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
 @using ProjMngWasm.Models;
-@using ProjMngWasm.Models.Develop
 @using ProjMngWasm.Services;
 @using System.Diagnostics.CodeAnalysis
+@using System.Text.Json
 
+@inherits PageBaseComponent
+<PageTitle>Jsini | Scaner - 개발자 Tool</PageTitle>
 
-<PageTitle>개발자 Tool</PageTitle>
-
-
-<RadzenCard class="rz-my-6">
+<RadzenCard class="rz-my-1">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <QuriDropDown @bind-Value="projectName" CodeId="projlist"> </QuriDropDown>
+      <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-
-
-
-
-      <QuriDropDown TValue="CommonCode" @bind-Value="dbType" CodeId="projdb" Name="db infomations"
-      
-      > </QuriDropDown>
-
-
-
-
-
-
-
-
-
-
-      <RadzenDropDown Data=@datax TValue="MyObject" @bind-Value=@singleValue
-                      TextProperty=@nameof(MyObject.Name) 
-                      AllowClear="true" AllowFiltering="true" Style="width: 100%; max-width: 400px;" Name="DropDownCustomObjects">
-      </RadzenDropDown>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true  />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
@@ -64,64 +29,55 @@
   </RadzenStack>
 </RadzenCard>
 
-
-
-
 <RadzenTabs TabPosition="TabPosition.Top" 
 RenderMode="TabRenderMode.Client"
 tabindex="@tabIndex"
-            SelectedIndexChanged="@OnTableChange" >
-    <Tabs>
-        <RadzenTabsItem Text="Proc">
+SelectedIndexChanged="@OnTableChange" >
+  <Tabs>
+    <RadzenTabsItem Text="Proc">
 
 
 
 
-<RadzenCard class="rz-my-6">
+      <RadzenCard class="rz-my-6">
 
-  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-    <RadzenColumn Size="5">
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+          <RadzenColumn Size="5">
 
             <RadzenDataGrid @bind-Value=@selectedItems
-                            Style="height:60vh;"
-      Data="@data"
-                      TItem="ProcInfo"
-                            IsLoading=@isLoading
-      FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-      LogicalFilterOperator="LogicalFilterOperator.And"                      
-      AllowFiltering="true" 
-      AllowColumnResize="true" 
-      FilterMode="FilterMode.Simple"
-      SelectionMode="DataGridSelectionMode.Single"
-      AllowPaging="false" 
-      AllowSorting="true"
-      PagerHorizontalAlign="HorizontalAlign.Left"
+            Style="height:60vh;"
+            Data="@data"
+            TItem="ProcInfo"
+            IsLoading=@isLoading
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+            LogicalFilterOperator="LogicalFilterOperator.And"                      
+            AllowFiltering="true" 
+            AllowColumnResize="true" 
+            FilterMode="FilterMode.Simple"
+            SelectionMode="DataGridSelectionMode.Single"
+            AllowPaging="false" 
+            AllowSorting="true"
+            PagerHorizontalAlign="HorizontalAlign.Left"
 
-      ShowPagingSummary="true">
-        <Columns>
-          <RadzenDataGridColumn title="ProcName" Property="ProcedureName" />
-          <RadzenDataGridColumn title="Desc" Property="Description" />
-        </Columns>
-      </RadzenDataGrid>
+            ShowPagingSummary="true">
+              <Columns>
+                <RadzenDataGridColumn title="ProcName" Property="ProcedureName" />
+                <RadzenDataGridColumn title="Desc" Property="Description" />
+              </Columns>
+            </RadzenDataGrid>
 
-    </RadzenColumn>
-    
-    <RadzenColumn Size="7">
+          </RadzenColumn>
 
-
-            <StandaloneCodeEditor @ref="_editor"
-    CssClass="code-editor"
-            ConstructionOptions="EditorConstructionOptions" />
+          <RadzenColumn Size="7">
 
 
+                  <StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="appData.FnPgsqlOtion" />
 
 
+          </RadzenColumn>
+        </RadzenRow>
 
-
-    </RadzenColumn>
-  </RadzenRow>
-
-</RadzenCard>
+      </RadzenCard>
 
 
 
@@ -140,21 +96,21 @@ tabindex="@tabIndex"
           <RadzenColumn Size="4">
 
             <RadzenDataGrid @bind-Value=@selectedTable
-                            Style="height:60vh;"
-                            Data="@dataTb"
-                            TItem="TableInfo"
-                            IsLoading=@isLoading2
-                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                            LogicalFilterOperator="LogicalFilterOperator.And"
-                            AllowFiltering="true"
-                            AllowColumnResize="true"
-                            FilterMode="FilterMode.Simple"
-                            SelectionMode="DataGridSelectionMode.Single"
-                            AllowPaging="false"
-                            AllowSorting="true"
-                            PagerHorizontalAlign="HorizontalAlign.Left"
-                            RowSelect="@OnRowSelect"
-                            ShowPagingSummary="true">
+            Style="height:60vh;"
+            Data="@dataTb"
+            TItem="TableInfo"
+            IsLoading=@isLoading2
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            AllowFiltering="true"
+            AllowColumnResize="true"
+            FilterMode="FilterMode.Simple"
+            SelectionMode="DataGridSelectionMode.Single"
+            AllowPaging="false"
+            AllowSorting="true"
+            PagerHorizontalAlign="HorizontalAlign.Left"
+            RowSelect="@OnRowSelect"
+            ShowPagingSummary="true">
               <Columns>
                 <RadzenDataGridColumn title="TableName" Property="TableName" />
                 <RadzenDataGridColumn title="Desc" Property="Description" />
@@ -165,22 +121,22 @@ tabindex="@tabIndex"
 
 
 
-           <RadzenColumn Size="8">
+          <RadzenColumn Size="8">
 
             <RadzenDataGrid 
-                            Style="height:60vh;"
-                            Data="@dataCol"
-                            TItem="ColumnInfo"
-                            IsLoading=@isLoading3
-                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                            LogicalFilterOperator="LogicalFilterOperator.And"
-                            AllowColumnResize="true"
-                            SelectionMode="DataGridSelectionMode.Single"
-                            AllowPaging="false"
-                            AllowSorting="true"
-                            
-                            PagerHorizontalAlign="HorizontalAlign.Left"
-                            ShowPagingSummary="true">
+            Style="height:60vh;"
+            Data="@dataCol"
+            TItem="ColumnInfo"
+            IsLoading=@isLoading3
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            AllowColumnResize="true"
+            SelectionMode="DataGridSelectionMode.Single"
+            AllowPaging="false"
+            AllowSorting="true"
+
+            PagerHorizontalAlign="HorizontalAlign.Left"
+            ShowPagingSummary="true">
               <Columns>
                 <RadzenDataGridColumn title="ColunmName" Property="ColunmName" />
                 <RadzenDataGridColumn title="Desc" Property="Description" Width="150px" />
@@ -213,28 +169,33 @@ tabindex="@tabIndex"
 
     <RadzenTabsItem Text="Prop">
 
-<RadzenCard class="rz-my-6">
-  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
-    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-      <RadzenText @bind-value="compnentTag" />
-    </RadzenStack>
-  </RadzenStack>
-</RadzenCard>
+      <RadzenCard class="rz-my-6">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
+          <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenText >
+
+              @foreach(var dr in dataCol){
+                @($"{dr.ColunmName},")
+              }
+
+            </RadzenText>
+          </RadzenStack>
+        </RadzenStack>
+      </RadzenCard>
 
 
-<RadzenCard class="rz-my-6">
+      <RadzenCard class="rz-my-6">
 
-  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-    
-    <RadzenColumn Size="7">
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+
+          <RadzenColumn Size="7">
             <pre Style="height:60vh;">
-        @SelectedTableProp
-      </pre>
+              @SelectedTableProp
+            </pre>
+          </RadzenColumn>
+        </RadzenRow>
 
-    </RadzenColumn>
-  </RadzenRow>
-
-</RadzenCard>
+      </RadzenCard>
 
 
 
@@ -250,36 +211,107 @@ tabindex="@tabIndex"
 
 
 
-<RadzenCard >
-  
-  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+      <RadzenCard >
+
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
 
           <RadzenTextBox Value=@compnentTag />
 
         </RadzenRow>
 
-  <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem" >
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem" >
 
-    
-    <RadzenColumn Size="7">
+
+          <RadzenColumn Size="7">
             <pre Style="height:60vh;">
-        @SelectedTableGridColum
-      </pre>
+              @SelectedTableGridColum
+            </pre>
 
-    </RadzenColumn>
-  </RadzenRow>
+          </RadzenColumn>
+        </RadzenRow>
 
-</RadzenCard>
-
-
+      </RadzenCard>
 
 
-
-      
 
 
 
     </RadzenTabsItem>
+
+
+
+
+
+
+
+
+
+
+
+
+    <RadzenTabsItem Text="ProcMake">
+
+
+
+
+      <RadzenCard>
+
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
+
+          <RadzenTextBox Value=@compnentTag />
+
+        </RadzenRow>
+
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem">
+
+
+          <RadzenColumn Size="7">
+
+            <RadzenButton Click="@CopyTextToClipboard" Text="Copy"></RadzenButton>
+
+            <StandaloneCodeEditor @ref="_editProc" CssClass="code-editor" ConstructionOptions="appData.FnPgsqlOtion" />
+
+          </RadzenColumn>
+        </RadzenRow>
+
+      </RadzenCard>
+
+
+
+
+
+    </RadzenTabsItem>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -288,117 +320,45 @@ tabindex="@tabIndex"
 
 @code {
 
+  CommonCode? projectName { get; set; }
+  CommonCode? dbType { get; set; }
 
+  private StandaloneCodeEditor? _editor;
+  private StandaloneCodeEditor?   _editProc;
 
-  class MyObject {
-    public int Id { get; set; }
-    public string Name { get; set; }
-
-    public override bool Equals(object o) {
-      var other = o as MyObject;
-
-      return other?.Id == Id;
-    }
-
-    public override string ToString() {
-      return $"Id: {Id}, Name: {Name}";
-    }
-
-    public override int GetHashCode() {
-      return base.GetHashCode();
-    }
-  }
-
-  MyObject singleValue = new MyObject() { Id = 5, Name = "Name5" };
-  IEnumerable<MyObject> datax = Enumerable.Range(0, 100).Select(i => new MyObject() { Id = i, Name = $"Name{i}" });
-
-
-
-
-  CommonCode dbType = new CommonCode(){ Cd_Id="aaaa", Cd_Name="AAAAAAA"};
-
-
-
-
-
-
-
-
-
-
-
-  [Inject] protected IDevService DevService { get; set; }
-
-  [AllowNull]  private StandaloneCodeEditor _editor;
-
-
-  //public RadzenDropDown testDbType{get;set;}
-  
-  //string testDbType { get; set; }
-  IEnumerable<CommonCode> dbTypeList { get; set; }
-
-
-  //_editor
+  IEnumerable<CommonCode>? dbTypeList { get; set; }
 
   IList<ProcInfo> _selectedItems { get; set; } = new List<ProcInfo>() { new ProcInfo() { Routine_Definition = "empty" } };
-  IList<ProcInfo> selectedItems { get { return _selectedItems; } set { _selectedItems = value; _editor.SetValue(_selectedItems[0]?.Routine_Definition); } }
-  IList<TableInfo> selectedTable;
-  ProcInfo selected_pi;
-
-  // string _selectedString;
-  // string SelectedString { get { return selectedItems?[0].Routine_Definition; } set{ _selectedString = value; } }
-
-  string SelectedTableProp;
-  string SelectedTableGridColum;
-
-
-
-  
-  private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor) {
-    return new StandaloneEditorConstructionOptions {
-        AutomaticLayout = true,
-        Language = "pgsql",
-        Theme= "vs-dark",
-        StickyScroll = new EditorStickyScrollOptions(){
-          Enabled = false,
-        }
-      };
+  IList<ProcInfo> selectedItems { 
+    get { return _selectedItems; } 
+    set { _selectedItems = value;
+      _editor.SetValue(_selectedItems[0].Routine_Definition ?? string.Empty);
+    } 
   }
+  IList<TableInfo>? selectedTable;
+  //ProcInfo? selected_pi;
 
-string compnentTag = "RadzenDataGridColumn";
+  //string? SelectedColumnComma;
+  string? SelectedTableProp;
+  string? SelectedTableGridColum;
 
+  string compnentTag = "RadzenDataGridColumn";
 
- public string projectName { get; set; } //= "hanju_dev";
-
-
-  
   int tabIndex { get; set; } = 0;
 
-
-  
-  public IEnumerable<ProcInfo> data { get; set; }
-  public IEnumerable<TableInfo> dataTb { get; set; }
-  public IEnumerable<ColumnInfo> dataCol { get; set; }
+  public IEnumerable<ProcInfo>? data { get; set; }
+  public IEnumerable<TableInfo>? dataTb { get; set; }
+  public IEnumerable<ColumnInfo>? dataCol { get; set; }
   bool isLoading = false;
   bool isLoading2 = false;
   bool isLoading3 = false;
 
-
   protected async Task OnLoad() {
-    
-    Console.WriteLine($"dbType {dbType}");
-    Console.WriteLine($"dbType.id {dbType.Cd_Id}");
-    Console.WriteLine($"dbType.name {dbType.Cd_Name}");
-    //singleValue
 
     if (dbType == null){
       Console.WriteLine("DbType 선택 필수");
       return;
     }
-
-   // Console.WriteLine($" testDbType : {testDbType?.SelectedItem}");
-
-    return;
 
     if (tabIndex == 0) {
       await LoadProc();
@@ -412,18 +372,12 @@ string compnentTag = "RadzenDataGridColumn";
 
   Dictionary<string, string> getParams(){
 
-
-
-
-
-
-
-
-
     return new Dictionary<string, string>() {
-    //{"db",dbType.Others["db_type"]},
-    //{"dbnick",dbType.Others["db_nick"]},
-    };
+  {"db",dbType?.Others["db_type"]??string.Empty},
+  {"dbnick",dbType?.Others["db_nick"]??string.Empty},
+  {"schema",dbType?.Others["db_schema"]??string.Empty},
+
+  };
   }
 
   protected async Task LoadProc() {
@@ -432,7 +386,8 @@ string compnentTag = "RadzenDataGridColumn";
     dic.Add("stp", "proclist");
 
     isLoading = true;
-    data = await DevService.GetList<ProcInfo>(dic);
+    var ri = await DevService.GetList<ProcInfo>("proclist", dic);
+    data = ri.Data;
 
     if (data != null && data.ToList().Count > 0 ){
       selectedItems = new List<ProcInfo>(){ data.ToList().FirstOrDefault() };
@@ -440,12 +395,13 @@ string compnentTag = "RadzenDataGridColumn";
     isLoading = false;
   }
 
-  
+
   protected async Task LoadTable() {
     Dictionary<string, string> dic = getParams();
     dic.Add("stp", "tablelist");
     isLoading2 = true;
-    dataTb = await DevService.GetList<TableInfo>(dic);
+    var ri = await DevService.GetList<TableInfo>("tablelist", dic);
+    dataTb = ri.Data;
     isLoading2 = false;
   }
 
@@ -459,23 +415,115 @@ string compnentTag = "RadzenDataGridColumn";
 
 
 
-  async void OnRowSelect(TableInfo tableInfo) {
-
-
+  async Task OnRowSelect(TableInfo tableInfo) {
 
     Dictionary<string, string> dic = getParams();
     dic.Add("stp", "columnsOftable");
-    dic.Add("table_name", tableInfo.TableName);
+    dic.Add("table_name", tableInfo.TableName ?? string.Empty);
     isLoading3 = true;
-    dataCol = await DevService.GetList<ColumnInfo>(dic);
+    var ri = await DevService.GetList<ColumnInfo>("columnsOftable", dic);
+    dataCol = ri.Data;
 
     SelectedTableProp = "";
     SelectedTableGridColum = "";
-    foreach(var dr in dataCol){
-      SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}"+System.Environment.NewLine;
+
+    string sp_colstr = "";
+    string c_cols = "";
+    string _col = "";
+    foreach (var dr in dataCol) {
+      SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}" + System.Environment.NewLine;
       SelectedTableGridColum += $"<{compnentTag} title=\"{dr.ColunmName}\" Property=\"{dr.ColunmName}\" />" + System.Environment.NewLine;
+      if (!string.IsNullOrEmpty(sp_colstr)){
+        sp_colstr += "  , ";
+      }
+      else{
+        sp_colstr += "    ";
+      }
+      sp_colstr += $"IN p_{dr.ColunmName}  character varying {System.Environment.NewLine}";
+      if (!string.IsNullOrEmpty(c_cols)) {
+        c_cols += "  , ";
+      }
+      else {
+        c_cols += "    ";
+      }
+      c_cols += $"a.{dr.ColunmName} {System.Environment.NewLine}";
+      if (string.IsNullOrEmpty(_col)){
+        _col=dr.ColunmName;
+      }
     }
 
+    string nowdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+    string spStr = $@"
+/* description : 해당 테이블 또는 프로그램명 등..
+ * writer      : quristyle
+ * date        : {nowdate}
+ */
+CREATE OR REPLACE PROCEDURE projmng.sp_{tableInfo.TableName}_exec({System.Environment.NewLine}
+{sp_colstr}  , IN p_req_type character varying
+  , INOUT p_cur refcursor
+)
+ LANGUAGE plpgsql
+AS $procedure$
+
+declare
+
+	BEGIN
+
+
+
+    if p_req_type = 'save' then
+
+      if ( select count(*)
+             from projmng.{tableInfo.TableName}
+	        where {_col} = p_{_col} ) > 0 then
+
+	      update projmng.{tableInfo.TableName}
+	         set {_col} = p_{_col}
+	       where {_col} = p_{_col}
+	      ;
+
+      else
+
+	      insert into projmng.{tableInfo.TableName}
+	      ( {_col} )
+	      values
+	      ( p_{_col} )
+	      ;
+
+      end if;
+
+    end if;
+
+
+
+
+
+
+
+
+
+      open p_cur for
+
+      select {c_cols}
+        from projmng.{tableInfo.TableName} a
+       where 1=1
+         and ( ( nvl(p_{_col}, '') = '' and 1=1  )
+             or  ( nvl(p_{_col}, '') != '' and a.{_col} = p_{_col}::int )
+             )
+
+      ;
+
+
+	END;
+
+$procedure$
+;
+
+
+";
+
+
+  await  _editProc.SetValue(spStr);
 
     isLoading3 = false;
     StateHasChanged();
@@ -483,18 +531,16 @@ string compnentTag = "RadzenDataGridColumn";
   }
 
 
-  async void OnTableChange(int index) {
-    tabIndex = index;
-    //await OnLoad();
+  private async Task CopyTextToClipboard() {
+    var str = await _editProc.GetValue();
+
+   await JSRuntime.InvokeVoidAsync("copyClipboard", str);
   }
+
+async void OnTableChange(int index) {
+  tabIndex = index;
+}
 
 
 }
 
-
-
-    <style>
-  .code-editor{
-    height: 60vh;
-  }
-      </style>

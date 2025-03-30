@@ -1,23 +1,21 @@
-using Microsoft.OpenApi.Models;
-using ProjMngServer.Components;
+﻿using ProjMngServer;
 using ProjMngServer.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<DevService>();
 builder.Services.AddScoped<ProjService>();
-
-
-
+builder.Services.AddScoped<SysService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Register services
+builder.Services.AddSingleton<AppData>();
 
 var app = builder.Build();
 
@@ -31,10 +29,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-
 app.MapControllers();
-
-
 
 // Cors 정보 등록
 app.UseCors(cors => cors
@@ -47,7 +42,4 @@ app.UseCors(cors => cors
            );
 //Cors 정보 등록
 
-
-
 app.Run();
-

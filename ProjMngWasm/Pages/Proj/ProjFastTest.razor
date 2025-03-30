@@ -1,0 +1,100 @@
+﻿@page "/proj-fasttest"
+
+
+@inherits PageBaseComponent
+
+<PageTitle>Jsini | Tester - </PageTitle>
+
+<RadzenCard class="rz-my-6">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      @* <QuriDropDown CodeId="projlist" @bind-Value=srtype /> *@
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="12" >
+
+
+    @* FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" *@
+
+    @* LogicalFilterOperator="LogicalFilterOperator.And" *@
+
+
+    <RadzenDataGrid 
+                    AllowFiltering="true"
+                    AllowColumnResize="true"
+                    FilterMode="FilterMode.Simple"
+                    SelectionMode="DataGridSelectionMode.Single"
+                    AllowPaging="true"
+                    AllowSorting="true"
+                    PageSize=10
+                    PagerHorizontalAlign="HorizontalAlign.Left"
+                    PagerAlwaysVisible=true
+                    PagerPosition=PagerPosition.TopAndBottom
+                    ShowPagingSummary="true"
+                    
+                    Data=Data>
+      <Columns>
+
+        <RadzenDataGridColumn Property="datetime"
+                              Type="@Type.GetType("System.DateTime")"
+                                  Title="datetime" 
+            MinWidth="7rem">
+
+
+
+          </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Property="aaa"
+                              Type="@Type.GetType("System.String")"
+                              Title="name"
+                              MinWidth="7rem">
+
+
+
+        </RadzenDataGridColumn>
+
+
+    </Columns>
+    </RadzenDataGrid>
+
+  </RadzenColumn>
+</RadzenRow>
+
+
+
+@code {
+
+public IEnumerable<TestClass> Data { get; set; } 
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+  }
+
+  protected async Task OnLoadWrk() {
+
+    List<TestClass> testClasses = new List<TestClass>();
+
+    testClasses.Add(new TestClass() { datetime = DateTime.Now });
+    testClasses.Add(new TestClass() { datetime = DateTime.Now, aaa="aaa" });
+    testClasses.Add(new TestClass() { aaa = "bbb"  });
+
+    Data = testClasses;
+  }
+
+
+  public class TestClass {
+    public DateTime? datetime { get; set; }
+    public string? aaa { get; set; }
+
+  }
+
+}

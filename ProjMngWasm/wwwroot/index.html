@@ -33,7 +33,7 @@
     <div class="text-center pt-3" style="color: white; font-size: 16pt; z-index: 9999; position: relative;">
       Loading...
     </div>
-    <div class="text-center mt-3" style="z-index: 9999; position: relative;">
+    <div class="text-center mt-3" style="z-index: 9999; position: relative; display:none;">
       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
             style="font-size: 16pt; width: 36px; height: 36px; color: white" />
     </div>
@@ -50,7 +50,7 @@
 
 
 
-  <div id="blazor-error-ui" style="display:none;visibility:hidden;position:absolute;left:999999;top:999999999999999;" >
+  <div id="blazor-error-ui" style="display:none;visibility:hidden;position:absolute;left:999999;top:999999999999999;">
     <!--An unhandled error has occurred.-->
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
@@ -63,6 +63,15 @@
   <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
 
 
-</body>
+  <script>
+    window.copyClipboard = function (text) {
+      window.focus();
+      navigator.clipboard.writeText(text).then(function () {
+        console.log('Text copied to clipboard');
+      }).catch(function (error) {
+        console.error('Could not copy text: ', error);
+      });
+    };
+  </script>
 
-</html>
+</body></html>

@@ -1,12 +1,20 @@
 ﻿@page "/projdb";
+@{
+  /* description : 프로젝트 목록 관리
+  * title : 프로젝트 DB
+      * sort : 2
+      * credt : 2021-09-01
+      * author : quristyle
+      */
+}
 
-@inherits BaseComponent
+@inherits PageBaseComponent
 
-<RadzenCard class="rz-my-6">
+<RadzenCard class="rz-my-1">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-      <QuriDropDown TValue="string" CodeId="projlist" @bind-Value=srtype IsAll=true />
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
@@ -19,44 +27,41 @@
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
   <RadzenColumn Size="12" >
 
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent ReqData=Data />
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent ReqData=Data IsEdit=true  />
 
   </RadzenColumn>
 </RadzenRow>
 
 @code {
 
-  public string srtype { get; set; }="";
+  public CommonCode? srtype { get; set; }
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
-    await OnLoadWrk();
   }
 
-
-  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
 
 
   protected async Task OnLoadWrk() {
-    Data = await JsiniService.GetList<Dictionary<string, object>>(new Dictionary<string, string>() { 
-    { "stp", "sp_projdblist" }
-    , { "proj_rid", srtype }
+    Data = await DbCont<Dictionary<string, object>>("sp_projdblist", new Dictionary<string, string>() {
+    { "proj_rid",  srtype?.Code ?? string.Empty }
     });
   }
 
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {
-    var req = JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbsave" } });
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbsave" } });
 
-    var saveobj = await JsiniService.GetList<IDictionary<string, object>>(req);
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_projdbsave", req);
   }
 
 
 
   private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
-    var req = JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbdel" } });
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
 
-    var saveobj = await JsiniService.GetList<IDictionary<string, object>>(req);
+    var saveobj = await DbDelete<IDictionary<string, object>>("sp_projdbdel", req);
   }
 
 

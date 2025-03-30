@@ -1,0 +1,374 @@
+﻿@page "/proj-table-comment";
+@{
+  /* description : 테이블 관리
+  * title : 테이블 관리
+  * sort : 2
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
+@inherits PageBaseComponent
+
+
+<PageTitle>Jsini | Programs - </PageTitle>
+
+<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:90vh;">
+
+
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="50%" Min="10%" Max="90%">
+
+    <!-- 왼쪽 컨텐츠 -->
+    <RadzenSplitter Orientation="Orientation.Vertical">
+      <!-- 왼쪽 위 컨텐츠 -->
+      <RadzenSplitterPane Size="60%" Min="10%" Max="90%">
+        <!-- 왼쪽 조회부 -->
+        <RadzenStack Orientation="Orientation.Horizontal" Style="height:38px;" Gap="4px">
+
+          <QuriDropDown @bind-Value="tableName" CodeId="projlist" />
+          <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@tableName?.Code IsEtcFix=true />
+          <RadzenButton Click="@Search" Text="Search" />
+
+        </RadzenStack>
+
+        <!-- left table -->
+        <RadzenStack Orientation="Orientation.Vertical" Style="height:calc(100% - 38px);" Gap="4px">
+
+
+          <RadzenDataGrid @bind-Value=@selectedTable
+          Style="height:100%;"
+          Data="@Data"
+          TItem="TableInfo"
+          IsLoading=@isLoading
+          RowSelect=OnRowSelect
+          FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+          LogicalFilterOperator="LogicalFilterOperator.And"
+          AllowFiltering="true"
+          AllowColumnResize="true"
+          FilterMode="FilterMode.Simple"
+          SelectionMode="DataGridSelectionMode.Single"
+          AllowPaging="false"
+          AllowSorting="true"
+          PagerHorizontalAlign="HorizontalAlign.Left"
+          ShowPagingSummary="true">
+            <Columns>
+              <RadzenDataGridColumn title="TableName" Property="TableName" />
+              <RadzenDataGridColumn title="Desc" Property="Description" />
+            </Columns>
+          </RadzenDataGrid>
+
+
+
+        </RadzenStack>
+
+      </RadzenSplitterPane>
+
+      <!-- 왼쪽 아래 컨텐츠 -->
+      <RadzenSplitterPane Size="40%" Min="10%" Max="90%">
+
+        <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%;" Gap="4px">
+          <!-- left columns -->
+      
+
+            <RadzenDataGrid Style="height:100%;"
+            @bind-Value=@selectedColumn
+            Data="@dataCol"
+            TItem="ColumnInfo"
+            IsLoading=@isLoading2
+            RowSelect=OnRowSelectCol
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            AllowColumnResize="true"
+            SelectionMode="DataGridSelectionMode.Single"
+            AllowPaging="false"
+            AllowSorting="true"
+            PagerHorizontalAlign="HorizontalAlign.Left"
+            ShowPagingSummary="true">
+              <Columns>
+                <RadzenDataGridColumn title="ColunmName" Property="ColunmName" />
+                <RadzenDataGridColumn title="Desc" Property="Description" Width="150px" />
+                <RadzenDataGridColumn title="Type" Property="Type_NM" />
+                <RadzenDataGridColumn title="Null" Property="NullAble" />
+                <RadzenDataGridColumn title="Ident" Property="Ident" />
+              </Columns>
+            </RadzenDataGrid>
+
+
+
+        </RadzenStack>
+      </RadzenSplitterPane>
+
+    </RadzenSplitter>
+
+  </RadzenSplitterPane>
+
+
+  <!-- 오른쪽 -->
+  <RadzenSplitterPane Size="50%" Min="10%" Max="90%" >
+
+
+    <!-- 오른쪽 컨텐츠 -->
+    <RadzenSplitter Orientation="Orientation.Vertical">
+      <!-- 오른쪽 위 컨텐츠 -->
+      <RadzenSplitterPane Size="60%" Min="10%" Max="90%" Style="height:100%;">
+
+        <!-- 오른쪽 조회부 -->
+        <RadzenStack Orientation="Orientation.Vertical" Style="height:100%;" Gap="4px">
+
+          <RadzenStack Orientation="Orientation.Horizontal" Style="height:38px;" Gap="4px">
+            <QuriDropDown @bind-Value="projectName2" CodeId="projlist" />
+            <QuriDropDown @bind-Value="dbType2" CodeId="projdb" Etc0=@projectName2?.Code IsEtcFix=true />
+            <div class="rz-p-2 rz-text-align-center">
+              <RadzenCheckBox @bind-Value="IsSameTable" title="Exsit Description" Name="SameTableCB" />
+              <RadzenLabel Text="동일 테이블명" Component="SameTableCB" class="rz-ms-2 rz-me-2" />
+              <RadzenCheckBox @bind-Value="IsExsitDesc" title="Exsit Description" Name="ExsitColumnCommentCB" />
+              <RadzenLabel Text="코멘트 존재" Component="ExsitColumnCommentCB" class="rz-ms-2" />
+            </div>
+            <RadzenButton Click=FindProc Text="프로시저추적" />
+          </RadzenStack>
+
+          <RadzenStack Orientation="Orientation.Vertical" Style="height:calc(100% - 38px);" Gap="4px">
+
+            <QuriDynamicGrid ActionBtnEvent=OnTableCommentSave  ReqData=DataMenu  IsLoading=isLoading3 />
+
+          </RadzenStack>
+
+        </RadzenStack>
+
+      </RadzenSplitterPane>
+
+
+      <!-- 오른쪽 아래 컨텐츠 -->
+      <RadzenSplitterPane Size="40%" Min="10%" Max="90%">
+
+        <RadzenStack Orientation="Orientation.Vertical" Style="height:100%;" Gap="4px">
+           
+          <QuriDynamicGrid ActionBtnEvent=OnProcCommentSave  ReqData=DataProc  IsLoading=isLoading4 />
+           
+        </RadzenStack>
+
+      </RadzenSplitterPane>
+
+    </RadzenSplitter>
+
+
+
+
+  </RadzenSplitterPane>
+
+
+</RadzenSplitter>
+
+
+
+
+
+
+
+
+
+
+@code {
+
+  CommonCode tableName { get; set; }
+  CommonCode projectName2 { get; set; }
+
+  CommonCode dbType { get; set; }
+  CommonCode dbType2 { get; set; }
+
+  bool isLoading { get; set; }
+  bool isLoading2 { get; set; }
+  bool isLoading3 { get; set; }
+  bool isLoading4 { get; set; }
+
+  IList<TableInfo> selectedTable;
+  //IList<TableInfo> selectedTable2;
+  IList<ColumnInfo> selectedColumn;
+  //IList<ColumnInfo> selectedColumn2;
+
+
+  public IEnumerable<TableInfo> Data { get; set; }
+  public IEnumerable<ColumnInfo> dataCol { get; set; }
+
+  public ResultInfo<Dictionary<string, object>> DataMenu { get; set; }
+
+  //public IList<IDictionary<string, object>> selectedTProc { get; set; } = new List<IDictionary<string, object>>() { new Dictionary<string, object>() { { "dsl_query", "empty" } } };
+
+
+  public ResultInfo<Dictionary<string, object>> DataProc { get; set; }
+
+
+
+
+
+
+  bool IsSameTable { get; set; }
+  bool IsExsitDesc { get; set; }
+
+  public IList<IDictionary<string, object>>? SelectedItems { get; set; }
+  public IList<IDictionary<string, object>>? SelectedItemsMenu { get; set; }
+  string FoldName { get; set; }
+  string MenuName { get; set; }
+
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+  }
+
+
+  // 왼쪽 테이블 조회
+  async Task Search() {
+
+    isLoading = true;
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+  {"db",dbType.Others["db_type"]},
+  {"dbnick",dbType.Others["db_nick"]},
+  {"schema",dbType.Others["db_schema"]},
+  {"stp", "tablelist"},
+
+  };
+    // Data = await DevService.GetList<TableInfo>(dic);
+    var ri = await JsCont<TableInfo>("tablelist", dic);
+    Data = ri.Data;
+    isLoading = false;
+  }
+
+
+
+
+  // 왼쪽 테이블의 칼럼 조회
+  async Task OnRowSelect(TableInfo tableInfo) {
+    isLoading2 = true;
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType.Others["db_type"]},
+      {"dbnick",dbType.Others["db_nick"]},
+      {"schema",dbType.Others["db_schema"]},
+      {"stp", "columnsOftable"},
+      {"table_name", tableInfo.TableName},
+
+      };
+
+
+    var ri = await JsCont<ColumnInfo>("columnsOftable", dic);
+    dataCol = ri.Data;
+    isLoading2 = false;
+    StateHasChanged();
+  }
+
+
+  // 왼쪽 테이블의 칼럼 선택
+  async Task OnRowSelectCol(ColumnInfo colInfo) {
+    isLoading3 = true;
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType2.Others["db_type"]},
+      {"dbnick",dbType2.Others["db_nick"]},
+      {"schema",dbType2.Others["db_schema"]},
+      {"stp", "columnOftable"},
+      {"table_name", colInfo.TableName},
+      {"column_name", colInfo.ColunmName},
+      {"same_talbe", IsSameTable?"Y":""  },
+      {"exsit_desc", IsExsitDesc?"Y":""  },
+
+      };
+
+    var ri = await JsCont<Dictionary<string, object>>("columnOftable", dic);
+    DataMenu = ri;
+
+
+    isLoading3 = false;
+
+  }
+
+
+
+  // 왼쪽 테이블의 칼럼 선택
+  async Task FindProc() {
+    isLoading4 = true;
+
+    Dictionary<string, string> dic2 = new Dictionary<string, string>() {
+      {"db",dbType2.Others["db_type"]},
+      {"dbnick",dbType2.Others["db_nick"]},
+      {"schema",dbType2.Others["db_schema"]},
+      {"stp", "proclistFind"},
+      {"table_name", selectedColumn[0].TableName},
+      {"column_name", selectedColumn[0].ColunmName},
+      {"same_talbe", IsSameTable?"Y":""  },
+      {"exsit_desc", IsExsitDesc?"Y":""  },
+
+      };
+
+
+    var ri2 = await JsCont<Dictionary<string, object>>("proclistFind", dic2);
+    DataProc = ri2;
+
+    isLoading4 = false;
+
+  }
+
+
+
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+    //var saveobj = await JsiniService.GetList<"sp_projwbssave",IDictionary<string, object>>(req);
+  }
+
+
+  private async Task SaveBtnEventMenu(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+    await DbSave<IDictionary<string, object>>("sp_dev_menu_exec",req);
+  }
+
+  private async Task DeleteBtnEventMenu(IDictionary<string, object> dic) {
+    var d = WasmUtil.JoinConvert(dic);
+    await DbDelete<IDictionary<string, object>>("sp_dev_menu_exec", d);
+  }
+
+  private void OnTableCommentSave(IDictionary<string, object> args) {
+    MakeMenu(args["colDescription"].ToString());
+
+    Notify(NotificationSeverity.Info, "OnTableCommentSave", $" {args["colDescription"].ToString()} ", 2000);
+
+  }
+
+  private void OnProcCommentSave(IDictionary<string, object> args)  {
+    string val = GetDicValueStr(args, "commentText");
+    MakeMenu(val);
+    Notify(NotificationSeverity.Info, "OnProcCommentSave", $" {val} ", 2000);
+
+  }
+
+
+  private async Task MakeMenu(string coldesc) {
+
+    if (selectedTable == null || selectedColumn == null ) {
+      Notify(NotificationSeverity.Info, "Need To Choice", $"좌우 필수 선택 selectedTable : {(selectedTable == null)} selectedColumn : {(selectedColumn == null)}", 5000, false);
+      return;
+    }
+
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType.Others["db_type"]},
+      {"dbnick",dbType.Others["db_nick"]},
+      {"schema",dbType.Others["db_schema"]},
+      {"table_name", selectedTable[0].TableName},
+      {"column_name", selectedColumn[0].ColunmName},
+      {"column_desc", coldesc},
+
+      };
+
+    //await DevService.GetList<ColumnInfo>("columnsCommentUpdate", dic);
+    var result = await JsCont<ColumnInfo>("columnsCommentUpdate", dic);
+    if( result.Code < 0){
+        await JsCont<ColumnInfo>("columnsCommentAdd", dic);
+    }
+
+
+  }
+
+
+
+
+
+
+
+}

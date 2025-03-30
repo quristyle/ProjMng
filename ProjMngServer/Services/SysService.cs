@@ -6,9 +6,9 @@ using System.Dynamic;
 
 namespace ProjMngServer.Services;
 
-public class ProjService : BaseService {
+public class SysService : BaseService {
 
-  public ProjService(IConfiguration configuration) { _configuration = configuration; }
+  public SysService(IConfiguration configuration) { _configuration = configuration; }
 
   public ResultInfo<dynamic> GetData(string procedureName, Dictionary<string, string> param) {
 
@@ -180,21 +180,16 @@ public class ProjService : BaseService {
     return ri;
   }
 
-  public ResultInfo<dynamic> GetMdData(string action_name, Dictionary<string, string> param) {
+
+  /// <summary> AppData clear </summary>
+  public ResultInfo<dynamic> AppDataClear(string action_name, Dictionary<string, string> param) {
 
     ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
 
-    IEnumerable<dynamic> aaa = BlazorUtil.GetBlazorMenuList();
-    ri.Cols = new Dictionary<string, string>() {
-      { "name", "System.String"}, 
-      { "fullname", "System.String"}, 
-      { "dir", "System.String"}, 
-      { "url", "System.String"}, 
-      { "title", "System.String"}
-    };
-    ri.Data = aaa.ToList();
+    AppData.DB_Infos.Clear();
+    AppData.DsrInfos.Clear();
 
-     GetRes(ref ri, param, DateTime.Now, DateTime.Now, DateTime.Now);
+
     return ri;
   }
 

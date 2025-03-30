@@ -9,213 +9,297 @@ using System.Security.Cryptography;
 using Npgsql;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using System.Dynamic;
+using System.Runtime.Intrinsics.Arm;
+using System.Reflection.Metadata;
+using static System.Net.WebRequestMethods;
+using Microsoft.Extensions.Primitives;
 
-namespace ProjMngServer.Services {
-  public class DevService : IDevService {
+namespace ProjMngServer.Services;
+public class DevService : BaseService {
 
-
-    private readonly IConfiguration _configuration;
-
-    public DevService(IConfiguration configuration) {
-      _configuration = configuration;
-    }
-
-
-    public IEnumerable<dynamic> DevExecuteQuery(Devsqlresp dsr, Dictionary<string, string> param) {
-      //var connectionString = _configuration.GetConnectionString(dsr.DbConnectionString);
-
-if(dsr.Dsl_type == "POSTGRESQL" ){
+  public DevService(IConfiguration configuration) { _configuration = configuration; }
 
 
+  public ResultInfo<dynamic> GetDataQuery(string dbNick, string query) {
 
+    ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
 
-      using (IDbConnection db = new NpgsqlConnection(dsr.DbConnectionString)) {
+    DateTime sdt = DateTime.Now;
 
-        var matches = Regex.Matches(dsr.Dsl_query, @"@\w+");
-        string[] kkk = matches.Select(m => m.Value).ToArray();
-        if (kkk != null && kkk.Length > 0) {
-          Dictionary<string,string> dic = new Dictionary<string,string>(); 
+    DbInfo di = GetDbInfo(dbNick);
 
-          //var dic = new { DbNick = "" };
+    IDbConnection db = null;
+    IDataReader rdr = null;
+    try {
 
-          foreach (string str in kkk) {
-            dic.Add(str.Replace("@", ""),  (param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty)     );
-          }
-
-
-          var parameters = new DynamicParameters();
-          foreach (string str in kkk) {
-            parameters.Add(str.Replace("@", ""), param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty);
-          }
-
-          Debug.WriteLine("exsit prames run  " );
-          return db.Query(sql: dsr.Dsl_query, param : parameters);
-        }
-        else {
-          Debug.WriteLine("not exsit prames  ");
-          return db.Query(sql: dsr.Dsl_query);
-        }
-
+      if (di.Db_type == "POSTGRESQL") {
+        db = new NpgsqlConnection(di.ToConnectionString());
       }
-}
-      else{
-
-
-      using (IDbConnection db = new SqlConnection(dsr.DbConnectionString)) {
-
-        var matches = Regex.Matches(dsr.Dsl_query, @"@\w+");
-        string[] kkk = matches.Select(m => m.Value).ToArray();
-        if (kkk != null && kkk.Length > 0) {
-          Dictionary<string,string> dic = new Dictionary<string,string>(); 
-
-          //var dic = new { DbNick = "" };
-
-          foreach (string str in kkk) {
-            dic.Add(str.Replace("@", ""),  (param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty)     );
-          }
-
-
-          var parameters = new DynamicParameters();
-          foreach (string str in kkk) {
-            parameters.Add(str.Replace("@", ""), param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty);
-          }
-
-          Debug.WriteLine("exsit prames run  " );
-          return db.Query(sql: dsr.Dsl_query, param : parameters);
-        }
-        else {
-          Debug.WriteLine("not exsit prames  ");
-          return db.Query(sql: dsr.Dsl_query);
-        }
-
-      }
-
+      else if (di.Db_type == "MSSQL") {
+        db = new SqlConnection(di.ToConnectionString());
       }
 
 
 
-    }
+      rdr = db.ExecuteReader(sql: query);
 
+      var resultList = new List<dynamic>();
 
+      while (rdr.Read()) {
 
+        var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+        string nm = "";
+        object oval = null;
+        //string empty = null;
+        for (int i = 0; i < rdr.FieldCount; i++) {
+          nm = rdr.GetName(i);
+          oval = rdr.GetValue(i);
 
-
-    public static Dictionary<string, string> db_constring = new Dictionary<string, string>();
-
-    string mssqlConstrFormat = @"Server={0},{1};Database={2};User Id={3};Password={4};{5}";
-    //Server=mitddns02.iptime.org,14344;Database=mitERP_HANJU;User Id=sa;Password=mit0104!;TrustServerCertificate=True
-    string postgresqlConstrFormat = @"Host={0};Port={1};Database={2};Username={3};Password={4}";
-    //Host=jsini.co.kr;Port=15432;Database=jsini;Username=jsini;Password=jsini
-    string mysqlConstrFormat = @"Server={0},{1};Database={2};User Id={3};Password={4};{5}";
-
-    Devsqlresp GetQuery(string dsl_type = "MSSQL", string dsl_cd = "proclist", string db_nick= "hanju_dev") {
-      if (string.IsNullOrEmpty(dsl_type)) dsl_type = "MSSQL";
-      if (string.IsNullOrEmpty(dsl_cd)) dsl_cd = "proclist";
-      if (string.IsNullOrEmpty(db_nick)) db_nick = "hanju_dev";
-
-      Debug.WriteLine("dsl_type: " + dsl_type);
-      Debug.WriteLine("dsl_cd: " + dsl_cd);
-      Debug.WriteLine("db_nick: " + db_nick);
-
-      var connectionString = _configuration.GetConnectionString("jsini");
-
-      Debug.WriteLine("connectionString: " + connectionString);
-
-      string query = @"
-select d.* 
-  from projmng.devsqlresp d 
- where dsl_type = '"+ dsl_type + @"'
-   and dsl_cd = '"+ dsl_cd + @"'
-";
-      Devsqlresp dsr = null;
-      using (IDbConnection db = new NpgsqlConnection(connectionString)) {
-        dsr= db.Query< Devsqlresp>(sql: query).ToList().FirstOrDefault();
-
-        Debug.WriteLine("dsr.Dsl_query: " + dsr.Dsl_query);
-        Debug.WriteLine("dsr.Dsl_cd: " + dsr.Dsl_cd);
-        Debug.WriteLine("dsr.Dsl_type: " + dsr.Dsl_type);
-
-
-      }
-
-      dsr.DbConnectionString = GetConstring(db_nick);
-      Debug.WriteLine("dsr.DbConnectionString: " + dsr.DbConnectionString);
-
-      return dsr;
-    }
-
-
-
-string db_nick_key = "@db_nick";
-string dbConQuery = @"
-select db_ip, db_port, db_database, db_id, db_pwd, db_cert, db_comm, db_nick, db_type
-  from projmng.devdbinfo d 
- where db_nick = @db_nick
-";
-    string GetConstring(string db_nick) {
-
-      string result = db_constring.TryGetValue(db_nick, out var dbValue) ? dbValue.ToString() : string.Empty;
-
-      if (string.IsNullOrEmpty(result)) { // 없으면 가져온다.
-
-        var connectionString = _configuration.GetConnectionString("jsini");
-        using (IDbConnection db = new NpgsqlConnection(connectionString)) {
-
-          var parameters = new DynamicParameters();
-          parameters.Add(db_nick_key, db_nick);
-          DbInfo dbinfo = db.Query<DbInfo>(sql: dbConQuery, param: parameters).ToList().FirstOrDefault();
-          switch (dbinfo.Db_type) {
-            case "MSSQL":
-              result = string.Format(mssqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd, dbinfo.Db_cert);
-              break;
-            case "POSTGRESQL":
-              result = string.Format(postgresqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd);
-              break;
-            case "MYSQL":
-              result = string.Format(mysqlConstrFormat, dbinfo.Db_ip, dbinfo.Db_port, dbinfo.Db_database, dbinfo.Db_id, dbinfo.Db_pwd);
-              break;
+          // oval 값이 Dbnull 인 경우 json 으로 {} 넘어 간다... 이를 클라이언트에서 처리시 잘못하면 parse error 가 난다.
+          if (oval.GetType() == typeof(System.DBNull)) {
+            expandoObject.Add(nm, null);
           }
-          db_constring[db_nick] = result;
+          else {
+            expandoObject.Add(nm, oval);
+          }
         }
+        resultList.Add(expandoObject);
       }
 
-      return result;
+
+
+      ri.Cols = GetColumns(rdr);
+
+      ri.Data = resultList;
+
+
+
+
+
+
+
+
+
+
+    }
+    catch (Exception e) {
+      ri.Code = -99;
+      ri.Message = e.Message;
+    }
+    finally {
+      if (rdr != null) { rdr.Close(); rdr.Dispose(); }
+      if (db != null) { db.Close(); db.Dispose(); }
     }
 
-
-    public Dictionary<string, object> GetData(Dictionary<string, string> param) {
-
-      // 조회목적      [stp]: srch type .. db 관련, code 관련, file 관련, etc
-      // 조회대상      [sta]: db, project code, doc 
-      // 조회대상 세부  [sob]: table, proc, view, func, columns
-      // 조회조건      [sva]: 조건값
-
-      string db = param.TryGetValue("db", out var dbValue) && dbValue != null ? dbValue.ToString() : string.Empty;
-      string stp = param.TryGetValue("stp", out var stpValue) && stpValue != null ? stpValue.ToString() : string.Empty;
-      string sta = param.TryGetValue("sta", out var staValue) && staValue != null ? staValue.ToString() : string.Empty;
-      string sob =   param.TryGetValue("sob", out var sobValue) && sobValue != null ? sobValue.ToString() : string.Empty;
-      string proj =              param.TryGetValue("proj", out var projValue) && projValue != null ? projValue.ToString() : string.Empty;
-      string dbNick =           param.TryGetValue("dbnick", out var dbNickValue) && dbNickValue != null ? dbNickValue.ToString() : string.Empty;
-      string sva =          param.TryGetValue("sva", out var svaValue) && svaValue != null ? svaValue.ToString() : string.Empty;
+    return ri;
 
 
-      Devsqlresp dsr = GetQuery(db, stp, dbNick);
-      dsr.Proj = proj;
-
-      var aaa = DevExecuteQuery(dsr, param);
-
-      var data = new Dictionary<string, object>      {
-                { "Rec", param },
-                { "result", aaa  }
-            };
-
-      return data;
-    }
   }
 
-  interface IDevService {
-    Dictionary<string, object> GetData(Dictionary<string, string> parameters); 
-    //IEnumerable<dynamic> ExecuteQuery(string query, string connectionStringName);
+  public ResultInfo<dynamic> GetData(Dictionary<string, string> param) {
+
+    //ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
+
+    DateTime sdt = DateTime.Now;
+    string dbtype = param.TryGetValue("db", out var dbValue) && dbValue != null ? dbValue.ToString() : string.Empty;
+    string stp = param.TryGetValue("stp", out var stpValue) && stpValue != null ? stpValue.ToString() : string.Empty;
+    string sta = param.TryGetValue("sta", out var staValue) && staValue != null ? staValue.ToString() : string.Empty;
+    string sob = param.TryGetValue("sob", out var sobValue) && sobValue != null ? sobValue.ToString() : string.Empty;
+    string proj = param.TryGetValue("proj", out var projValue) && projValue != null ? projValue.ToString() : string.Empty;
+    string dbNick = param.TryGetValue("dbnick", out var dbNickValue) && dbNickValue != null ? dbNickValue.ToString() : string.Empty;
+    string sva = param.TryGetValue("sva", out var svaValue) && svaValue != null ? svaValue.ToString() : string.Empty;
+
+    DateTime spdt = DateTime.Now;
+    DateTime epdt = DateTime.Now;
+
+    ResultInfo<dynamic> ri = DevExecuteQuery(dbNick, stp, param);
+    epdt = DateTime.Now;
+    GetRes(ref ri, param, sdt, spdt, epdt);
+
+    return ri;
+  }
+
+
+  public ResultInfo<dynamic> DevExecuteQuery(string dbNick, string stp, Dictionary<string, string> param) {
+
+    ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
+
+    // 디비정보 가져오기
+    DbInfo di = GetDbInfo(dbNick);
+
+    // 디비의 쿼리 정보 가져오기
+    Devsqlresp dsr = GetDsr(di, stp);
+
+    if (dsr == null) {
+      ri.Code = -88;
+      ri.Message = $" dbtype {di.Db_type} 의 {stp} 가 정의 되지 않았습니다.";
+      return ri;
+    }
+
+
+    IDbConnection db = null;
+    IDataReader rdr = null;
+    try {
+
+      if (dsr.Dsl_type == "POSTGRESQL") {
+        db = new NpgsqlConnection(di.ToConnectionString());
+      }
+      else if (dsr.Dsl_type == "MSSQL") {
+        db = new SqlConnection(di.ToConnectionString());
+      }
+
+      string directString = ChangeQueryDirectQuery(dsr.Dsl_query, param);
+
+      DynamicParameters parameters = GetParams(directString, param);
+
+      rdr = db.ExecuteReader(sql: directString, param: parameters);
+
+      var resultList = new List<dynamic>();
+
+      while (rdr.Read()) {
+
+        var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+        string nm = "";
+        object oval = null;
+        //string empty = null;
+        for (int i = 0; i < rdr.FieldCount; i++) {
+          nm = rdr.GetName(i);
+          oval = rdr.GetValue(i);
+
+          // oval 값이 Dbnull 인 경우 json 으로 {} 넘어 간다... 이를 클라이언트에서 처리시 잘못하면 parse error 가 난다.
+          if (oval.GetType() == typeof(System.DBNull)) {
+            expandoObject.Add(nm, null);
+          }
+          else {
+            expandoObject.Add(nm, oval);
+          }
+        }
+        resultList.Add(expandoObject);
+      }
+
+
+
+      ri.Cols = GetColumns(rdr);
+
+      ri.Data = resultList;
+
+
+    }
+    catch (Exception e) {
+      ri.Code = -99;
+      ri.Message = e.Message;
+    }
+    finally {
+      if (rdr != null) { rdr.Close(); rdr.Dispose(); }
+      if (db != null) { db.Close(); db.Dispose(); }
+    }
+
+    return ri;
+
+
+  }
+
+
+  /// <summary> 디비에 맞는 시스템 쿼리 가져 오기 </summary>
+  private Devsqlresp GetDsr(DbInfo di, string dsrKey) {
+    Devsqlresp result = null;
+    foreach (var dsr in AppData.DsrInfos) {
+      if (dsr.Dsl_type == di.Db_type && dsr.Dsl_cd == dsrKey) {
+        result = dsr;
+        break;
+      }
+    }
+    if (result == null) {
+      result = GetDevsqlresp(di.Db_type, dsrKey);
+      if (result != null) {
+        AppData.DsrInfos.Add(result);
+      }
+    }
+
+    return result;
+  }
+
+
+
+
+  private Devsqlresp GetDsr(string dbNick, string dsrKey) {
+
+    // 디비정보 가져오기
+    DbInfo di = GetDbInfo(dbNick);
+
+    Devsqlresp result = null;
+    foreach (var dsr in AppData.DsrInfos) {
+      if (dsr.Dsl_type == di.Db_type && dsr.Dsl_cd == dsrKey) {
+        result = dsr;
+        break;
+      }
+    }
+    if (result == null) {
+      result = GetDevsqlresp(di.Db_type, dsrKey);
+      AppData.DsrInfos.Add(result);
+    }
+
+    return result;
+  }
+
+
+  /// <summary> db 에서 dsr 정보를 가져온다. </summary>
+  Devsqlresp GetDevsqlresp(string dsl_type, string dsl_cd) {
+    var connectionString = _configuration.GetConnectionString("jsini");
+
+    var parameters = new DynamicParameters();
+    parameters.Add("@dsl_type", dsl_type);
+    parameters.Add("@dsl_cd", dsl_cd);
+
+    Devsqlresp dsr = null;
+    using (IDbConnection db = new NpgsqlConnection(connectionString)) {
+      dsr = db.Query<Devsqlresp>(sql: ConstInfo.dbVsqlResp, parameters).ToList().FirstOrDefault();
+    }
+
+    return dsr;
+  }
+
+
+  string ChangeQueryDirectQuery(string dsl_query, Dictionary<string, string> param) {
+    String result = dsl_query;
+    // $key 값은 문자열을 바꾼다. 다이렉트 쿼리 문자열 $
+    var _dd_matches = Regex.Matches(dsl_query, @"\$\w+");
+    string[] _dd_kkk = _dd_matches.Select(m => m.Value).Distinct().ToArray();
+
+    if (_dd_kkk != null && _dd_kkk.Length > 0) {
+
+      foreach (string str in _dd_kkk) {
+        string key = str.Replace("$", "");
+        if (param.TryGetValue(key, out var strValue) && strValue != null) {
+          result = result.Replace(str, strValue);
+        }
+      }
+
+    }
+    return result;
+  }
+
+
+
+  DynamicParameters GetParams(string directString, Dictionary<string, string> param) {
+
+
+    DynamicParameters parameters = new DynamicParameters();
+
+    // @ 값은 파라미터를 등록한다.
+    var matches = Regex.Matches(directString, @"@\w+");
+    string[] kkk = matches.Select(m => m.Value).Distinct().ToArray();
+
+
+    if (kkk != null && kkk.Length > 0) {
+      foreach (string str in kkk) {
+        parameters.Add(str.Replace("@", ""), param.TryGetValue(str.Replace("@", ""), out var strValue) && strValue != null ? strValue.ToString() : string.Empty);
+      }
+    }
+
+    return parameters;
 
   }
 

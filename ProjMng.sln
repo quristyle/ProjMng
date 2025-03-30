@@ -14,6 +14,11 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "projmngvuejs", "ProjMngVuej
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "ProjMngVue_admintemp", "ProjMngVue_admintemp\ProjMngVue_admintemp.esproj", "{7F020B78-BC3B-A804-DDEA-BB8CA8B59FDB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C8D5274F-AC00-46C7-1F8D-E88E81087A52}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

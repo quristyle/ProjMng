@@ -4,6 +4,19 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+      <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    
+    
+    
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningsAsErrors>$(WarningsAsErrors)</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningsAsErrors>$(WarningsAsErrors)</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +34,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Razor" Version="6.0.36" />
     <PackageReference Include="MetadataReferenceService.BlazorWasm" Version="0.0.1" />
-    <PackageReference Include="Radzen.Blazor" Version="6.2.5" />
+    <PackageReference Include="Radzen.Blazor" Version="6.3.0" />
     
     
     

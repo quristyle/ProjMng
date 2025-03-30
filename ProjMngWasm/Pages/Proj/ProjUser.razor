@@ -1,0 +1,114 @@
+﻿@page "/proj-user"
+@{
+  /* description : 프로젝의 사용자 관리
+  * title : User
+  * sort : 3
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<PageTitle>Jsini | Proj User - @srtype?.Name</PageTitle>
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="6" >
+
+    <QuriDynamicGrid 
+    SaveBtnEvent=SaveBtnEvent 
+    DeleteBtnEvent=DeleteBtnEvent
+    RowClickEvent=RowClickEvent
+    ReqData=Data IsEdit=true
+                     SItems=_selectedItems
+                     IsLoading=gridLoding />
+
+  </RadzenColumn>
+
+  <RadzenColumn Size="6">
+
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEventProj
+                     ReqData=DataProj IsEdit=true IsLoading=gridProjLoding />
+
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+  CommonCode? srtype { get; set; }
+  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+  const string _spName = "sp_dev_user_exec";
+  bool gridLoding { get; set; } = false;
+  public IList<IDictionary<string, object>>? _selectedItems { get; set; }
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    await OnLoadWrk();
+  }
+
+  protected async Task OnLoadWrk() {
+    gridLoding = true;
+    Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
+    { "user_name", "" },{ "prj_rid", srtype?.Code }
+    });
+    gridLoding = false;
+  }
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {    
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+    await DbSave<Dictionary<string, object>>(_spName, req);
+  }
+
+  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+    await DbDelete<Dictionary<string, object>>(_spName, req);
+  }
+
+
+
+  //project choice
+
+  public ResultInfo<Dictionary<string, object>> DataProj { get; set; }
+  bool gridProjLoding {get;set;}= false;
+
+
+  string _spNameProj = "sp_dev_proj_user_map_exec";
+  protected async Task ProjectUser() {
+    gridProjLoding = true;
+    DataProj = await DbCont<Dictionary<string, object>>(_spNameProj, new Dictionary<string, string>() {
+    { "user_id", user_id }
+    });
+    gridProjLoding = false;
+    StateHasChanged();
+  }
+
+  private async Task SaveBtnEventProj(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {
+    { "user_id", user_id }
+    });
+    await DbSave<Dictionary<string, object>>(_spNameProj, req);
+  }
+  string user_id { get; set; }
+  private void RowClickEvent(IDictionary<string, object> args)  {
+    //args.Data["user_id"]
+
+    user_id = args.TryGetValue("user_id", out object oojb) ? oojb.ToString() : "";
+
+    ProjectUser(     );
+  }
+}

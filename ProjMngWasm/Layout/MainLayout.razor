@@ -1,49 +1,63 @@
 ﻿@using Radzen
 @using Radzen.Blazor
+@using static ProjMngWasm.Layout.MainCont
 @inherits LayoutComponentBase
 @inject ThemeService ThemeService
 @inject QueryStringThemeService QueryStringThemeService
-@inject ExampleService ExampleService
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
 @inject TooltipService TooltipService
 @inject DialogService DialogService
 
+@inject JsiniService? JsiniService
 
 <HeadContent>
   <RadzenTheme Theme="software-dark" />
 </HeadContent>
 
-<RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
-<RadzenHeader>
-    <ChildContent>
-        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
-            <RadzenColumn Size="5">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                    <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Project Managerment</span>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="7">
-                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-                    <RadzenAppearanceToggle class="rz-mx-2" />
-                    <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-    </ChildContent>
-</RadzenHeader>
+<RadzenComponents />
 
-<RadzenBody @ref="@body0">
+<RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
+  
+  <RadzenHeader>
     <ChildContent>
-        <RadzenContentContainer Name="main">
-            <RadzenRow class="rz-pt-6 rz-px-0 rz-px-sm-8 rz-px-xl-12">
-                <RadzenColumn Size="12">
+      <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
+        <RadzenColumn Size="5">
+          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Project Managerment</span>
+          </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="7">
+          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+            <RadzenAppearanceToggle class="rz-mx-2" />
+            <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
+          </RadzenStack>
+        </RadzenColumn>
+      </RadzenRow>
+    </ChildContent>
+  </RadzenHeader>
+
+  <RadzenBody >
+    <ChildContent>
+      <RadzenContentContainer Name="main">
+        <RadzenRow>
+          <RadzenColumn Size="12">
+
             <RadzenRow class="rz-mx-auto " Style="">
-              <RadzenColumn Size="12" class="">
+                            
+              <RadzenColumn Size="12" class="" Visible=IsBodyUrl>
+                <CascadingValue Value="projItems">
+                  <MainCont @ref="_main" />
+                </CascadingValue>
+              </RadzenColumn>
+
+              <RadzenColumn Size="12" class="" Visible=!IsBodyUrl>
                             @Body
               </RadzenColumn>
+
             </RadzenRow>
+
             <RadzenRow>
               <RadzenColumn Size="12">
                 <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" class="rz-mt-12">
@@ -51,83 +65,64 @@
                 </RadzenText>
               </RadzenColumn>
             </RadzenRow>
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenContentContainer>
+
+          </RadzenColumn>
+        </RadzenRow>
+      </RadzenContentContainer>
     </ChildContent>
-</RadzenBody>
+  </RadzenBody>
 
 
-<RadzenSidebar @ref="sidebar0" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
+  <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-        <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
+      <RadzenTextBox id="find" Placeholder="Find page ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
     </div>
+
+    <div>
+      <RadzenButton Click=OnLoadMenu>Load Menu</RadzenButton>
+      </div>
+
+
+
+
     <div style="flex: 1; overflow: auto">
-    <RadzenPanelMenu Match="NavLinkMatch.Prefix">
-      
-      <RadzenPanelMenuItem Text="장비 Monitoring" Icon="" aria-label="">
-          <RadzenPanelMenuItem Text="Funeral" Path="/funeral" Icon="" aria-label=""></RadzenPanelMenuItem>
-          <RadzenPanelMenuItem Text="Jsini" Path="/jsini" Icon="" aria-label=""></RadzenPanelMenuItem>
-      </RadzenPanelMenuItem>
 
-      <RadzenPanelMenuItem Text="Projects" Icon="" aria-label="">
-        <RadzenPanelMenuItem Text="UMS Monitor" Path="/ums" Icon="" aria-label=""></RadzenPanelMenuItem>
-        <RadzenPanelMenuItem Text="UMS Data" Path="/umsw" Icon="" aria-label=""></RadzenPanelMenuItem>
-        <RadzenPanelMenuItem Text="Funeral Data" Path="/funeralw" Icon="" aria-label=""></RadzenPanelMenuItem>
-      </RadzenPanelMenuItem>
+      <RadzenPanelMenu Match="NavLinkMatch.Prefix">
 
-        <RadzenPanelMenuItem Text="ProjManager" Icon="" aria-label="">
-          <RadzenPanelMenuItem Text="ProjInit" Path="/" Icon="" aria-label=""></RadzenPanelMenuItem>
-          <RadzenPanelMenuItem Text="DB Proj" Path="/projdb" Icon="" aria-label=""></RadzenPanelMenuItem>
-        </RadzenPanelMenuItem>
+        @if (_Data != null) {
 
-        <RadzenPanelMenuItem Text="Tools" Icon="" aria-label="">
-          <RadzenPanelMenuItem Text="DBTool" Path="/dbtool" Icon="" aria-label=""></RadzenPanelMenuItem>
+          @foreach (var di in dirs) {
+
+            <RadzenPanelMenuItem  Text=@di.Key Icon="" >
+              @foreach (var p in _Data) {
+
+              @if( di.Key == p["dir"].ToString() ){
+
+              <RadzenPanelMenuItem Click=@(()=>AddCallTab(p)) Text="@p["title"].ToString()"
+                Icon="" aria-label=""
+                                       title="@(@p["sort"].ToString() +". "+ @p["description"].ToString())" />
+
+              }
+
+            }
+
+            </RadzenPanelMenuItem>
+
+          }
 
 
-          
-
-        </RadzenPanelMenuItem>
-        <RadzenPanelMenuItem Text="dev" Icon="" aria-label="">
-          <RadzenPanelMenuItem Text="icon" Path="/icon" Icon="" aria-label=""></RadzenPanelMenuItem>
-          <RadzenPanelMenuItem Text="colors" Path="/colors" Icon="" aria-label=""></RadzenPanelMenuItem>
-        </RadzenPanelMenuItem>
-
-      @if(false){
-        @foreach (var category in examples)
-        {
-            <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
-                @if (category.Children != null)
-                {
-                    @foreach (var example in category.Children)
-                    {
-                        if (example.Children != null)
-                        {
-                            <NavigationItem @key=example @bind-Expanded=@example.Expanded Example=@example>
-                            @foreach (var child in example.Children)
-                            {
-                                <NavigationItem @key=child @bind-Expanded=@child.Expanded Example=@child />
-                            }
-                            </NavigationItem>
-                        }
-                        else
-                        {
-                            <NavigationItem @key=example @bind-Expanded=@example.Expanded Example=@example />
-                        }
-                    }
-                }
-            </NavigationItem>
         }
-        }
-    </RadzenPanelMenu>
+
+      </RadzenPanelMenu>
+
     </div>
-</RadzenSidebar>
-<RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
+  </RadzenSidebar>
+  <RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack class="rz-p-4" Gap="0">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-m-0">Configuration</RadzenText>
-            <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@(() => configSidebarExpanded = false)" />
-        </RadzenStack>
+      <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-m-0">Configuration</RadzenText>
+        <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@(() => configSidebarExpanded = false)" />
+      </RadzenStack>
       <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" class="rz-mt-6">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
           <RadzenLabel Text="Use WCAG compliant colors" Component="WCAG" Title="Use WCAG 2.2 AA compliant color swatches" />
@@ -135,19 +130,19 @@
         </RadzenStack>
         <RadzenSwitch Value="@(ThemeService.Wcag == true)" Name="WCAG" Change="@(ThemeService.SetWcag)" />
       </RadzenStack>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" class="rz-mt-8 rz-mb-2">
-            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Themes</RadzenText>
-            <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="freeThemesInfo" Click="@(args => FreeThemesTooltip(freeThemesInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
-        </RadzenStack>
-        <RadzenListBox TValue="string" TextProperty="Text" ValueProperty="Value" Data="@Themes.Free" Value="@ThemeService.Theme" Change="@ChangeTheme" Style="width: 100%; max-width: 400px; height: 50%; --rz-dropdown-item-padding: 10px 16px 16px; --rz-listbox-padding: 0;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select theme" }})">
-            <Template>
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
-                    @RenderTheme(context)
-                </RadzenStack>
-            </Template>
-        </RadzenListBox>
+      <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" class="rz-mt-8 rz-mb-2">
+        <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Themes</RadzenText>
+        <RadzenButton Icon="info" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.ExtraSmall" @ref="freeThemesInfo" Click="@(args => FreeThemesTooltip(freeThemesInfo.Element, new TooltipOptions(){ Position = TooltipPosition.Left, Duration = null, Style = "background: var(--rz-base-900); color: var(--rz-base-100)" }))" />
+      </RadzenStack>
+      <RadzenListBox TValue="string" TextProperty="Text" ValueProperty="Value" Data="@Themes.Free" Value="@ThemeService.Theme" Change="@ChangeTheme" Style="width: 100%; max-width: 400px; height: 50%; --rz-dropdown-item-padding: 10px 16px 16px; --rz-listbox-padding: 0;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select theme" }})">
+        <Template>
+          <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
+            @RenderTheme(context)
+          </RadzenStack>
+        </Template>
+      </RadzenListBox>
     </RadzenStack>
-</RadzenSidebar>
+  </RadzenSidebar>
 
 
 </RadzenLayout>
@@ -159,40 +154,29 @@
 }
 
 @code {
-  RadzenSidebar sidebar0;
-  RadzenBody body0;
-  RadzenButton wcagColorsInfo;
-  RadzenButton freeThemesInfo;
+  RadzenButton? wcagColorsInfo;
+  RadzenButton? freeThemesInfo;
   bool sidebarExpanded = true;
   bool configSidebarExpanded = false;
   bool rendered;
 
-  IEnumerable<Example> examples;
-  protected override void OnInitialized() {
-    examples = ExampleService.Examples;
 
+  bool IsBodyUrl{get;set;} = true;
+
+  protected override void OnInitialized() {
     System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ko");
   }
 
-  protected override void OnAfterRender(bool firstRender) {
-    if (firstRender) {
-      rendered = true;
-    }
-  }
 
   void FilterPanelMenu(ChangeEventArgs args) {
-    var term = args.Value.ToString();
-
-    examples = string.IsNullOrEmpty(term) ? ExampleService.Examples : ExampleService.Filter(term);
+    var term = args.Value??string.Empty;
   }
 
   void ChangeTheme(object value) {
     ThemeService.SetTheme($"{value}");
   }
 
-
-
-  void WcagColorsTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>
+  void WcagColorsTooltip(ElementReference elementReference, TooltipOptions options) => TooltipService.Open(elementReference, ds =>
   @<div Style="width: 280px; white-space: normal; padding: 20px;">
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" Style="color: currentColor;">WCAG Compliant Colors</RadzenText>
     <RadzenText TextStyle="TextStyle.Body2" Style="color: currentColor;">Enable to preview themes with WCAG 2.2 AA compliant color swatches.</RadzenText>
@@ -200,7 +184,7 @@
       <NavLink class="rz-button rz-button-sm rz-secondary rz-text-align-center" href="/accessibility#wcag-colors">See how to use</NavLink>
     </RadzenStack>
   </div>, options);
-  void FreeThemesTooltip(ElementReference elementReference, TooltipOptions options = null) => TooltipService.Open(elementReference, ds =>
+  void FreeThemesTooltip(ElementReference elementReference, TooltipOptions options) => TooltipService.Open(elementReference, ds =>
   @<div Style="width: 200px; white-space: normal; padding: 20px;">
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" Style="color: currentColor;">Use Free Themes</RadzenText>
     <RadzenText TextStyle="TextStyle.Body2" Style="color: currentColor;">These themes are free for commercial use.</RadzenText>
@@ -209,15 +193,27 @@
     </RadzenStack>
   </div>, options);
 
-  async Task ShowVideoDialog() {
-    await DialogService.OpenAsync("Create new Blazor app", ds =>
-  @<div class="embed-container">
-    <iframe src="https://www.youtube.com/embed/_F-CUWxYvCA?&rel=0" frameborder="0" allowfullscreen=""></iframe>
-  </div>, new DialogOptions() {
-          Width = "50%",
-          Resizable = true
-        });
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      rendered = true;
+
+      var currentUrl = UriHelper.Uri;
+      var baseUri = UriHelper.BaseUri;
+      var relativeUrl = currentUrl.Replace(baseUri, string.Empty);
+      Console.WriteLine($"Relative URL: {relativeUrl}");
+
+      Console.WriteLine($"Current URL: {currentUrl}");
+
+      if (!string.IsNullOrEmpty(relativeUrl) && !relativeUrl.StartsWith('?') ) {
+        IsBodyUrl = false;
+      }
+
+      await OnLoadMenu();
+
+    }
   }
+ 
+  public List<ProgramInfo> projItems = new List<ProgramInfo>();// { "Customers", "Orders", "Order Details" };
 
   internal static RenderFragment RenderTheme(Theme theme, bool showTitle = true) {
     return __builder => {
@@ -285,4 +281,69 @@
       </text>
     };
   }
+
+  MainCont? _main{get;set;}
+
+  public Dictionary<string, string> dirs { get; set; } = new Dictionary<string, string>();
+  //public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+  public IEnumerable<Dictionary<string, object>>? _Data { get; set; }
+
+  protected async Task OnLoadMenu() {
+    if (JsiniService != null) {
+      try {
+        var data = await JsiniService.GetList<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>());
+
+        if (data != null && data.Data != null) {
+          dirs.Clear(); // 기존 데이터를 초기화하여 중복된 키를 방지
+
+          var groupedData = data.Data
+              .Where(d => d.ContainsKey("dir"))
+              .GroupBy(d => d["dir"].ToString())
+              .Select(g => g.First());
+
+          foreach (var d in groupedData) {
+            dirs[d["dir"].ToString()] = d["dir"].ToString();
+          }
+
+          _Data = data.Data.OrderBy(d => d["sort"].ToString());
+
+          //Data = data;
+        }
+        else {
+          Console.WriteLine("Data or Data.Data is null.");
+        }
+      }
+      catch (Exception ex) {
+        Console.WriteLine($"An error occurred: {ex.Message}");
+      }
+      finally {
+        // 비동기 작업이 완료된 후 상태 변경을 반영
+        StateHasChanged();
+      }
+      
+    }
+    else {
+      Console.WriteLine("JsiniService is null.");
+    }
+  }
+
+  private void AddCallTab(Dictionary<string, object> p) {
+
+    if (p.ContainsKey("fullname") && p["fullname"] != null &&
+        p.ContainsKey("title") && p["title"] != null &&
+        p.ContainsKey("name") && p["name"] != null &&
+        p.ContainsKey("dir") && p["dir"] != null) {
+
+      _main.AddItem(p["fullname"].ToString()??string.Empty,
+                    p["title"].ToString() ?? string.Empty,
+                    p["name"].ToString() ?? string.Empty,
+                    p["dir"].ToString() ?? string.Empty);
+    }
+    else {
+      Console.WriteLine("One or more keys are missing or null in the dictionary.");
+    }
+    
+  }
+
+
 }

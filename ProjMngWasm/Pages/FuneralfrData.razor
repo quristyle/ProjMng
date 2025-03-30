@@ -1,6 +1,16 @@
 ﻿@page "/funeralw";
+@{
+  /* description : funeralw
+  * title : funeralw
+  * sort : 1
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
 @using ProjMngWasm.Models;
 @using ProjMngWasm.Services;
+
+@inherits PageBaseComponent
 
 <RadzenCard class="rz-my-6">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
@@ -62,7 +72,6 @@
 
   public string srtype { get; set; } = "2";
 
-    [Inject]    protected IFuneralService FuneralService { get; set; }
 
 
   public IEnumerable<IDictionary<string, object>> data2 { get; set; }

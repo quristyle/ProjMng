@@ -1,0 +1,183 @@
+﻿@inherits QuriDynamicGridBase
+@if (ReqData != null){
+
+  /*
+
+
+        */
+
+
+  <RadzenDataGrid 
+    Data="@orders"
+                @ref="ordersGrid" 
+                ColumnWidth="100px"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        @bind-Value="@SItems"
+                        GridLines="Radzen.DataGridGridLines.Vertical"
+                        RowUpdate="@OnUpdateRow"
+                        RowCreate="@OnCreateRow"
+                        RowDoubleClick="@OnDoubleClick"
+                        RowSelect="@OnRowClick"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        AllowFiltering="true"
+                        AllowColumnResize="true"
+                        FilterMode="FilterMode.Simple"
+                        SelectionMode="DataGridSelectionMode.Single"
+                        AllowPaging="true"
+                        AllowSorting="true"
+                        PageSize=15
+                        Style="width:100%;height:100%;"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        PagerAlwaysVisible=true
+                        PagerPosition=PagerPosition.Bottom
+                        IsLoading="@IsLoading"
+                        TItem="IDictionary<string, object>"
+      >
+
+    <EmptyTemplate>
+      <p style="color: lightgrey; font-size: 18px; text-align: center; margin: 2rem;">No records to display.</p>
+    </EmptyTemplate>
+  <Columns>
+
+      @if (cols != null) {
+    @foreach (var col in cols)        {
+
+      if (isHiddenCol(col.Key)){ continue; }
+
+      <RadzenDataGridColumn 
+        @key=@col.Key
+        Width="@GetWidth(col.Value)"
+        TextAlign="TextAlign.Center"
+        Title="@col.Key"                               
+        Type=@WasmUtil.GetType(col.Value)
+        Property="@PropertyAccess.GetDynamicPropertyExpression( col.Key, WasmUtil.GetType(col.Value) )"
+      >
+
+        <EditTemplate Context="order">
+
+          @if (col.Value == "System.DateTime") {
+              <RadzenDatePicker @bind-Value=@order[col.Key] DateFormat="yyyy-MM-dd"      />
+            } 
+            else if (col.Value == "System.Int32") {
+            <RadzenNumeric @bind-Value=@order[col.Key] />
+            }
+
+              else if (col.Value == "System.Boolean") {
+                <RadzenCheckBox @bind-Value=@order[col.Key] />
+              }
+
+            else {
+            <RadzenTextBox Change="@(args => order[@col.Key] = args)"
+                            Value=@(order.TryGetValue(@col.Key, out object k)?k?.ToString():"")
+                            Name="@col.Key" aria-label="Enter {col.Key}" />
+            
+            }
+        </EditTemplate>
+              
+
+        <Template>
+
+
+          @if (col.Value == "System.DateTime") {
+            if (context[@col.Key] != null && !string.IsNullOrWhiteSpace(context[@col.Key].ToString()) && context[@col.Key].GetType() == typeof(DateTime)
+        ){
+              //@vrst.ToString("yyyy-MM-dd");
+
+                  
+            @(((DateTime)context[@col.Key]).ToString("yyyy-MM-dd"))
+
+            }
+            else{
+                  
+            @context[@col.Key] 
+
+
+            }
+
+
+          }
+              else if (col.Value == "System.Boolean") {
+                @if((bool)context[@col.Key]){
+                  <RadzenIcon Icon="done" />
+                }
+                else {
+                  
+                }
+          }
+          else {
+          @context[@col.Key]
+          }
+        </Template>
+      </RadzenDataGridColumn>
+    }
+    }
+
+      @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete ) ) {
+    <RadzenDataGridColumn Context="IDictionary<string, object>" 
+      Filterable=false Sortable="false" 
+      TextAlign="TextAlign.Center" 
+      Frozen="true"
+                              FrozenPosition="FrozenColumnPosition.Right" 
+                              Width="80px" MinWidth="80px" MaxWidth="80px">
+      <Template Context="order">
+
+
+
+            @if (IsSave) {
+              <RadzenButton Icon="add_circle" Size="ButtonSize.ExtraSmall" Click="@(() => InsertAfterRow(order))" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+              <RadzenButton Icon="edit" Size="ButtonSize.ExtraSmall" Click="@(args => EditRow(order))" @onclick:stopPropagation="true" />
+            }
+
+
+
+
+
+            @if (IsDelete) {
+              <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true" />
+            }
+
+
+            @if( IsAction ){
+              <RadzenButton Icon="assignment_return" Size="ButtonSize.ExtraSmall" Click="@(args => ActionRow(order))" @onclick:stopPropagation="true" />
+            }
+      </Template>
+      <EditTemplate Context="order">
+
+            @if (IsSave) {
+              <RadzenButton Icon="check" Size="ButtonSize.ExtraSmall" Click="@((args) => SaveRow(order))" aria-label="Save" />
+              <RadzenButton Icon="close" Size="ButtonSize.ExtraSmall" Click="@(args => CancelEdit(order))" aria-label="Cancel" />
+            }
+
+
+
+
+
+            @if (IsDelete) {
+              <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall" Click="@(args => DeleteRow(order))" aria-label="Delete" />
+            }
+            @if( IsAction ){
+              <RadzenButton Icon="assignment_return" Size="ButtonSize.ExtraSmall" Click="@(args => ActionRow(order))" aria-label="action" />
+            }
+      </EditTemplate>
+    </RadzenDataGridColumn>
+    }
+
+  </Columns>
+</RadzenDataGrid>
+}
+
+
+@code{
+
+  protected string GetWidth(string typeStr, string unit = "px"){
+    string result = "";
+    if (typeStr == "System.DateTime") {
+    result = "150";
+    }
+
+    return result+unit;
+  }
+
+
+
+}

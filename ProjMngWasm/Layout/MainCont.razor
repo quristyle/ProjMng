@@ -1,0 +1,98 @@
+﻿@if (ready) {
+  <RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="example-tabs" RenderMode="TabRenderMode.Client" @ref="@ProjTabs">
+        <Tabs>
+      @if ( ProjItems != null && ProjItems?.Count > 0 ) {
+      @foreach (var item in ProjItems) {
+            <RadzenTabsItem Text="@(item.ProjName)" title="@(item.ProjPath)">
+                    @if (item.ComponentType is not null) {
+              <DynamicComponent Type="item.ComponentType" />
+                    }
+              else {
+                <p> @item.ProjName </p>
+              <p> @item.ProjId </p>
+              <p> @item.ProjPath </p>
+              <p> @item.ComponentType </p>
+                        <p>컴포넌트를 찾을 수 없습니다.</p>
+                    }
+
+                </RadzenTabsItem>
+            }
+      }
+        </Tabs>
+    </RadzenTabs>
+  </RadzenCard>
+}
+@code {
+   RadzenTabs? ProjTabs{get;set;} 
+
+  private List<ProgramInfo> _projItems = new List<ProgramInfo>();
+  [CascadingParameter]
+  public List<ProgramInfo> ProjItems {
+    get => _projItems;
+    set {
+      if (_projItems != value) {
+        _projItems = value;
+        //selectedIndex = _projItems.Count - 1;
+
+        // ProjTabs?.Reload();
+        // StateHasChanged();
+        // ProjTabs?.Reload();
+      }
+    }
+  }
+
+    bool ready;
+    protected override async Task OnAfterRenderAsync(bool firstRender)    {
+        if (firstRender)        {
+            ready = true;
+            await InvokeAsync(StateHasChanged);
+
+      //_projItems.Add(new ProgramInfo("ProjMngWasm.Pages.Proj.ProjDb", "ProjMngWasm") { ProjId = "ProjDb", ProjPath = "ProjDb" });
+     
+      //selectedIndex = _projItems.Count -1;
+
+      //ProjTabs?.Reload();
+      //StateHasChanged();
+
+    }
+  }
+
+  int selectedIndex = 0;
+
+  public void AddItem( string fullname, string title, string name, string dir) {
+
+    bool isExsit = false;
+    for(int i = 0; i < _projItems.Count; i++){
+
+      if( _projItems[i].ProjPath == fullname ){
+        selectedIndex = i;
+        isExsit = true;
+        break;
+      }
+
+    }
+
+    if ( !isExsit ){
+      ProgramInfo ppp = new ProgramInfo(fullname, fullname) {
+          ProjName = title,
+          ProjId = name,
+          ProjPath = fullname
+        };
+
+      _projItems.Add(ppp);
+      selectedIndex = _projItems.Count - 1;
+
+    }
+    //ProjTabs?.Reload();
+
+  }
+
+
+}
+
+<style>
+  ul[role=tablist] {
+    flex-wrap: wrap;
+  }
+</style>

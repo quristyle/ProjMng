@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjMngServer.Services;
-using System.Collections.Generic;
+using ProjModel;
 
 namespace ProjMngServer.Controllers;
 
@@ -13,10 +13,19 @@ public class DevController : ControllerBase {
     _devService = devService;
   }
 
-
   [HttpPost]
   public ActionResult<Dictionary<string, object>> PostBody([FromBody] Dictionary<string, string> parameters) {
     var data = _devService.GetData(parameters);
+    return Ok(data);
+  }
+  [HttpPost]
+  [Route("sql")]
+  public ActionResult<Dictionary<string, object>> PostSql([FromBody] Dictionary<string, string> param) {
+
+    string query = param.TryGetValue("query", out var dbValue) && dbValue != null ? dbValue.ToString() : string.Empty;
+    string db_nick = param.TryGetValue("db_nick", out var stpValue) && stpValue != null ? stpValue.ToString() : string.Empty;
+
+    var data = _devService.GetDataQuery(db_nick, query);
     return Ok(data);
   }
 
@@ -27,7 +36,6 @@ public class DevController : ControllerBase {
     var data = _devService.GetData(parameters);
     return Ok(data);
   }
-
 
   [HttpGet]
   public ActionResult<Dictionary<string, object>> Get() {

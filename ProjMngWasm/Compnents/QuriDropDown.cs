@@ -3,87 +3,50 @@ using ProjMngWasm.Commons;
 using ProjMngWasm.Services;
 using ProjModel;
 using Radzen.Blazor;
+using System.Linq;
 
 namespace ProjMngWasm.Compnents;
 
 public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
-  [Inject] protected IJsiniService JsiniService { get; set; }
-  [Inject]  AppData appData { get; set; }
+  [Inject] private JsiniService? JsiniService { get; set; }
+  [Inject] AppData? appData { get; set; }
 
-  public string _codeId;
-  private string _previousCodeId;
-  [Parameter] public string CodeId { 
-    get { return _codeId; } 
-    set {
-      if (_codeId != value) {
-        _codeId = value;
-        //LoadItems();
-      }
-    }
-  }
+  public string? _codeId;
+  //private string? _previousCodeId;
+  [Parameter] public string? CodeId { get; set; }
+
+  /// <summary> 전체 표기 여부 </summary>
   [Parameter] public bool IsAll { get; set; } = false;
 
+  /// <summary> etc 에 값이 비었을때 메인코드 데이터를 호출 하지 않는다. </summary>
+  [Parameter] public bool IsEtcFix { get; set; } = false;
 
-  string _etc0;
-  [Parameter] public string Etc0 { 
-    get { return _etc0; } 
-    set {
-      if (_etc0 != value) {
-        _etc0 = value;
-        if (!string.IsNullOrWhiteSpace(value)) {
-          //LoadItems(true);
-        }
-      }
-    }
-  }
-
-  //Dictionary<string, string> codeList = new Dictionary<string, string>() { { "11", "quristyle all" },
-  //{ "12", "quristyle wait" },
-  //{ "13", "ui userAll complete" } ,
-  //{ "14", "ui userAll wait" } ,
-  //{ "15", "ui userAll " } ,
-  //}; //No longer needed here
-
-  protected override async Task OnInitializedAsync() {
-    await base.OnInitializedAsync();
-    //TextProperty = "Cd_Name";
-    //ValueProperty = "Cd_Id";
-    //TextProperty = "Cd_Name";
-    //ValueProperty = "Cd_Id";
-
-
-
-    //appData.GlobalDic.Add("projuser", codeList);
-  }
-
-  //protected override async void OnParametersSet() {
-  //  base.OnParametersSet();
-  // await LoadItems();
-  //}
-
-
+  string? _etc0;
+  [Parameter] public string? Etc0 { get; set; }
 
   protected override async void OnParametersSet() {
     base.OnParametersSet();
-    if (_previousCodeId != _codeId) {
-      _previousCodeId = _codeId;
+    if (_codeId != CodeId) {
+      _codeId = CodeId;
       await LoadItems();
     }
+
+    if (_etc0 != Etc0) {
+      _etc0 = Etc0;
+      await LoadItems();
+    }
+
   }
 
   //bool isFrist = true;
-  async Task LoadItems(bool isRelod = false) {
+  async Task LoadItems() {
 
+    if (IsEtcFix && string.IsNullOrEmpty(Etc0) ) {
+      return;
+    }
 
-    Console.WriteLine($"LoadItems : {_codeId} etc0 : {_etc0}");
-    //if(!isFrist){
-    //  isFrist = false;
-    //  return;
-    //}
-
-
-    IEnumerable<CommonCode> tmp = new List<CommonCode>();
+    List<CommonCode> tmp = new List<CommonCode>();
 
     if (!string.IsNullOrEmpty(_codeId)) {
       // isRelod
@@ -94,14 +57,14 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         Console.WriteLine($"isRelod LoadItems : {_codeId} etc0 : {_etc0}");
 
         // dictionary는 _codeId에 해당하는 Dictionary<string, string>입니다.
-        tmp = dictionary.AsEnumerable();
+        tmp = WasmUtil.DeepCopy(dictionary);
       }
       else if (string.IsNullOrWhiteSpace(_etc0) && appData.GlobalDic.TryGetValue(_codeId, out var dictionary2)) {
         // dictionary는 _codeId에 해당하는 Dictionary<string, string>입니다.
 
         Console.WriteLine($"Finder LoadItems : {_codeId} etc0 : {_etc0}");
 
-        tmp = dictionary2.AsEnumerable();
+        tmp = WasmUtil.DeepCopy(dictionary2);
       }
       else {
 
@@ -109,8 +72,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         Console.WriteLine($"LoadData LoadItems : {_codeId} etc0 : {_etc0}");
 
         // _codeId에 해당하는 딕셔너리가 없을 경우 처리
-        var data = await JsiniService.GetList<Dictionary<string, string>>(new Dictionary<string, string>() {
-                { "stp", "sp_projCommon" },
+        var data = await JsiniService.GetList<Dictionary<string, string>>("sp_projCommon",new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", Etc0 }
             });
@@ -122,10 +84,10 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
           dic.Add(
 
             new CommonCode() {
-              Cd_Id = d["cd_id"],
-              Cd_Name = d["cd_name"],
-              Cd_Desc = d["cd_desc"],
-              //Others = d,
+              Code = d["code"],
+              Name = d["name"],
+              Desc = d["desc"],
+              Others = d,
             }
 
             );
@@ -134,42 +96,21 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         if(!appData.GlobalDic.ContainsKey(_codeId)) {
           appData.GlobalDic.Add(_codeId, dic);
         }
-        tmp = dic.AsEnumerable();
-
-        //tmp = Enumerable.Range(0, 100).Select(i => new CommonCode() { Cd_Id = $"ID{i}", Cd_Name = $"Name{i}" });
+        tmp = WasmUtil.DeepCopy(dic);
 
       }
     }
     else {
-      // If CodeId is empty or GlobalDic is null, provide a default or empty list
-      tmp = (new List<CommonCode>()).AsEnumerable();
+      tmp = new List<CommonCode>();
     }
 
-    if (IsAll) {
-      //tmp.Insert(0, new CommonCode() { Cd_Id="", Cd_Name="All", Cd_Desc="All items" });
-      
+    if (IsAll) {      
+      tmp.Insert(0, new CommonCode() { Code="", Name="All", Desc="All items" });      
     }
 
-    Data = tmp;
+    Data = tmp.AsEnumerable();
     //if (!IsAll && tmp.Count > 0) {
-      /*
-      var dt =  base.LoadData;
-
-      this.selectedIndex = 0;
-      this.SelectedItem = tmp[0];
-      this.SelectedItemsText = tmp[0].Value;
-      this.Value = tmp[0].Key;
-
-      await Task.Run(async  () => {
-          this.selectedIndex = 0;
-          this.SelectedItem = tmp[0];
-          this.SelectedItemsText = tmp[0].Value;
-          this.Value = tmp[0].Key;
-          await Task.Delay(10);
-      });
-
-      StateHasChanged();
-      */
+      /* 고민.. */
     //}
   }
 
