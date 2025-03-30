@@ -6,7 +6,6 @@ public class DbInfo {
 
   public const string mssqlConstrFormat = @"Server={0},{1};Database={2};User Id={3};Password={4};{5}";
   public const string postgresqlConstrFormat = @"Host={0};Port={1};Database={2};Username={3};Password={4};SearchPath={5};{6}";
-  //Host=jsini.co.kr;Port=15432;Database=jsini;Username=jsini;Password=jsini;Pooling=true;SearchPath=projmng
   public const string mysqlConstrFormat = @"Server={0},{1};Database={2};User Id={3};Password={4};{5}";
 
   public string? Db_ip { get; set; }
