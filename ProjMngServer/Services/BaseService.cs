@@ -11,7 +11,7 @@ public class BaseService {
   protected IConfiguration _configuration;
 
   /// <summary> 되돌려줄 response dictionary </summary>
-  protected void GetRes(ref ResultInfo<dynamic> ri, Dictionary<string, string> param
+  protected void GetRes<T>(ref ResultInfo<T> ri, Dictionary<string, string> param
     , DateTime sdt, DateTime spdt, DateTime epdt
     ) {
 

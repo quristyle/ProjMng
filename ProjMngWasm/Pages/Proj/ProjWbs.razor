@@ -6,38 +6,41 @@
   * credt : 2021-09-01
   * author : quristyle
   */
-}
+      }
 
 @inherits PageBaseComponent
 
-<PageTitle>Jsini | WBS - @srtype?.Name</PageTitle>
+      <PageTitle>Jsini | WBS - @srtype?.Name</PageTitle>
 
-<RadzenCard class="rz-my-6">
-  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+      <RadzenCard class="rz-my-6">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-      <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-        <QuriDropDown CodeId="projlist" @bind-Value=srtype />
-      </RadzenStack>
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+            <QuriDropDown CodeId="projlist" @bind-Value=srtype />
+          </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-      <RadzenButton Click="@OnLoadWrk" Text="Search" />
-    </RadzenStack>
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+            <RadzenButton Click="@OnLoadWrk" Text="Search" />
+          </RadzenStack>
 
-  </RadzenStack>
-</RadzenCard>
+        </RadzenStack>
+      </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-  <RadzenColumn Size="12" >
+      <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+        <RadzenColumn Size="12" >
 
-    <QuriDynamicGrid 
-      SaveBtnEvent=SaveBtnEvent 
-      ReqData=Data IsEdit=true
-      HiddenCols="prj_rid,wbs_id,proc_lvl,build_user,plan_sdt,plan_edt,build_status,dev_chk,build_chk,build_chk_dt,qc_user,qc_chk,qc_chk_dt,cre_user,cre_dt,mod_user,mod_dt,comm" />
+          <QuriDynamicGrid 
+          SaveBtnEvent=SaveBtnEvent 
 
-  </RadzenColumn>
-</RadzenRow>
+          AddBtnEvent=NewRowCreate
 
-@code {
+          ReqData=Data 
+          HiddenCols="wbs_id,proc_lvl,build_user,plan_sdt,plan_edt,build_status,dev_chk,build_chk,build_chk_dt,qc_user,qc_chk,qc_chk_dt,cre_user,cre_dt,mod_user,mod_dt,comm" />
+
+        </RadzenColumn>
+      </RadzenRow>
+
+      @code {
 
   CommonCode srtype { get; set; }
 
@@ -51,20 +54,23 @@
 
 
   protected async Task OnLoadWrk() {
-    Data = await DbCont<Dictionary<string, object>>("sp_projwbslist", new Dictionary<string, string>() {
-     { "proj_rid", srtype?.Code }
+    Data = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+     { "prj_rid", srtype?.Code }
     });
   }
 
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {
     //var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
-    await DbSave<Dictionary<string, object>>("sp_projwbssave", dic);
+    await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);
   }
 
 
 
 
 
-
+  private void NewRowCreate(IDictionary<string, object> args)  {
+    args["prj_rid"] = srtype?.Code;
+    StateHasChanged();
+  }
 }

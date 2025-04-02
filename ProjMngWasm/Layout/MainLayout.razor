@@ -13,6 +13,7 @@
 
 <HeadContent>
   <RadzenTheme Theme="software-dark" />
+  @* software-dark *@
 </HeadContent>
 
 <RadzenComponents />
@@ -46,7 +47,8 @@
 
             <RadzenRow class="rz-mx-auto " Style="">
                             
-              <RadzenColumn Size="12" class="" Visible=IsBodyUrl>
+              <RadzenColumn Size="12" class="" >        
+                @* Visible=IsBodyUrl *@
                 <CascadingValue Value="projItems">
                   <MainCont @ref="_main" />
                 </CascadingValue>
@@ -291,7 +293,7 @@
   protected async Task OnLoadMenu() {
     if (JsiniService != null) {
       try {
-        var data = await JsiniService.GetList<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>());
+        var data = await JsiniService.GetList<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>(){{"prj_rid","3"}});
 
         if (data != null && data.Data != null) {
           dirs.Clear(); // 기존 데이터를 초기화하여 중복된 키를 방지

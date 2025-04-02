@@ -25,6 +25,7 @@
                         SelectionMode="DataGridSelectionMode.Single"
                         AllowPaging="true"
                         AllowSorting="true"
+                        ShowPagingSummary="true"
                         PageSize=15
                         Style="width:100%;height:100%;"
                         PagerHorizontalAlign="HorizontalAlign.Left"
@@ -124,7 +125,6 @@
 
 
             @if (IsSave) {
-              <RadzenButton Icon="add_circle" Size="ButtonSize.ExtraSmall" Click="@(() => InsertAfterRow(order))" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
               <RadzenButton Icon="edit" Size="ButtonSize.ExtraSmall" Click="@(args => EditRow(order))" @onclick:stopPropagation="true" />
             }
 
@@ -163,6 +163,18 @@
     }
 
   </Columns>
+
+
+    <HeaderTemplate  >
+
+      @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
+      <RadzenButton Icon="add_circle" Click="@(() => InsertAfterRow(null))"  />
+
+        }
+    </HeaderTemplate>
+
+
+
 </RadzenDataGrid>
 }
 

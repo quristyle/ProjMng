@@ -20,11 +20,12 @@ public class QuriDynamicGridBase : BaseComponent {
 
   public IDictionary<string, string> cols { get; set; } = new Dictionary<string, string>();
 
+  [Parameter] public EventCallback<IDictionary<string, object>> AddBtnEvent { get; set; }
   [Parameter] public EventCallback<IDictionary<string, object>> SaveBtnEvent { get; set; }
   [Parameter] public EventCallback<IDictionary<string, object>> DeleteBtnEvent { get; set; }
   [Parameter] public EventCallback<IDictionary<string, object>> ActionBtnEvent { get; set; }
   // 편집 가능여부
-  [Parameter] public bool IsEdit { get; set; } = false;
+  //[Parameter] public bool IsEdit { get; set; } = false;
   // 동작 버턴 활성 여부
 
 
@@ -218,6 +219,7 @@ public class QuriDynamicGridBase : BaseComponent {
     var order = CreateData();
     ordersToInsert.Add(order);
     await ordersGrid.InsertAfterRow(order, row);
+    await AddBtnEvent.InvokeAsync(order);
   }
 
   protected async Task OnCreateRow(IDictionary<string, object> order) {

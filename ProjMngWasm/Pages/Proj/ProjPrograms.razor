@@ -35,7 +35,7 @@
 
           <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
         <QuriDynamicGrid 
-                         ReqData=Data IsEdit=true
+                         ReqData=Data 
                          @bind-SItems=SelectedItems
                          HiddenCols="pgm_name_eng,remark,reg_id,reg_dt,upt_id,upt_dt" />
 
@@ -98,7 +98,7 @@
                          @bind-SItems=SelectedItemsMenu
                          ReqData=DataMenu
                          HiddenCols="reg_id,reg_dt,upt_id,upt_dt"
-                         IsEdit=true />
+                         />
 
 
       </RadzenSplitterPane>

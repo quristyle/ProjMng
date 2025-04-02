@@ -1,0 +1,104 @@
+﻿@page "/proj-src";
+@{
+  /* description : 프로젝트 소스관리
+  * title : Source
+  * sort : 3
+  * credt : 2025-03-31
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="12" >
+
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent RowClickEvent=OnLoadWrk_dtl ReqData=Data  />
+
+  </RadzenColumn>
+
+
+        <RadzenColumn Size="12">
+
+          <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent_dtl DeleteBtnEvent=DeleteBtnEvent_dtl ReqData=Data_dtl />
+
+        </RadzenColumn>
+
+
+</RadzenRow>
+
+@code {
+
+  public CommonCode? srtype { get; set; }
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+  }
+
+  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+  public ResultInfo<Dictionary<string, object>>? Data_dtl { get; set; }
+
+
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>("sp_dev_srcinfo_exec", new Dictionary<string, string>() {
+    { "prj_rid",  srtype?.Code ?? string.Empty }
+    });
+  }
+
+
+  protected async Task OnLoadWrk_dtl(IDictionary<string, object> seldic) {
+    Data_dtl = await DbCont<Dictionary<string, object>>("sp_dev_srcinfo_dtl_exec", new Dictionary<string, string>() {
+    { "src_rid",  seldic["src_rid"].ToString() }
+    });
+  }
+
+
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {  });
+
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_srcinfo_exec", req);
+  }
+
+
+
+  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+
+    var saveobj = await DbDelete<IDictionary<string, object>>("sp_dev_srcinfo_exec", req);
+  }
+
+
+  
+  private async Task SaveBtnEvent_dtl(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {  });
+
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_srcinfo_dtl_exec", req);
+  }
+
+
+
+  private async Task DeleteBtnEvent_dtl(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+
+    var saveobj = await DbDelete<IDictionary<string, object>>("sp_dev_srcinfo_dtl_exec", req);
+  }
+
+
+
+
+}

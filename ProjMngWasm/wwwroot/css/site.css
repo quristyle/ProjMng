@@ -11,13 +11,13 @@
 
 :root {
   --rz-layout-body-padding: 0.04rem 0 0 0.04rem !important;
-  --rz-body-font-size: 0.825rem !important;
+/*  --rz-body-font-size: 0.825rem !important;*/
   --rz-tabs-padding: 0.25rem !important;
 }
 
 * {
   font-family: Play, 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
-  font-weight: 100;
+/*  font-weight: 100;*/
 }
 
 
@@ -632,3 +632,33 @@ svg.illustration {
   font-size: 0.7rem;
   margin: 1rem 0 0.6rem 0;
 }
+
+
+
+
+
+
+
+
+/*radzon-blazor 6.4.0 에서 일부 테마에서 step 코드 안먹음*/
+
+.rz-steps [role=tablist] {
+  display: flex;
+}
+
+.rz-steps .rz-steps-item:not(:last-child) {
+  flex: auto;
+  display: flex;
+  align-items: center;
+}
+
+  .rz-steps .rz-steps-item:not(:last-child):after {
+    display: "block";
+    content: "";
+    flex: auto;
+    height: 1px;
+    margin-inline-end: 16px;
+    background-color: var(--rz-base-300);
+  }
+
+

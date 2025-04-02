@@ -1,0 +1,253 @@
+﻿@page "/proj-monitoring";
+@{
+  /* description : 프로젝트 상태 정보를 제공
+  * title : 모니터링
+  * sort : 30
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+
+<RadzenSteps >
+  <Steps>
+          <RadzenStepsItem Text="요건정의"></RadzenStepsItem>
+          <RadzenStepsItem Text="시스템" Disabled=true></RadzenStepsItem>
+          <RadzenStepsItem Text="통합테스트" Disabled=true></RadzenStepsItem>
+          <RadzenStepsItem Text="완료" Disabled=true></RadzenStepsItem>
+  </Steps>
+</RadzenSteps>
+
+
+
+
+
+
+      <RadzenRow Style="--rz-text-h2-line-height: 1; --rz-text-h2-font-weight: 200;">
+        <RadzenColumn Size="12" SizeMD="12" SizeXL="12">
+          <RadzenRow>
+            <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
+              <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenText TextStyle="TextStyle.H6">Progress</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@closeRatioPercentage %</RadzenText>
+                  </RadzenStack>
+                  <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@closeRatioPercentage ShowValue=true />
+                  <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@closeRatioPercentage ShowValue=true />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
+              <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+
+                    <RadzenStack Orientation="Orientation.Vertical">
+                      <RadzenText TextStyle="TextStyle.H6">Comment</RadzenText>
+                      <RadzenText TextStyle="TextStyle.Body1">@_totalFileCount</RadzenText>
+                    </RadzenStack>
+
+
+                    <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@_compFileCount</RadzenText>
+                  </RadzenStack>
+                  <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@commentRatioPercentage ShowValue=true />
+                  <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@commentRatioPercentage ShowValue=true />
+                </RadzenStack>
+              </RadzenCard>
+              
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
+
+
+              <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                      <RadzenText TextStyle="TextStyle.H6">Wbs</RadzenText>
+                      <RadzenText TextStyle="TextStyle.Body2">@_totalWbsCount</RadzenText>
+                    </RadzenStack>
+                    <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@_compWbsCount</RadzenText>
+                  </RadzenStack>
+                  <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@wbsRatioPercentage ShowValue=true />
+                  <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@wbsRatioPercentage ShowValue=true />
+                </RadzenStack>
+              </RadzenCard>
+
+             
+            </RadzenColumn>
+          </RadzenRow>
+        </RadzenColumn>
+</RadzenRow>
+
+
+
+
+          <RadzenRow Style="margin-top:10px;">
+
+        @foreach (var user in userData) {
+
+    <RadzenColumn Size="12" SizeMD="3" SizeXL="3">
+
+
+
+
+
+      <RadzenCard Style="width: 100%;">
+        <RadzenRow>
+          <RadzenColumn Size="8" class="rz-text-truncate">
+            <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{@user.Key}") class="rz-me-1" />
+            <b>@(@user.Key)</b>
+          </RadzenColumn>
+          <RadzenColumn Size="4" class="rz-text-align-end">
+            <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@(Math.Round(@user.Value["author"] * 100 / @_totalFileCount, 1).ToString()) />
+          </RadzenColumn>
+        </RadzenRow>
+        <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+          <RadzenImage Path="https://www.siminsori.com/news/photo/201907/214004_63243_312.jpg"
+                       Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(@user.Key)" />
+          <RadzenStack Gap="0">
+            <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">file : @(@user.Value["author"])</RadzenText>
+            <RadzenText TextStyle="TextStyle.H6">wbs : @(@user.Value["dev_user"])</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2">@(@user.Key), @(@user.Key)</RadzenText>
+          </RadzenStack>
+        </RadzenStack>
+      </RadzenCard>
+
+
+
+
+
+
+
+
+    </RadzenColumn>
+
+
+
+        }
+
+      </RadzenRow>
+
+@code {
+
+  double closeRatioPercentage{get;set;}= 90;
+
+
+  double commentRatioPercentage { get; set; } = 0;
+
+
+  double wbsRatioPercentage { get; set; } = 0;
+
+  
+  double _totalFileCount { get; set; } = 0;
+  double _totalWbsCount { get; set; } = 0;
+
+  double _planFileCount { get; set; } = 0;
+  double _planWbsCount { get; set; } = 0;
+
+  double _compFileCount { get; set; } = 0;
+  double _compWbsCount { get; set; } = 0;
+
+
+  public CommonCode? srtype { get; set; }
+
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      await OnLoadWrk();
+    }
+  }
+
+  //source data
+  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+
+
+  protected async Task OnLoadWrk() {
+
+    userData.Clear();
+
+    Data = await MdCont<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>() { 
+    { "prj_rid",  srtype?.Code ?? "3" }
+    });
+
+    var dataList = Data.Data;
+
+    _totalFileCount = dataList.Count;
+    int emptyCredtCount = dataList.Count(d => d.ContainsKey("credt") && string.IsNullOrEmpty(d["credt"]?.ToString()));
+    _compFileCount = dataList.Count(d => d.ContainsKey("credt") && !string.IsNullOrEmpty(d["credt"]?.ToString()));
+
+
+    commentRatioPercentage = Math.Round((_compFileCount * 100) / _totalFileCount, 1);
+
+
+   CountUsersWithDevEdt(dataList, "author");
+
+    // wbs
+    var wbsData = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+     { "prj_rid", srtype?.Code ?? "3"  }
+    });
+
+     dataList = wbsData.Data;
+
+    _totalWbsCount = dataList.Count;
+    emptyCredtCount = dataList.Count(d => d.ContainsKey("dev_edt") && string.IsNullOrEmpty(d["dev_edt"]?.ToString()));
+    _compWbsCount = dataList.Count(d => d.ContainsKey("dev_edt") && !string.IsNullOrEmpty(d["dev_edt"]?.ToString()));
+
+
+    wbsRatioPercentage = Math.Round((_totalWbsCount <= 0) ? 0 : ((_compWbsCount * 100) / _totalWbsCount), 1);
+
+    closeRatioPercentage = Math.Round((commentRatioPercentage + wbsRatioPercentage) / 2, 1);
+
+
+    CountUsersWithDevEdt(dataList, "dev_user");
+
+  }
+
+  Dictionary<string, Dictionary<string, int>> userData { get; set; } = new Dictionary<string, Dictionary<string, int>>();
+
+
+  public void CountUsersWithDevEdt(List<Dictionary<string, object>> dataList, string user_key) {
+
+    foreach (var dict in dataList) {
+      if (dict.ContainsKey(user_key) && dict[user_key] != null) {
+        string user = dict[user_key].ToString();
+        if (!string.IsNullOrEmpty(user)) {
+          if (!userData.ContainsKey(user)) {
+            userData[user] = new Dictionary<string, int>();
+          }
+
+          if (!userData[user].ContainsKey(user_key)) {
+            userData[user][user_key] = 0;
+          }
+
+
+          userData[user][user_key]++;
+
+          // if (dict.ContainsKey("dev_edt") && string.IsNullOrEmpty(dict["dev_edt"]?.ToString())) {
+          //   userCounts[user].EmptyDevEdtCount++;
+          // }
+        }
+      }
+    }
+
+  }
+
+}
