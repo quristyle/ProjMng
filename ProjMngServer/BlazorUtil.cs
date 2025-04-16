@@ -47,7 +47,7 @@ public class BlazorUtil {
    // string basePath = @"c:\projects\ProjMng";
    // string projNamespace = @"ProjMngWasm";
    // string pageRoot = @"Pages";
-    string folderPath = basePath + @"\" + projNamespace + @"\";
+    string folderPath = basePath + @"/" + projNamespace + @"/";
     string searchPattern = "*.razor";
     //string pagePattern = "@page\\s+\"(?<url>[^\"]+)\"";
     //string namePattern = "@\\* description :\\s*(?<title>[^*]+)\\s*\\*@";
