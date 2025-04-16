@@ -1,0 +1,59 @@
+﻿@page "/projcombotest";
+@{ 
+  /* description : projcombotest
+   * title : projcombotest
+  * sort : 1
+  * credt : 2025-04-15
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <RadzenTextBox @bind-Value="srtype" />
+      <QuriDropDown CodeId="projlist" @bind-Value=testProj />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+  <RadzenColumn Size="12" >
+
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent ReqData=@Data />
+
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+  public string srtype { get; set; } = "";
+
+  public CommonCode? testProj { get; set; }
+
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      await OnLoadWrk();
+    }
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>("sp_projlist", new Dictionary<string, string>() { });
+  }
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_projdbsave", dic);
+  }
+
+}

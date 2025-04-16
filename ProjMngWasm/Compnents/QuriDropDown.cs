@@ -109,11 +109,18 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     }
 
     Data = tmp.AsEnumerable();
-    //if (!IsAll && tmp.Count > 0) {
+    if (!IsAll && tmp.Count > 0) {
       /* 고민.. */
-    //}
+      Console.WriteLine("aaaaaaaaaaaaa");
+                object obj = tmp[0];
+                await ValueChanged.InvokeAsync((TValue)obj); // 바인딩된 변수에 반영
+    }
+            StateHasChanged(); // 다시 렌더링
   }
 
 
+
+    //[Parameter] public CommonCode Value { get; set; }              // 바인딩 값
+    //[Parameter] public EventCallback<CommonCode> ValueChanged { get; set; } // 변경 이벤트
 
 }
