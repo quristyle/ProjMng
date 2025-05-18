@@ -1,44 +1,91 @@
 ﻿@inherits QuriDynamicGridBase
+
+
 @if (ReqData != null){
-
-  /*
-
-
-        */
-
 
   <RadzenDataGrid 
     Data="@orders"
-                @ref="ordersGrid" 
-                ColumnWidth="100px"
-                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        @bind-Value="@SItems"
-                        GridLines="Radzen.DataGridGridLines.Vertical"
-                        RowUpdate="@OnUpdateRow"
-                        RowCreate="@OnCreateRow"
-                        RowDoubleClick="@OnDoubleClick"
-                        RowSelect="@OnRowClick"
-                        LogicalFilterOperator="LogicalFilterOperator.And"
-                        AllowFiltering="true"
-                        AllowColumnResize="true"
-                        FilterMode="FilterMode.Simple"
-                        SelectionMode="DataGridSelectionMode.Single"
-                        AllowPaging="true"
-                        AllowSorting="true"
-                        ShowPagingSummary="true"
-                        PageSize=15
-                        Style="width:100%;height:100%;"
-                        PagerHorizontalAlign="HorizontalAlign.Left"
-                        PagerAlwaysVisible=true
-                        PagerPosition=PagerPosition.Bottom
-                        IsLoading="@IsLoading"
-                        TItem="IDictionary<string, object>"
+    @ref="ordersGrid" 
+    ColumnWidth="100px"
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    @bind-Value="@SItems"
+    GridLines="Radzen.DataGridGridLines.Vertical"
+    RowUpdate="@OnUpdateRow"
+    RowCreate="@OnCreateRow"
+    RowDoubleClick="@OnDoubleClick"
+    RowSelect="@OnRowClick"
+    LogicalFilterOperator="LogicalFilterOperator.And"
+    AllowFiltering=@IsToggle
+    AllowColumnResize="true"
+    FilterMode="FilterMode.Simple"
+    SelectionMode="DataGridSelectionMode.Single"
+    AllowSorting="true"
+    Count=@RecordCount
+    
+    Style="width:100%;height:100%;"
+    IsLoading="@IsLoading"
+    TItem="IDictionary<string, object>"
       >
 
+      @* 
+
+
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        PagerAlwaysVisible=true
+                        AllowPaging="true"
+                        PageSize=5000
+                        AllowPaging="true"
+                        PagerPosition=PagerPosition.Bottom
+
+
+      *@
+
+
+
     <EmptyTemplate>
-      <p style="color: lightgrey; font-size: 18px; text-align: center; margin: 2rem;">No records to display.</p>
+      <p style="color: lightgrey; font-size: 18px; text-align: center; margin: 2rem;">No records</p>
     </EmptyTemplate>
   <Columns>
+
+      @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
+        <RadzenDataGridColumn Context="IDictionary<string, object>"
+                              Filterable=false
+                              Sortable="false"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true"
+                              FrozenPosition="FrozenColumnPosition.Left"
+                              Width=@ActionWidth() MinWidth=@ActionWidth() MaxWidth=100 >
+          <Template Context="order">
+
+            @if (IsSave) {
+              <a class="action" @onclick="@(args => EditRow(order))"><i class="bi bi-pencil"></i></a>
+            }
+            @if (IsAction) {
+              @* <RadzenButton Icon="assignment_return" Size="ButtonSize.ExtraSmall" Click="@(args => ActionRow(order))" @onclick:stopPropagation="true" /> *@
+              <a class="action" @onclick="@(args => ActionRow(order))"><i class="bi bi-check-square"></i></a>
+            }
+            @if (IsDelete) {
+              <a class="action float-end" @onclick="@(args => ConfDeleteRow(order))"><i class="bi bi-dash-square"></i></a>
+            }
+
+          </Template>
+          <EditTemplate Context="order">
+
+            @if (IsSave) {
+              <a class="action" @onclick="@(args => SaveRow(order))"><i class="bi bi-save2"></i></a>
+              <a class="action" @onclick="@(args => CancelEdit(order))"><i class="bi bi-x-square"></i></a>
+            }
+            @if (IsAction) {
+              <a class="action" @onclick="@(args => ActionRow(order))"><i class="bi bi-action"></i></a>
+            }
+            @* @if (IsDelete) { *@
+            @*   <a class="action float-end" @onclick="@(args => ConfDeleteRow(order))"><i class="bi bi-dash-square"></i></a> *@
+            @* } *@
+
+          </EditTemplate>
+        </RadzenDataGridColumn>
+      }
 
       @if (cols != null) {
     @foreach (var col in cols)        {
@@ -55,36 +102,29 @@
       >
 
         <EditTemplate Context="order">
-
           @if (col.Value == "System.DateTime") {
-              <RadzenDatePicker @bind-Value=@order[col.Key] DateFormat="yyyy-MM-dd"      />
-            } 
-            else if (col.Value == "System.Int32") {
-            <RadzenNumeric @bind-Value=@order[col.Key] />
-            }
-
-              else if (col.Value == "System.Boolean") {
-                <RadzenCheckBox @bind-Value=@order[col.Key] />
-              }
-
-            else {
-            <RadzenTextBox Change="@(args => order[@col.Key] = args)"
-                            Value=@(order.TryGetValue(@col.Key, out object k)?k?.ToString():"")
-                            Name="@col.Key" aria-label="Enter {col.Key}" />
-            
-            }
+            <RadzenDatePicker @bind-Value=@order[col.Key] DateFormat="yyyy-MM-dd"      />
+          } 
+          else if (col.Value == "System.Int32") {
+          <RadzenNumeric @bind-Value=@order[col.Key] />
+          }
+          else if (col.Value == "System.Boolean") {
+            <RadzenCheckBox @bind-Value=@order[col.Key] />
+          }
+          else {
+          <RadzenTextBox Change="@(args => order[@col.Key] = args)"
+                          Value=@(order.TryGetValue(@col.Key, out object k)?k?.ToString():"")
+                          Name="@col.Key" aria-label="Enter {col.Key}" />
+          }
         </EditTemplate>
               
-
         <Template>
-
 
           @if (col.Value == "System.DateTime") {
             if (context[@col.Key] != null && !string.IsNullOrWhiteSpace(context[@col.Key].ToString()) && context[@col.Key].GetType() == typeof(DateTime)
         ){
               //@vrst.ToString("yyyy-MM-dd");
-
-                  
+ 
             @(((DateTime)context[@col.Key]).ToString("yyyy-MM-dd"))
 
             }
@@ -92,18 +132,16 @@
                   
             @context[@col.Key] 
 
-
             }
 
-
           }
-              else if (col.Value == "System.Boolean") {
-                @if((bool)context[@col.Key]){
-                  <RadzenIcon Icon="done" />
-                }
-                else {
+          else if (col.Value == "System.Boolean") {
+            @if((bool)context[@col.Key]){
+              <RadzenIcon Icon="done" />
+            }
+            else {
                   
-                }
+            }
           }
           else {
           @context[@col.Key]
@@ -113,83 +151,65 @@
     }
     }
 
-      @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete ) ) {
-    <RadzenDataGridColumn Context="IDictionary<string, object>" 
-      Filterable=false Sortable="false" 
-      TextAlign="TextAlign.Center" 
-      Frozen="true"
-                              FrozenPosition="FrozenColumnPosition.Right" 
-                              Width="80px" MinWidth="80px" MaxWidth="80px">
-      <Template Context="order">
 
 
+      @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
+        <RadzenDataGridColumn Filterable=false Sortable="false" Width="auto"  />
+      }
 
-            @if (IsSave) {
-              <RadzenButton Icon="edit" Size="ButtonSize.ExtraSmall" Click="@(args => EditRow(order))" @onclick:stopPropagation="true" />
-            }
-
-
-
-
-
-            @if (IsDelete) {
-              <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true" />
-            }
-
-
-            @if( IsAction ){
-              <RadzenButton Icon="assignment_return" Size="ButtonSize.ExtraSmall" Click="@(args => ActionRow(order))" @onclick:stopPropagation="true" />
-            }
-      </Template>
-      <EditTemplate Context="order">
-
-            @if (IsSave) {
-              <RadzenButton Icon="check" Size="ButtonSize.ExtraSmall" Click="@((args) => SaveRow(order))" aria-label="Save" />
-              <RadzenButton Icon="close" Size="ButtonSize.ExtraSmall" Click="@(args => CancelEdit(order))" aria-label="Cancel" />
-            }
-
-
-
-
-
-            @if (IsDelete) {
-              <RadzenButton Icon="delete" Size="ButtonSize.ExtraSmall" Click="@(args => DeleteRow(order))" aria-label="Delete" />
-            }
-            @if( IsAction ){
-              <RadzenButton Icon="assignment_return" Size="ButtonSize.ExtraSmall" Click="@(args => ActionRow(order))" aria-label="action" />
-            }
-      </EditTemplate>
-    </RadzenDataGridColumn>
-    }
 
   </Columns>
 
-
-    <HeaderTemplate  >
-
-      @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
-      <RadzenButton Icon="add_circle" Click="@(() => InsertAfterRow(null))"  />
-
+    <FooterTemplate >
+      <div class="action-btn px-1 py-1">
+        @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
+          <a class="action float-start" @onclick=@(() => InsertAfterRow(null))><i class="bi bi-plus-square"></i></a>
         }
-    </HeaderTemplate>
 
-
+        <a class="action float-end" @onclick=@(() => ToggleFilter())><i class="bi bi-filter"></i></a>
+        <span class="action float-end">@orders.Count items</span>
+      </div>
+    </FooterTemplate>
 
 </RadzenDataGrid>
-}
 
+}
 
 @code{
 
+
+
+
+
   protected string GetWidth(string typeStr, string unit = "px"){
-    string result = "";
+    string result = "100";
     if (typeStr == "System.DateTime") {
-    result = "150";
+      result = "140";
+    }
+    else if (typeStr == "System.Int32") {
+      result = "60";
+    }
+    else if (typeStr == "System.Boolean") {
+      result = "40";
     }
 
     return result+unit;
   }
 
+  protected string ActionWidth() {
+    int v = 10;
+
+    if (IsSave ) {      v += 32;    }
+    if (IsAction) { v += 32; }
+    if (IsDelete) { v += 32; }
+
+    return v + "px";
+  }
+
+  bool IsToggle{get;set;}=false;
+  protected void ToggleFilter() {
+    IsToggle = !IsToggle;
+  }
 
 
 }

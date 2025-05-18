@@ -132,6 +132,8 @@ public class DevService : BaseService {
     // 디비의 쿼리 정보 가져오기
     Devsqlresp dsr = GetDsr(di, stp);
 
+
+
     if (dsr == null) {
       ri.Code = -88;
       ri.Message = $" dbtype {di.Db_type} 의 {stp} 가 정의 되지 않았습니다.";
@@ -149,6 +151,8 @@ public class DevService : BaseService {
       else if (dsr.Dsl_type == "MSSQL") {
         db = new SqlConnection(di.ToConnectionString());
       }
+
+      param["schema"] = di.Db_schema;
 
       string directString = ChangeQueryDirectQuery(dsr.Dsl_query, param);
 
@@ -262,6 +266,13 @@ public class DevService : BaseService {
   }
 
 
+
+  /// <summary>
+  /// $key 값은 문자열을 바꾼다. 다이렉트 쿼리 문자열 $ 를 바꾼다.
+  /// </summary>
+  /// <param name="dsl_query"></param>
+  /// <param name="param"></param>
+  /// <returns></returns>
   string ChangeQueryDirectQuery(string dsl_query, Dictionary<string, string> param) {
     String result = dsl_query;
     // $key 값은 문자열을 바꾼다. 다이렉트 쿼리 문자열 $

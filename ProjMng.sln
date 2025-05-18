@@ -19,6 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeWorkWasm", "HomeWorkWasm\HomeWorkWasm.csproj", "{DD1B0DF2-3420-4AE7-A0E1-0E6CB2BF8FEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasmShear", "WasmShear\WasmShear.csproj", "{745316FF-A6C4-40FE-BBD9-82EAE9CE3E07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +57,14 @@ Global
 		{7F020B78-BC3B-A804-DDEA-BB8CA8B59FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F020B78-BC3B-A804-DDEA-BB8CA8B59FDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F020B78-BC3B-A804-DDEA-BB8CA8B59FDB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DD1B0DF2-3420-4AE7-A0E1-0E6CB2BF8FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD1B0DF2-3420-4AE7-A0E1-0E6CB2BF8FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD1B0DF2-3420-4AE7-A0E1-0E6CB2BF8FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD1B0DF2-3420-4AE7-A0E1-0E6CB2BF8FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{745316FF-A6C4-40FE-BBD9-82EAE9CE3E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745316FF-A6C4-40FE-BBD9-82EAE9CE3E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745316FF-A6C4-40FE-BBD9-82EAE9CE3E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745316FF-A6C4-40FE-BBD9-82EAE9CE3E07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

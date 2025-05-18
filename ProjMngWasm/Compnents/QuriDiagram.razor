@@ -1,0 +1,92 @@
+﻿@{
+  /* description : 다이어 그램 편집기
+  * title : diagram
+  * sort : 0
+  * credt : 2025-04-13
+  * author : quristyle
+  */
+}
+
+@inject IJSRuntime JS
+@using ProjMngWasm.Models;
+@using System.Diagnostics.CodeAnalysis
+@using System.Text.Json
+
+@inherits BaseComponent
+
+<h3>Diagram</h3>
+
+<div class="toolbar" style="margin-bottom:10px;">
+  <button @onclick="AddEntity">엔터티 추가</button>
+  <button @onclick="SaveDiagram">xml 저장</button>
+  <button @onclick="LoadDiagram">xml 불러오기</button>
+  <button @onclick="RemoveSelected">선택된 엔터티 삭제</button>
+  <button @onclick="AutoLayout">자동 정렬</button>
+
+  <button @onclick="SaveAsObjectJson">객체형 JSON 저장</button>
+  <button @onclick="LoadFromObjectJson">객체형 JSON 불러오기</button>
+
+</div>
+
+<div id="@ContainerId" style="height:70vh; border:1px solid #ccc;"></div>
+
+<p><strong>선택한 노드:</strong> @_selectedNode</p>
+
+<textarea id="diagramData"
+                style="width:100%; height:150px; margin-top:10px;"
+                @bind="_diagramXml"></textarea>
+
+
+
+@code {
+
+  private DotNetObjectReference<QuriDiagram>? _dotNetRef;
+  private string ContainerId = $"graph-container-{Guid.NewGuid()}";
+
+  private string _selectedNode = "없음";
+  private string SelectERD = "";
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      _dotNetRef = DotNetObjectReference.Create(this);
+      await JS.InvokeVoidAsync("mxGraphInit", ContainerId, _dotNetRef);
+    }
+  }
+
+  private string _diagramXml = "";
+
+  private async Task AddEntity() =>    await JS.InvokeVoidAsync("addEntityNode");
+
+  public async Task<string> SaveDiagram() { _diagramXml = await JS.InvokeAsync<string>("saveDiagramXml", ContainerId); return _diagramXml; }
+
+    private async Task LoadDiagram() => await JS.InvokeVoidAsync("loadDiagramXml", _diagramXml);
+
+    private async Task AutoLayout() => await JS.InvokeVoidAsync("autoLayout");
+
+  public async Task<string> SaveAsObjectJson() { _diagramXml = await JS.InvokeAsync<string>("saveDiagramAsObjectJson", ContainerId); return _diagramXml; }
+  
+  private async Task LoadFromObjectJson() => await JS.InvokeVoidAsync("loadDiagramFromObjectJson", ContainerId, _diagramXml);
+    private async Task RemoveSelected() =>  await JS.InvokeVoidAsync("removeSelectedEntity");
+
+
+
+
+  public async Task LoadDiagramFromObjectJson(string db_pvalue) {
+    await JS.InvokeVoidAsync("loadDiagramFromObjectJson", ContainerId,  db_pvalue);
+  }
+
+
+
+
+  [JSInvokable]
+  public Task OnNodeClicked(string label) {
+    _selectedNode = label;
+    StateHasChanged(); // UI 갱신
+    return Task.CompletedTask;
+  }
+
+  public async ValueTask DisposeAsync() {
+    _dotNetRef?.Dispose();
+  }
+
+}

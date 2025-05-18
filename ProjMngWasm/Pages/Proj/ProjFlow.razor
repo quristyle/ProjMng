@@ -1,0 +1,168 @@
+﻿@page "/flows"
+@{
+  /* description : 업무 흐름도
+  * title : Flows
+  * sort : 4
+  * credt : 2025-04-12
+  * author : quristyle
+  */
+}
+
+@inject IJSRuntime JS
+@using ProjMngWasm.Models;
+@using System.Diagnostics.CodeAnalysis
+@using System.Text.Json
+
+@inherits PageBaseComponent
+<PageTitle>Jsini | Flow</PageTitle>
+
+<RadzenCard>
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
+      <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true />
+
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
+      <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>
+    </RadzenStack>
+  </RadzenStack>
+</RadzenCard>
+
+<QuriDiagram @ref="diagram" />
+
+
+
+@code {
+
+  QuriDiagram diagram { get; set; }
+  CommonCode? projectName { get; set; }
+  CommonCode? dbType { get; set; }
+
+
+  private string _diagramXml = "없음";
+  private string SelectERD = "";
+
+  
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+    }
+  }
+
+  
+  protected async Task OnLoad() {
+
+    // 기존 JSON 데이터 로드
+    var loadobj = await DbCont<IDictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
+        {"db_rid", dbType.Code},
+        {"db_pkey", "erd"},
+    });
+
+    string db_pvalue = string.Empty;
+    if (loadobj.Data.Count > 0) {
+      db_pvalue = loadobj.Data[0]["db_pvalue"].ToString();
+      SelectERD = loadobj.Data[0]["db_prid"].ToString();
+    }
+    else{
+      SelectERD = "";
+    }
+
+    // 기존 JSON 데이터를 역직렬화
+    ErdInfo existingErdInfo = string.IsNullOrEmpty(db_pvalue)
+        ? new ErdInfo()
+        : JsonSerializer.Deserialize<ErdInfo>(db_pvalue) ?? new ErdInfo();
+
+
+    // 새로 생성된 데이터
+    Dictionary<string, string> dic = getParams();
+    var ri = await devService.GetList<TableInfo>("tablelist", dic);
+    List<TableInfo> dataTb = ri.Data;
+
+    ErdInfo newErdInfo = new ErdInfo();
+    //int _x = 100;
+    foreach (var item in dataTb) {
+      newErdInfo.entities.Add(new EntityInfo() {
+          id = item.TableName,
+          name = item.TableName,
+          desc = item.Description ?? string.Empty,
+          x = 10,
+          y = 10
+        });
+      //_x += 50;
+    }
+
+
+    // 기존 데이터와 새 데이터 비교 및 병합
+    var existingNames = existingErdInfo.entities.Select(e => e.id).ToHashSet();
+    var newNames = newErdInfo.entities.Select(e => e.id).ToHashSet();
+
+    // 새로 추가된 엔터티 추가
+    foreach (var entity in newErdInfo.entities) {
+      var existingEntity = existingErdInfo.entities.FirstOrDefault(e => e.id == entity.id);
+      if (existingEntity != null) {
+        // 기존 데이터가 있으면 x 값을 유지
+        //entity.x = existingEntity.x;
+        existingEntity.desc = entity.desc??string.Empty;
+      }
+      else {
+        // 새로 추가된 엔터티는 그대로 추가
+        existingErdInfo.entities.Add(entity);
+      }
+    }
+
+    // 기존 데이터에서 제거된 엔터티 삭제 삭제 하지 말자.. 대신 삭제 표시를 하자.
+    //existingErdInfo.entities.RemoveAll(e => !newNames.Contains(e.id));
+
+    // 삭제 표기
+    foreach (var entity in existingErdInfo.entities) {
+      var existingEntity = newErdInfo.entities.FirstOrDefault(e => e.id == entity.id);
+      if (existingEntity == null) {
+        // 삭제된 엔터티는 삭제 표시
+        entity.desc += "(삭제됨)";
+      }
+    }
+
+
+
+
+    // 병합된 데이터를 JSON으로 직렬화
+    db_pvalue = JsonSerializer.Serialize(existingErdInfo, new JsonSerializerOptions { WriteIndented = true });
+
+    await diagram.LoadDiagramFromObjectJson(db_pvalue);
+
+    // 다이어그램 로드
+    //await JS.InvokeVoidAsync("loadDiagramFromObjectJson", db_pvalue);
+
+  }
+
+
+  protected async Task OnSave() {
+
+    _diagramXml = await diagram.SaveAsObjectJson(); // await JS.InvokeAsync<string>("saveDiagramAsObjectJson");
+
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>(){
+      {"db_rid", dbType.Code},
+      {"db_pkey", "erd"},
+      {"db_prid", SelectERD},
+      {"db_pvalue", _diagramXml},
+    });
+
+
+  }
+
+
+
+  Dictionary<string, string> getParams() {
+
+    return new Dictionary<string, string>() {
+  {"db",dbType?.Others["db_type"]??string.Empty},
+  {"dbnick",dbType?.Others["db_nick"]??string.Empty},
+  {"schema",dbType?.Others["db_schema"]??string.Empty},
+
+  };
+  }
+
+
+}

@@ -8,7 +8,6 @@
   */
 }
 @using ProjMngWasm.Models;
-@using ProjMngWasm.Services;
 
 @inherits PageBaseComponent
 
@@ -86,7 +85,7 @@
 
   protected async Task OnLoadWrk() {
     cols.Clear();
-    data2 = await FuneralService.GetList("fr.room.roomstatus2", new Dictionary<string, object>() { { "company", srtype }
+    data2 = await funeralService.GetList("fr.room.roomstatus2", new Dictionary<string, object>() { { "company", srtype }
       , { "b_key", "" }
       , { "srch", "" }
        });

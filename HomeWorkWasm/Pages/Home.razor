@@ -1,0 +1,67 @@
+﻿@page "/home"
+@page "/"
+@inherits CommonPageComponent
+<PageTitle>Home</PageTitle>
+
+
+<div class="container-xl">
+  <div class="row row-deck row-cards">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body" style="height: 10rem">
+
+          <h3>안녕하세요</h3>
+          <h3><strong>@appData.User?.LastName</strong> 님!</h3>
+
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body" style="height: 10rem">
+
+
+          <a href="/work">ToDo</a>
+
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body" style="height: 10rem"></div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body" style="height: 10rem"></div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="row row-cards">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body" style="height: 10rem"></div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body" style="height: 10rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body" style="height: 10rem"></div>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body" style="height: 10rem"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

@@ -8,7 +8,6 @@
   */
 }
 @using ProjMngWasm.Models;
-@using ProjMngWasm.Services;
 @using System.Diagnostics.CodeAnalysis
 @using System.Text.Json
 
@@ -62,7 +61,8 @@ SelectedIndexChanged="@OnTableChange" >
             ShowPagingSummary="true">
               <Columns>
                 <RadzenDataGridColumn title="ProcName" Property="ProcedureName" />
-                <RadzenDataGridColumn title="Desc" Property="Description" />
+                      <RadzenDataGridColumn title="Desc" Property="Description" />
+                      <RadzenDataGridColumn title="cont" Property="Routine_Definition" />
               </Columns>
             </RadzenDataGrid>
 
@@ -71,13 +71,117 @@ SelectedIndexChanged="@OnTableChange" >
           <RadzenColumn Size="7">
 
 
-                  <StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="appData.FnPgsqlOtion" />
+                  <QuriCodeEditor @ref="_editor" />
 
 
           </RadzenColumn>
         </RadzenRow>
 
       </RadzenCard>
+
+
+
+    </RadzenTabsItem>
+
+    <RadzenTabsItem Text="Fn">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <RadzenCard class="rz-my-6">
+
+              <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
+                <RadzenColumn Size="5">
+
+                  <RadzenDataGrid @bind-Value=@FnSelectedItems
+                                  Style="height:60vh;"
+                                  Data="@FnData"
+                                  TItem="ProcInfo"
+                                  IsLoading=@isLoading
+                                  FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                  LogicalFilterOperator="LogicalFilterOperator.And"
+                                  AllowFiltering="true"
+                                  AllowColumnResize="true"
+                                  FilterMode="FilterMode.Simple"
+                                  SelectionMode="DataGridSelectionMode.Single"
+                                  AllowPaging="false"
+                                  AllowSorting="true"
+                                  PagerHorizontalAlign="HorizontalAlign.Left"
+                                  ShowPagingSummary="true">
+                    <Columns>
+                      <RadzenDataGridColumn title="Function" Property="ProcedureName" />
+                      <RadzenDataGridColumn title="Desc" Property="Description" />
+                      <RadzenDataGridColumn title="cont" Property="Routine_Definition" />
+                    </Columns>
+                  </RadzenDataGrid>
+
+                </RadzenColumn>
+
+                <RadzenColumn Size="7">
+
+
+                  <QuriCodeEditor @ref="_FnEditor" />
+
+
+                </RadzenColumn>
+              </RadzenRow>
+
+            </RadzenCard>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -157,8 +261,6 @@ SelectedIndexChanged="@OnTableChange" >
 
 
 
-
-
     </RadzenTabsItem>
     @* table end *@
 
@@ -174,8 +276,10 @@ SelectedIndexChanged="@OnTableChange" >
           <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
             <RadzenText >
 
-              @foreach(var dr in dataCol){
-                @($"{dr.ColunmName},")
+              @if( dataCol != null ){
+                foreach(var dr in dataCol){
+                  @($"{dr.ColunmName},")
+                }
               }
 
             </RadzenText>
@@ -201,8 +305,6 @@ SelectedIndexChanged="@OnTableChange" >
 
 
     </RadzenTabsItem>
-
-
 
 
 
@@ -240,15 +342,6 @@ SelectedIndexChanged="@OnTableChange" >
 
 
 
-
-
-
-
-
-
-
-
-
     <RadzenTabsItem Text="ProcMake">
 
 
@@ -256,23 +349,16 @@ SelectedIndexChanged="@OnTableChange" >
 
       <RadzenCard>
 
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
 
-          <RadzenTextBox Value=@compnentTag />
-
-        </RadzenRow>
-
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem">
+        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
 
 
           <RadzenColumn Size="7">
-
-            <RadzenButton Click="@CopyTextToClipboard" Text="Copy"></RadzenButton>
-
-            <StandaloneCodeEditor @ref="_editProc" CssClass="code-editor" ConstructionOptions="appData.FnPgsqlOtion" />
+            <QuriCodeEditor @ref="_editProc" />
 
           </RadzenColumn>
         </RadzenRow>
+
 
       </RadzenCard>
 
@@ -284,37 +370,6 @@ SelectedIndexChanged="@OnTableChange" >
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   </Tabs>
 </RadzenTabs>
 
@@ -322,9 +377,10 @@ SelectedIndexChanged="@OnTableChange" >
 
   CommonCode? projectName { get; set; }
   CommonCode? dbType { get; set; }
-
-  private StandaloneCodeEditor? _editor;
-  private StandaloneCodeEditor?   _editProc;
+  
+  private QuriCodeEditor? _editor;
+  private QuriCodeEditor? _FnEditor;
+  private QuriCodeEditor? _editProc;
 
   IEnumerable<CommonCode>? dbTypeList { get; set; }
 
@@ -335,6 +391,18 @@ SelectedIndexChanged="@OnTableChange" >
       _editor.SetValue(_selectedItems[0].Routine_Definition ?? string.Empty);
     } 
   }
+
+
+  IList<ProcInfo> _FnSelectedItems { get; set; } = new List<ProcInfo>() { new ProcInfo() { Routine_Definition = "empty" } };
+  IList<ProcInfo> FnSelectedItems {
+    get { return _FnSelectedItems; }
+    set {
+      _FnSelectedItems = value;
+      _FnEditor.SetValue(_FnSelectedItems[0].Routine_Definition ?? string.Empty);
+    }
+  }
+
+
   IList<TableInfo>? selectedTable;
   //ProcInfo? selected_pi;
 
@@ -345,19 +413,49 @@ SelectedIndexChanged="@OnTableChange" >
   string compnentTag = "RadzenDataGridColumn";
 
   int tabIndex { get; set; } = 0;
-
+  
   public IEnumerable<ProcInfo>? data { get; set; }
+  public IEnumerable<ProcInfo>? FnData { get; set; }
   public IEnumerable<TableInfo>? dataTb { get; set; }
   public IEnumerable<ColumnInfo>? dataCol { get; set; }
   bool isLoading = false;
   bool isLoading2 = false;
   bool isLoading3 = false;
 
+
+  string DBSpMakeString;
+
+
   protected async Task OnLoad() {
 
     if (dbType == null){
       Console.WriteLine("DbType 선택 필수");
       return;
+    }
+
+
+
+    var dbLogicItem = await DbCont<Dictionary<string, string>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
+      { "db_rid", dbType.Code },
+      { "db_pkey", "sp_fmt" }
+    });
+    if (dbLogicItem.Data.Count == 0) {
+      string dbtype = dbType?.Others["db_type"];
+      
+    switch (dbtype) {
+        case "MSSQL":
+          DBSpMakeString = WasmUtil.MssqlProcMakeBase;
+        break;
+        case "POSTGRESQL":
+          DBSpMakeString = WasmUtil.PostgresqlProcMakeBase;
+        break;
+      default:
+        break;
+    }
+
+    }
+    else {
+      DBSpMakeString = dbLogicItem.Data[0]["db_pvalue"] ?? string.Empty;
     }
 
     if (tabIndex == 0) {
@@ -383,11 +481,12 @@ SelectedIndexChanged="@OnTableChange" >
   protected async Task LoadProc() {
 
     Dictionary<string, string> dic = getParams();
-    dic.Add("stp", "proclist");
+    //dic.Add("stp", "proclist");
 
     isLoading = true;
-    var ri = await DevService.GetList<ProcInfo>("proclist", dic);
-    data = ri.Data;
+    var ri = await devService.GetList<ProcInfo>("proclist", dic);
+    FnData = ri.Data.Where(i => i.PgType == "sql").ToList();
+    data = ri.Data.Where(i => i.PgType != "sql").ToList();
 
     if (data != null && data.ToList().Count > 0 ){
       selectedItems = new List<ProcInfo>(){ data.ToList().FirstOrDefault() };
@@ -400,7 +499,7 @@ SelectedIndexChanged="@OnTableChange" >
     Dictionary<string, string> dic = getParams();
     dic.Add("stp", "tablelist");
     isLoading2 = true;
-    var ri = await DevService.GetList<TableInfo>("tablelist", dic);
+    var ri = await devService.GetList<TableInfo>("tablelist", dic);
     dataTb = ri.Data;
     isLoading2 = false;
   }
@@ -417,110 +516,71 @@ SelectedIndexChanged="@OnTableChange" >
 
   async Task OnRowSelect(TableInfo tableInfo) {
 
+
+
+    string dbtype = dbType?.Others["db_type"];
+    string dbSchema = dbType?.Others["db_schema"];
+    string prefix = "p_";
+    string prefix2 = "p_";
+    string varstr = "character varying";
+    string spStr = DBSpMakeString;
+
+    switch (dbtype) {
+      case "MSSQL":
+        prefix = "@p_";
+        prefix2 = "@p_";
+        varstr = "varchar(100)";
+        break;
+      case "AWG":
+        prefix = "p_";
+        break;
+      case "POSTGRESQL":
+        prefix = "IN p_";
+        prefix2 = "p_";
+        varstr = "character varying";
+        break;
+      case "oracle":
+        prefix = "p_";
+        break;
+      case "mysql":
+        prefix = "";
+        break;
+      default:
+        prefix = "p_";
+        break;
+    }
+
     Dictionary<string, string> dic = getParams();
     dic.Add("stp", "columnsOftable");
     dic.Add("table_name", tableInfo.TableName ?? string.Empty);
     isLoading3 = true;
-    var ri = await DevService.GetList<ColumnInfo>("columnsOftable", dic);
+    var ri = await devService.GetList<ColumnInfo>("columnsOftable", dic);
     dataCol = ri.Data;
 
     SelectedTableProp = "";
     SelectedTableGridColum = "";
 
-    string sp_colstr = "";
-    string c_cols = "";
-    string _col = "";
     foreach (var dr in dataCol) {
       SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}" + System.Environment.NewLine;
-      SelectedTableGridColum += $"<{compnentTag} title=\"{dr.ColunmName}\" Property=\"{dr.ColunmName}\" />" + System.Environment.NewLine;
-      if (!string.IsNullOrEmpty(sp_colstr)){
-        sp_colstr += "  , ";
-      }
-      else{
-        sp_colstr += "    ";
-      }
-      sp_colstr += $"IN p_{dr.ColunmName}  character varying {System.Environment.NewLine}";
-      if (!string.IsNullOrEmpty(c_cols)) {
-        c_cols += "  , ";
-      }
-      else {
-        c_cols += "    ";
-      }
-      c_cols += $"a.{dr.ColunmName} {System.Environment.NewLine}";
-      if (string.IsNullOrEmpty(_col)){
-        _col=dr.ColunmName;
-      }
+      SelectedTableGridColum += $"<{compnentTag} title=\"{(string.IsNullOrWhiteSpace(dr.ColDescription) ? dr.ColunmName:dr.ColDescription)}\" Property=\"{dr.ColunmName}\" />" + System.Environment.NewLine;
     }
 
     string nowdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-    string spStr = $@"
-/* description : 해당 테이블 또는 프로그램명 등..
- * writer      : quristyle
- * date        : {nowdate}
- */
-CREATE OR REPLACE PROCEDURE projmng.sp_{tableInfo.TableName}_exec({System.Environment.NewLine}
-{sp_colstr}  , IN p_req_type character varying
-  , INOUT p_cur refcursor
-)
- LANGUAGE plpgsql
-AS $procedure$
+  
+    
 
-declare
-
-	BEGIN
+    
 
 
-
-    if p_req_type = 'save' then
-
-      if ( select count(*)
-             from projmng.{tableInfo.TableName}
-	        where {_col} = p_{_col} ) > 0 then
-
-	      update projmng.{tableInfo.TableName}
-	         set {_col} = p_{_col}
-	       where {_col} = p_{_col}
-	      ;
-
-      else
-
-	      insert into projmng.{tableInfo.TableName}
-	      ( {_col} )
-	      values
-	      ( p_{_col} )
-	      ;
-
-      end if;
-
-    end if;
-
-
-
-
-
-
-
-
-
-      open p_cur for
-
-      select {c_cols}
-        from projmng.{tableInfo.TableName} a
-       where 1=1
-         and ( ( nvl(p_{_col}, '') = '' and 1=1  )
-             or  ( nvl(p_{_col}, '') != '' and a.{_col} = p_{_col}::int )
-             )
-
-      ;
-
-
-	END;
-
-$procedure$
-;
-
-
-";
+    spStr = spStr.Replace("quri_TableName_quri", tableInfo.TableName);
+    spStr = spStr.Replace("quri_date_quri", nowdate);
+    spStr = spStr.Replace("quri_cols_quri", string.Join($"{System.Environment.NewLine},", dataCol.Select(c => c.ColunmName + $" -- " + c.Description)));
+    spStr = spStr.Replace("quri_in_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => $"{prefix}" + c.ColunmName + $" {varstr}" + $" -- " + c.Description)));
+    spStr = spStr.Replace("quri_schema_quri", dbSchema);
+    spStr = spStr.Replace("quri_keycol_quri", dataCol.Select(c => c.ColunmName).First());
+    spStr = spStr.Replace("quri_p_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => $"{prefix2}" + c.ColunmName + $" -- " + c.Description)));
+    spStr = spStr.Replace("quri_up_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => c.ColunmName + $" = {prefix2}" + c.ColunmName + $" -- " + c.Description)));
+    spStr = spStr.Replace("quri_cols_comment_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => c.ColunmName + $" -- " + c.Description)));
 
 
   await  _editProc.SetValue(spStr);
@@ -530,12 +590,6 @@ $procedure$
 
   }
 
-
-  private async Task CopyTextToClipboard() {
-    var str = await _editProc.GetValue();
-
-   await JSRuntime.InvokeVoidAsync("copyClipboard", str);
-  }
 
 async void OnTableChange(int index) {
   tabIndex = index;

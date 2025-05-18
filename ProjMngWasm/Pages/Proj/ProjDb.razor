@@ -13,12 +13,13 @@
 <RadzenCard class="rz-my-1">
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" >
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true Change=OnLoadWrk />
     </RadzenStack>
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />
+      <RadzenButton Click="@OnSaveWrk" Text="Save" />
     </RadzenStack>
 
   </RadzenStack>
@@ -27,10 +28,24 @@
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
   <RadzenColumn Size="12" >
 
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent ReqData=Data />
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent ReqData=Data  SItemsChanged=OnDbInfoChange />
 
   </RadzenColumn>
 </RadzenRow>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
+  <RadzenColumn Size="4">
+
+    <QuriDynamicGrid ReqData=DbPropData SaveBtnEvent=SaveDBPropEvent SItemsChanged=OnDbPropChange />
+
+  </RadzenColumn>
+  <RadzenColumn Size="8">
+
+    <QuriCodeEditor @ref="_editProc" />
+
+  </RadzenColumn>
+</RadzenRow>
+
 
 @code {
 
@@ -41,6 +56,15 @@
   }
 
   public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+  public List<IDictionary<string, object>>? SelDbInfo { get; set; }
+
+
+  public ResultInfo<Dictionary<string, object>>? DbPropData { get; set; }
+  public IList<IDictionary<string, object>>? SelDbProp { get; set; }
+
+
+
+  private QuriCodeEditor? _editProc;
 
 
   protected async Task OnLoadWrk() {
@@ -49,6 +73,18 @@
     });
   }
 
+  protected async Task OnSaveWrk() {
+    var sp_fmt = await _editProc.GetValue();
+    await DbSave<Dictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
+    { "db_rid",  SelDbProp.FirstOrDefault()["db_rid"].ToString() },
+    { "db_prid",  SelDbProp.FirstOrDefault()["db_prid"].ToString() },
+    { "db_pkey",  SelDbProp.FirstOrDefault()["db_pkey"].ToString() },
+    { "db_pvalue",  sp_fmt },
+    });
+  }
+
+
+  
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {
     var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbsave" } });
@@ -64,6 +100,28 @@
     var saveobj = await DbDelete<IDictionary<string, object>>("sp_projdbdel", req);
   }
 
+
+  private async Task OnDbInfoChange(IList<IDictionary<string, object>> args) {
+    DbPropData = await DbCont<Dictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
+    { "db_rid",  args.FirstOrDefault()["db_rid"].ToString() }
+    });
+  }
+
+
+  private async Task OnDbPropChange(IList<IDictionary<string, object>> args) {
+    SelDbProp = args;
+    _editProc.SetValue(args.FirstOrDefault()["db_pvalue"].ToString());
+
+  }
+
+  
+
+
+  private async Task SaveDBPropEvent(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {  });
+
+    //var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_db_prop_exec", req);
+  }
 
 
 }

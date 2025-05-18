@@ -1,0 +1,107 @@
+﻿@page "/new-work"
+
+@inherits CommonPageComponent
+<div class="row row-cards">
+
+  <div class="col-12">
+
+
+
+
+
+    <div class="mb-3">
+      <div class="form-label">구분</div>
+      <select class="form-select" @bind=@sGugun >
+
+        @{
+
+          if (Data != null && Data.Data != null) {
+            foreach (var i in Data.Data) {
+              <option value='@DicValue(i, "cm_cd")'>@DicValue(i, "cm_nm") - @DicValue(i, "cm_val")</option>
+            }
+          }
+        }
+
+      </select>
+    </div>
+
+
+    <div class="mb-3">
+      <label class="form-label">설명</label>
+      <textarea class="form-control" name="example-textarea"
+                placeholder="Textarea placeholder" @bind=@sComment ></textarea>
+    </div>
+
+
+
+
+
+
+
+
+  </div>
+
+
+  <div class="col-12">
+
+
+
+    <a class="btn btn-green w-50" @onclick=@(e=>Save())>등록</a>
+
+
+  </div>
+
+
+  <div class="col-12">
+
+    <a href="/work" class="btn btn-red w-50">취소</a>
+
+  </div>
+
+
+</div>
+
+
+
+@code {
+  public string sGugun { get; set; }
+  public string sComment { get; set; } = "";
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      OnLoadWrk();
+    }
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>("sp_projcommon", new Dictionary<string, string>() {
+    {"code_id", "HOMEWORK"},
+    //{"is_complete", "false"}
+    });
+    StateHasChanged();
+  }
+
+
+  private async Task Save() {
+    Dictionary<string, object> sData =null;
+    if (string.IsNullOrEmpty(sGugun)){
+      sData = Data.Data.FirstOrDefault();
+    }
+    else {
+      sData = Data.Data.Select(i => i).Where(i => DicValue(i, "cm_cd") == sGugun).FirstOrDefault();
+    }
+
+    await DbSave<IDictionary<string, object>>("sp_home_todo_exec", new Dictionary<string, string>() {
+    {"title",  sData["cm_nm"].ToString()},
+    {"fix_point",  sData["cm_val"].ToString()},
+    {"comments", sComment},
+    {"target_day", DateTime.Now.ToString("yyyyMMdd")},
+    {"target_user", appData.User?.UserId},
+    });
+    StateHasChanged();
+    navigationManager.NavigateTo("/work");
+  }
+
+}

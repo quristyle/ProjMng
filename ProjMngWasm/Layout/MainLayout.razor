@@ -1,4 +1,5 @@
 ﻿@using Radzen
+@using Newtonsoft.Json
 @using Radzen.Blazor
 @using static ProjMngWasm.Layout.MainCont
 @inherits LayoutComponentBase
@@ -9,10 +10,13 @@
 @inject TooltipService TooltipService
 @inject DialogService DialogService
 
-@inject JsiniService? JsiniService
+@inject JsiniService? jsiniService
+@inject NavigationManager? NavigationManager
+
+@inject ContextMenuService ContextMenuService
 
 <HeadContent>
-  <RadzenTheme Theme="software-dark" />
+  <RadzenTheme Theme="standard-dark" />
   @* software-dark *@
 </HeadContent>
 
@@ -26,11 +30,28 @@
         <RadzenColumn Size="5">
           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
             <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-            <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Project Managerment</span>
+            <a href="/"><span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Project Managerment</span></a>
           </RadzenStack>
         </RadzenColumn>
         <RadzenColumn Size="7">
-          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+
+
+
+          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+            <RadzenProfileMenu>
+              <Template>
+                <RadzenGravatar Email="user@example.com">
+                </RadzenGravatar>
+              </Template>
+              <ChildContent>
+                <RadzenProfileMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenProfileMenuItem>
+                <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenProfileMenuItem>
+                <RadzenProfileMenuItem Text="FileInput" Path="fileinput" Icon="attach_file"></RadzenProfileMenuItem>
+                <RadzenProfileMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenProfileMenuItem>
+                <RadzenProfileMenuItem Text="Log Out" Path="login" Icon="exit_to_app"></RadzenProfileMenuItem>
+              </ChildContent>
+            </RadzenProfileMenu>
+         
             <RadzenAppearanceToggle class="rz-mx-2" />
             <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
           </RadzenStack>
@@ -45,7 +66,7 @@
         <RadzenRow>
           <RadzenColumn Size="12">
 
-            <RadzenRow class="rz-mx-auto " Style="">
+            <RadzenRow class="rz-mx-auto main-body-context " Style="">
                             
               <RadzenColumn Size="12" class="" >        
                 @* Visible=IsBodyUrl *@
@@ -55,7 +76,7 @@
               </RadzenColumn>
 
               <RadzenColumn Size="12" class="" Visible=!IsBodyUrl>
-                            @Body
+                @Body
               </RadzenColumn>
 
             </RadzenRow>
@@ -75,14 +96,16 @@
   </RadzenBody>
 
 
-  <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
+  <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" class="" style="display: flex; flex-direction: column">
     <div style="padding: 1rem">
-      <RadzenTextBox id="find" Placeholder="Find page ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
+      <RadzenTextBox id="find" 
+        Placeholder="Find page ..." 
+        type="search" 
+        @oninput="@FilterPanelMenu" 
+        style="width: 100%" 
+        class="rz-search-input" aria-label="find" />
+      <a class="action" @onclick=OnLoadMenu ><i class="bi bi-arrow-clockwise"></i></a>
     </div>
-
-    <div>
-      <RadzenButton Click=OnLoadMenu>Load Menu</RadzenButton>
-      </div>
 
 
 
@@ -95,14 +118,16 @@
 
           @foreach (var di in dirs) {
 
-            <RadzenPanelMenuItem  Text=@di.Key Icon="" >
+            <RadzenPanelMenuItem  Text=@di.dir Icon="" @bind-Expanded=@di.expend >
               @foreach (var p in _Data) {
 
-              @if( di.Key == p["dir"].ToString() ){
+              @if( di.dir == p["dir"].ToString() ){
 
-              <RadzenPanelMenuItem Click=@(()=>AddCallTab(p)) Text="@p["title"].ToString()"
+              <RadzenPanelMenuItem 
+                Click=@(()=>AddCallTab(p)) Text="@p["title"].ToString()"
                 Icon="" aria-label=""
-                                       title="@(@p["sort"].ToString() +". "+ @p["description"].ToString())" />
+                title="@(@p["sort"].ToString() +". "+ @p["description"].ToString())"
+                                       ContextMenu=@((MouseEventArgs args) => ShowContextMenuWithContent(args, p)) @oncontextmenu:preventDefault="true" />
 
               }
 
@@ -172,6 +197,40 @@
 
   void FilterPanelMenu(ChangeEventArgs args) {
     var term = args.Value??string.Empty;
+    if (string.IsNullOrEmpty(term?.ToString())) {
+
+      dirs.ForEach(menuDir =>
+{
+    Console.WriteLine($"Before2: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
+        menuDir.expend = menuDir.pre_expend; // 값 복사
+
+        menuDir.first_memory = false;
+    Console.WriteLine($"After2: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
+});
+
+      _Data = _Data2;
+    }
+    else {
+
+
+      dirs.ForEach(menuDir =>
+{
+    Console.WriteLine($"Before: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
+      if(  !menuDir.first_memory ){
+    menuDir.pre_expend = menuDir.expend; // 값 복사
+          menuDir.first_memory = true;
+      }
+    menuDir.expend = true; // 새로운 값 설정
+    Console.WriteLine($"After: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
+});
+
+      _Data = _Data2?.Where(x => 
+        x["title"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)||
+        x["description"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase) ||
+        x["url"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)
+      );
+    }
+    StateHasChanged();
   }
 
   void ChangeTheme(object value) {
@@ -199,21 +258,33 @@
     if (firstRender) {
       rendered = true;
 
-      var currentUrl = UriHelper.Uri;
-      var baseUri = UriHelper.BaseUri;
-      var relativeUrl = currentUrl.Replace(baseUri, string.Empty);
-      Console.WriteLine($"Relative URL: {relativeUrl}");
-
-      Console.WriteLine($"Current URL: {currentUrl}");
-
-      if (!string.IsNullOrEmpty(relativeUrl) && !relativeUrl.StartsWith('?') ) {
-        IsBodyUrl = false;
-      }
 
       await OnLoadMenu();
 
     }
+    var currentUrl = UriHelper.Uri;
+    var baseUri = UriHelper.BaseUri;
+    var relativeUrl = currentUrl.Replace(baseUri, string.Empty);
+    Console.WriteLine($"Relative URL: {relativeUrl}");
+
+    Console.WriteLine($"Current URL: {currentUrl}");
+
+    if ((_openPageUrl != relativeUrl) && !string.IsNullOrEmpty(relativeUrl) && !relativeUrl.StartsWith('?')) {
+      _openPageUrl = relativeUrl;
+      IsBodyUrl = false;
+      StateHasChanged();
+    }
+
+    if ( !IsBodyUrl && (_openPageUrl != relativeUrl)  ) {
+      _openPageUrl = relativeUrl;
+      IsBodyUrl = true;
+      StateHasChanged();
+    }
+
+
   }
+
+  string _openPageUrl = null;
  
   public List<ProgramInfo> projItems = new List<ProgramInfo>();// { "Customers", "Orders", "Order Details" };
 
@@ -286,14 +357,65 @@
 
   MainCont? _main{get;set;}
 
-  public Dictionary<string, string> dirs { get; set; } = new Dictionary<string, string>();
+  public List<MenuDir> dirs { get; set; } = new List<MenuDir>();
   //public ResultInfo<Dictionary<string, object>>? Data { get; set; }
   public IEnumerable<Dictionary<string, object>>? _Data { get; set; }
+  public IEnumerable<Dictionary<string, object>>? _Data2 { get; set; }
+
+
+  [Inject] AppProjData appData { get; set; }
+
+
+  protected override async Task OnInitializedAsync() {
+    bool isLogin = await AuthCheck();
+    if (!isLogin) {
+      NavigationManager.NavigateTo("/login");
+    }
+    //StateHasChanged();
+  }
+
+
+
+  public async Task<bool> AuthCheck() {
+
+
+    // 인증체크
+    if (appData.User == null) {
+
+
+      try {
+        string json = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
+        if (!string.IsNullOrEmpty(json)) {
+          Member user = JsonConvert.DeserializeObject<Member>(json);
+          appData.User = user;
+        }
+      }
+      catch (Exception eee) {
+      }
+
+      return (appData.User != null);
+    }
+    else {
+      return true;
+      // 인증된 사용자
+      // appData.User = user;
+      // appData.IsLogin = true;
+    }
+
+
+  }
+
+
+
+
+
+
+
 
   protected async Task OnLoadMenu() {
-    if (JsiniService != null) {
+    if (jsiniService != null) {
       try {
-        var data = await JsiniService.GetList<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>(){{"prj_rid","3"}});
+        var data = await jsiniService.GetList<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>(){{"prj_rid","3"}});
 
         if (data != null && data.Data != null) {
           dirs.Clear(); // 기존 데이터를 초기화하여 중복된 키를 방지
@@ -304,12 +426,16 @@
               .Select(g => g.First());
 
           foreach (var d in groupedData) {
-            dirs[d["dir"].ToString()] = d["dir"].ToString();
+            dirs.Add(new MenuDir() {
+                  dir = d["dir"].ToString(),
+                  expend = false
+                });
+           // dirs[d["dir"].ToString()] = d["dir"].ToString();
           }
 
-          _Data = data.Data.OrderBy(d => d["sort"].ToString());
+          _Data2 = data.Data.OrderBy(d => d["sort"].ToString());
 
-          //Data = data;
+          _Data = _Data2;
         }
         else {
           Console.WriteLine("Data or Data.Data is null.");
@@ -334,11 +460,13 @@
     if (p.ContainsKey("fullname") && p["fullname"] != null &&
         p.ContainsKey("title") && p["title"] != null &&
         p.ContainsKey("name") && p["name"] != null &&
+        p.ContainsKey("url") && p["url"] != null &&
         p.ContainsKey("dir") && p["dir"] != null) {
 
       _main.AddItem(p["fullname"].ToString()??string.Empty,
                     p["title"].ToString() ?? string.Empty,
                     p["name"].ToString() ?? string.Empty,
+                    p["url"].ToString() ?? string.Empty,
                     p["dir"].ToString() ?? string.Empty);
     }
     else {
@@ -346,6 +474,65 @@
     }
     
   }
+
+
+
+
+
+  void ShowContextMenuWithContent(MouseEventArgs args, Dictionary<string, object> item) => ContextMenuService.Open(args, ds =>
+  @<RadzenMenu Click="@( ( MenuItemEventArgs ee) =>  OnMenuItemClick(ee, item))">
+    <RadzenMenuItem Text=@("Open "+item["url"].ToString()) Value="1"></RadzenMenuItem>
+    <RadzenMenuItem Text=@( item["fullname"].ToString()) Value="2"></RadzenMenuItem>
+    <RadzenMenuItem Text="More items" Value="3">
+      <RadzenMenuItem Text="More sub items" Value="4">
+        <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
+        <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
+      </RadzenMenuItem>
+    </RadzenMenuItem>
+  </RadzenMenu>);
+
+  void OnMenuItemClick(MenuItemEventArgs args, Dictionary<string, object> item) {
+
+
+    Console.WriteLine($"Clicked on {args.Value}");
+
+
+    if (args.Value.Equals(1)) {
+      // Open URL
+      string url = item["url"].ToString();
+      if (!string.IsNullOrEmpty(url)) {
+        NavigationManager.NavigateTo(url);
+      }
+    }
+    else if (args.Value.Equals(2)) {
+      // Do something else
+    }
+    else if (args.Value.Equals(3)) {
+      // Do something else
+    }
+    else if (args.Value.Equals(4)) {
+      // Do something else
+    }
+    if (!args.Value.Equals(3) && !args.Value.Equals(4)) {
+    ContextMenuService.Close();
+    }
+  }
+
+
+
+
+
+
+
+  public class MenuDir {
+    public string? dir { get; set; }
+    public bool expend { get; set; } = false;
+    public bool pre_expend { get; set; } = false;
+    public bool first_memory { get; set; } = false;
+  }
+
+
+
 
 
 }

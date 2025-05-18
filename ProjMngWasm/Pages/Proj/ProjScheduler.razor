@@ -1,0 +1,111 @@
+﻿@page "/proj-shceduler";
+@{
+  
+  /* description : Schedule calendar
+  * title : Schedule
+  * sort : 5
+  * credt : 2025-04-05
+  * author : quristyle
+  */
+
+ }
+
+@inherits PageBaseComponent
+
+<PageTitle>Jsini | Scheduler - @srtype?.Name</PageTitle>
+
+<RadzenCard >
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton  Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+      <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
+                       TextProperty="Text" SelectedIndex="1"
+                       SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender MonthSelect=@OnMonthSelect>
+        <RadzenMonthView />
+        <RadzenYearPlannerView StartMonth="@startMonth" />
+        <RadzenYearTimelineView StartMonth="@startMonth" />
+        <RadzenYearView StartMonth="@startMonth" />
+      </RadzenScheduler>
+
+@code {
+
+  CommonCode srtype { get; set; }
+
+  RadzenScheduler<Appointment> scheduler;
+
+  Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+  Month startMonth = Month.January;
+
+  IList<Appointment> appointments = new List<Appointment>
+    {
+        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
+        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
+        new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
+        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
+        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
+    };
+
+  void OnSlotRender(SchedulerSlotRenderEventArgs args) {
+    // Highlight today in month view
+    if (args.View.Text == "Month" && args.Start.Date == DateTime.Today) {
+      args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+    }
+
+    // Draw a line for new year if start month is not January
+    if ((args.View.Text == "Planner" || args.View.Text == "Timeline") && args.Start.Month == 12 && startMonth != Month.January) {
+      args.Attributes["style"] = "border-bottom: thick double var(--rz-base-600);";
+    }
+  }
+
+  async Task OnSlotSelect(SchedulerSlotSelectEventArgs args) {
+
+
+    if (args.View.Text != "Year") {
+      Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+          new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+
+      if (data != null) {
+        appointments.Add(data);
+        // Either call the Reload method or reassign the Data property of the Scheduler
+        await scheduler.Reload();
+      }
+    }
+  }
+
+  async Task OnMonthSelect(SchedulerMonthSelectEventArgs args) {
+
+    await Task.CompletedTask;
+  }
+
+  async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args) {
+
+
+    await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
+
+    await scheduler.Reload();
+  }
+
+  void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args) {
+    // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+    if (args.Data.Text == "Birthday") {
+      args.Attributes["style"] = "background: red";
+    }
+  }
+
+
+
+
+}

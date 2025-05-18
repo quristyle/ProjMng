@@ -34,15 +34,17 @@ public class BlazorUtil {
   }
 
 
-
-
-
-
-
   //blazor 파일을 읽어서 메뉴를 만들어 주는 함수
   public static List<Dictionary<string, string>> GetBlazorMenuList(string basePath, string projNamespace, string pageRoot, string pagePattern) {
 
-   List<Dictionary<string, string>> aaa = new List<Dictionary<string, string>>();
+
+    Console.WriteLine("GetBlazorMenuList start ------------------------------------------------- ");
+    Console.WriteLine("basePath : " + basePath);
+    Console.WriteLine("projNamespace : " + projNamespace);
+    Console.WriteLine("pageRoot : " + pageRoot);
+    Console.WriteLine("pagePattern : " + pagePattern);
+
+    List<Dictionary<string, string>> aaa = new List<Dictionary<string, string>>();
 
    // string basePath = @"c:\projects\ProjMng";
    // string projNamespace = @"ProjMngWasm";
@@ -52,17 +54,16 @@ public class BlazorUtil {
     //string pagePattern = "@page\\s+\"(?<url>[^\"]+)\"";
     //string namePattern = "@\\* description :\\s*(?<title>[^*]+)\\s*\\*@";
 
-
-    /* description : 프로젝트 상태 정보를 제공
-* title : 모니터링
-* sort : 30
-* credt : 2021-09-01
-* author : quristyle
-*/
-
+    Console.WriteLine("folderPath : " + folderPath);
 
     try {
       foreach (string file in Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories)) {
+
+
+        Console.WriteLine("file : " + file);
+
+
+
         string content = File.ReadAllText(file);
         Match match = Regex.Match(content, pagePattern);
 
@@ -71,7 +72,7 @@ public class BlazorUtil {
           Dictionary<string, string> binfo = new Dictionary<string, string>();
           binfo.Add("name", Path.GetFileNameWithoutExtension(file));
 
-            string dir = Path.GetDirectoryName(file);
+          string dir = Path.GetDirectoryName(file);
           string rurl = RemovePath(dir, basePath);
           rurl = RemovePath(rurl, projNamespace);
           rurl = RemovePath(rurl, pageRoot);
@@ -83,7 +84,7 @@ public class BlazorUtil {
           rurl = RemovePath(rurl, ".razor");
           rurl = RemovePath(rurl, "..");
 
-          binfo.Add("fullname", RemoveNonAlphabeticLeadingChar(rurl.Replace("\\", ".")));
+          binfo.Add("fullname", RemoveNonAlphabeticLeadingChar(rurl.Replace("\\", ".").Replace("/", ".")));
 
 
 
@@ -97,14 +98,6 @@ public class BlazorUtil {
 
 
 
-          /*
-      * 작성자명 : 김지수
-      * 작성일자 : 25-02-27
-      * 최종수정 : 25-02-27
-      * 화면명 : 계측기별 Peak값 조회
-      * 프로시저명 : : P_HMI_DAY_USEQTY_PEAK, P_HMI_TIME_USEQTY_PEAK, P_HMI_MIN_UEEQTY_PEAK, P_HMI_PEAK_VALUE_RST
-      */
-
 
 
         }
@@ -113,6 +106,7 @@ public class BlazorUtil {
     catch (Exception ex) {
       Console.WriteLine("오류 발생: " + ex.Message);
     }
+    Console.WriteLine("GetBlazorMenuList end ------------------------------------------------- ");
     return aaa;
   }
 }

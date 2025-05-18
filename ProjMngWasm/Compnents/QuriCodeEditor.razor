@@ -1,0 +1,65 @@
+﻿@using System.Diagnostics.CodeAnalysis
+
+@inherits BaseComponent
+<div class="editor-wrapper">
+<StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="appProjData.FnPgsqlOtion"
+OnKeyDown=OnKeyDown
+/>
+<a class="copy-button" @onclick="CopyTextToClipboard"><i class="bi bi-copy"></i></a>
+</div>
+
+<style>
+  .editor-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .copy-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 10;
+    color: white;
+    border: none;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .copy-button:hover {
+   background-color: #007bff;
+  }
+  </style>
+
+
+@code {
+   StandaloneCodeEditor? _editor;
+
+
+   
+  [Parameter] public EventCallback<KeyboardEvent> KeyDownEvent { get; set; }
+
+  protected async Task OnKeyDown(KeyboardEvent e) {
+
+    KeyDownEvent.InvokeAsync(e);
+
+  }
+
+
+  public async Task<string> GetValue() {
+    string editorValue = await _editor.GetValue();
+    return editorValue;
+  }
+
+  public async Task SetValue(string value) {
+    _editor.SetValue(value);
+  }
+
+  private async Task CopyTextToClipboard() {
+    var str = await _editor.GetValue();
+    await jsRuntime.InvokeVoidAsync("copyClipboard", str);
+  }
+
+
+}

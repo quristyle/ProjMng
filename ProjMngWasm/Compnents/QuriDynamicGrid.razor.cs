@@ -13,7 +13,7 @@ public class QuriDynamicGridBase : BaseComponent {
   protected List<Dictionary<string, object>> orders;
   //protected IEnumerable<Dictionary<string, object>> _data { get; set; } = new List<Dictionary<string, object>>();
 
-  protected List<IDictionary<string, object>> ordersToInsert = new List<IDictionary<string, object>>();
+  //protected List<IDictionary<string, object>> ordersToInsert = new List<IDictionary<string, object>>();
   protected List<IDictionary<string, object>> ordersToUpdate = new List<IDictionary<string, object>>();
 
   protected DataGridEditMode editMode = DataGridEditMode.Single;
@@ -74,9 +74,12 @@ public class QuriDynamicGridBase : BaseComponent {
   }
   [Parameter] public EventCallback<IList<IDictionary<string, object>>> SItemsChanged { get; set; }
   [Parameter] public ResultInfo<Dictionary<string, object>> ReqData { get; set; }
+  
+  public int RecordCount { get; set; } = 0;
 
   protected override void OnParametersSet() {
     if (ReqData != null) {
+      RecordCount = ReqData.Data.Count;
       orders = ReqData.Data;
       cols = ReqData.Cols;
     }
@@ -118,12 +121,12 @@ public class QuriDynamicGridBase : BaseComponent {
 
 
   protected void Reset() {
-    ordersToInsert.Clear();
+    //ordersToInsert.Clear();
     ordersToUpdate.Clear();
   }
 
   protected void Reset(IDictionary<string, object> order) {
-    ordersToInsert.Remove(order);
+    //ordersToInsert.Remove(order);
     ordersToUpdate.Remove(order);
   }
 
@@ -159,21 +162,31 @@ public class QuriDynamicGridBase : BaseComponent {
   }
 
 
-  protected async Task InsertRow() {
-    if (!ordersGrid.IsValid) return;
+  //protected async Task InsertRow() {
+  //  if (!ordersGrid.IsValid) return;
 
-    if (editMode == DataGridEditMode.Single) {
-      Reset();
+  //  if (editMode == DataGridEditMode.Single) {
+  //    Reset();
+  //  }
+
+  //  var order = CreateData();
+
+
+
+  //  ordersToInsert.Add(order);
+  //  await ordersGrid.InsertRow(order);
+  //}
+
+
+
+  protected async Task ConfDeleteRow(IDictionary<string, object> order) {
+
+    var a = await DialogService.Confirm("Are You Delete?", "Qutions?", new ConfirmOptions() { OkButtonText = "Delete", CancelButtonText = "Cancel" });
+
+    if(a == true) {
+     await DeleteRow(order);
     }
-
-    var order = CreateData();
-
-
-
-    ordersToInsert.Add(order);
-    await ordersGrid.InsertRow(order);
   }
-
 
 
   protected async Task DeleteRow(IDictionary<string, object> order) {
@@ -197,7 +210,6 @@ public class QuriDynamicGridBase : BaseComponent {
 
 
 
-
   protected async Task ActionRow(IDictionary<string, object> order) {
   
     if (orders.Contains(order)) {
@@ -216,16 +228,50 @@ public class QuriDynamicGridBase : BaseComponent {
       Reset();
     }
 
+    int findIndex = 0;
+    var firstItem = SItems?.FirstOrDefault();
+    if (firstItem != null) {
+      findIndex = orders.FindIndex(order => order.SequenceEqual(firstItem)); // 항목이 존재 하는데 -1 리턴한다. 고쳐라..
+      Console.WriteLine($"Index of the first item in SItems within orders: {findIndex}");
+    }
+    else {
+      Console.WriteLine("SItems is empty or null.");
+    }
+
+    if (findIndex < 0) findIndex = 0;
+
+    //SItems
+
+    //ordersGrid
+
     var order = CreateData();
-    ordersToInsert.Add(order);
-    await ordersGrid.InsertAfterRow(order, row);
+    //ordersToInsert.Add(order);
+
+    orders.Insert(findIndex, order);
+
+    await ordersGrid.EditRow(order);
+
+
+    RecordCount = orders.Count;
+
+    await ordersGrid.RefreshDataAsync();
+
+    //await ordersGrid.InsertAfterRow(order, row);
+
+    //await ordersGrid.RowSelect.InvokeAsync(row);
+
+    //await ordersGrid.InsertRow(order);
     await AddBtnEvent.InvokeAsync(order);
+
+    //StateHasChanged();
+
+
   }
 
   protected async Task OnCreateRow(IDictionary<string, object> order) {
 
     await DataSave(order);
-    ordersToInsert.Remove(order);
+    //ordersToInsert.Remove(order);
   }
 
 
@@ -244,7 +290,9 @@ public class QuriDynamicGridBase : BaseComponent {
 
 
   protected async Task OnDoubleClick(DataGridRowMouseEventArgs<IDictionary<string, object>> e) {
-    await EditRow(e.Data);
+    if( IsSave) {
+      await EditRow(e.Data);
+    }
   }
 
   protected async Task SaveRow(IDictionary<string, object> order) {

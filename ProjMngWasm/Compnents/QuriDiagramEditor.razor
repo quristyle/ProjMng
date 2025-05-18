@@ -1,0 +1,72 @@
+﻿@{
+  /* description : 다이어 그램 편집기
+  * title : diagram editor
+  * sort : 0
+  * credt : 2025-04-13
+  * author : quristyle
+  */
+}
+
+@inject IJSRuntime JS
+@using ProjMngWasm.Models;
+@using System.Diagnostics.CodeAnalysis
+@using System.Text.Json
+
+@inherits BaseComponent
+
+<div style="border:1px solid #ccc; width:100%; height:800px;">
+  <iframe id="@ContainerId" src="/lib/mxgraph/js/examples/grapheditor/www/index2.html"
+          width="100%"
+          height="100%"
+          style="border:none;"
+          onload="console.log('iframe loaded')">
+  </iframe>
+</div>
+
+
+@code {
+
+  private DotNetObjectReference<QuriDiagramEditor>? _dotNetRef;
+
+  private string ContainerId = $"graph-wrapper-{Guid.NewGuid()}";
+
+
+  private string _selectedNode = "없음";
+  private string SelectERD = "";
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+
+
+
+      /*
+      //await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/mxClient.js");
+      await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/EditorUi.js");
+      await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/Editor.js");
+      //await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/Editor.js");
+      //await LoadScript("/lib/mxgraph/js/src/js/editor/mxEditor.js");
+      await LoadScript("/lib/mxgraph/js/src/js/editor/mxDefaultToolbar.js");
+      await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/Actions.js");
+      await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/Sidebar.js");
+      await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/Dialogs.js");
+      await LoadScript("/lib/mxgraph/js/examples/grapheditor/www/js/Graph.js");
+
+      */
+
+
+
+    }
+  }
+
+
+  public async Task<string> SaveAsObjectXml() { 
+    var xmlStr = await JS.InvokeAsync<string>("saveDiagramAsXml", ContainerId);
+    return xmlStr;
+  }
+  
+  public async Task LoadDiagramFromObjectXml(string db_pvalue) {
+    await JS.InvokeVoidAsync("loadDiagramFromXml", ContainerId,  db_pvalue);
+  }
+
+
+}

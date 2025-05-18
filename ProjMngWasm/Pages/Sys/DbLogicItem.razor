@@ -46,10 +46,11 @@
 
   protected async Task OnLoadWrk() {
     Data = await DbCont<Dictionary<string, object>>("sp_devsqlresp_base_exec", new Dictionary<string, string>() { });
+    StateHasChanged();
   }
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {
-    var saveobj = await DbSave<IDictionary<string, object>>("sp_devsqlresp_base_exec", dic);
+    await DbSave<IDictionary<string, object>>("sp_devsqlresp_base_exec", dic);
   }
 
 }

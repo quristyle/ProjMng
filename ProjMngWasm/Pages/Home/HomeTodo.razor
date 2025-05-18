@@ -1,0 +1,94 @@
+﻿@page "/home-todo";
+@{ 
+  /* description : Todo Check List
+   * title : 할일 목록
+  * sort : 1
+  * credt : 2025-05-01
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <RadzenDatePicker @bind-Value=@selDate DateFormat="yyyy-MM-dd" />
+      <QuriDropDown @bind-Value="srtype" CodeId="family" IsAll=true />
+      <QuriDropDown @bind-Value="sYN" CodeId="YNBOOL" IsAll=true />
+      <QuriDropDown @bind-Value="sState" CodeId="TODO_STATE" IsAll=true />
+
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnMakeWrk" Text="Make Day Work" />
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
+  <RadzenColumn Size="12" >
+
+    <QuriDynamicGrid 
+      SaveBtnEvent=SaveBtnEvent 
+      ReqData=@Data 
+      DeleteBtnEvent=DeleteBtnEvent
+      HiddenCols="todo_key,cre_dt,comp_dt,cre_id,comp_id,mod_dt,mod_id"
+      />
+
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+  public DateTime? selDate = DateTime.Now;
+  public CommonCode srtype { get; set; }
+  public CommonCode sYN { get; set; }
+  public CommonCode sState { get; set; }
+
+  
+
+
+  
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      OnLoadWrk();
+    }
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>("sp_home_todo_exec", new Dictionary<string, string>() {
+      {"target_user", srtype?.Code},
+      {"target_day", selDate?.ToString("yyyyMMdd")},
+      {"is_complete", sYN?.Code},
+      {"todo_state", sState?.Code},
+      //srtype
+    
+    });
+  StateHasChanged();
+  }
+
+  protected async Task OnMakeWrk() {
+    await DbCont<Dictionary<string, object>>("sp_home_todo_make", new Dictionary<string, string>() {
+      {"target_day", selDate?.ToString("yyyyMMdd")}
+    });
+    StateHasChanged();
+  }
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_home_todo_exec", dic);
+  }
+
+  
+
+  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
+    await DbDelete<IDictionary<string, object>>("sp_home_todo_exec", dic);
+  }
+
+}

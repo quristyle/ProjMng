@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Components;
 using ProjMngWasm.Commons;
-using ProjMngWasm.Services;
 using ProjModel;
 using Radzen.Blazor;
 using System.Linq;
+using WasmShear;
+using WasmShear.Services;
 
 namespace ProjMngWasm.Compnents;
 
 public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
-  [Inject] private JsiniService? JsiniService { get; set; }
-  [Inject] AppData? appData { get; set; }
+  [Inject] private JsiniService? jsiniService { get; set; }
+  [Inject] AppProjData? appData { get; set; }
 
   public string? _codeId;
   //private string? _previousCodeId;
@@ -72,7 +73,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         Console.WriteLine($"LoadData LoadItems : {_codeId} etc0 : {_etc0}");
 
         // _codeId에 해당하는 딕셔너리가 없을 경우 처리
-        var data = await JsiniService.GetList<Dictionary<string, string>>("sp_projCommon",new Dictionary<string, string>() {
+        var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon",new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", Etc0 }
             });

@@ -1,0 +1,136 @@
+﻿@page "/home-todo-monitor";
+@{ 
+  /* description : Todo Monitoring
+   * title : 할일 목록 모니터링
+  * sort : 1
+  * credt : 2025-05-07
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard class="rz-my-1">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <RadzenDatePicker @bind-Value=@selDate DateFormat="yyyy-MM-dd" />
+      <QuriDropDown @bind-Value="srtype" CodeId="family" IsAll=true />
+
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal"   >
+ 
+
+    @{
+
+      if (TotalData != null){
+
+        foreach (var item in TotalData.Data) {
+
+        <RadzenColumn Size="6">
+
+
+          <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+            <RadzenStack Gap="0">
+              <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText TextStyle="TextStyle.H5">@DicValue(item, "target_user")</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-color-info-dark rz-m-0">@DicValue(item, "today_pay")</RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" class="rz-color-success rz-m-0">@DicValue(item, "total_pay")</RadzenText>
+              </RadzenStack>
+              <RadzenSparkline Style="width: 100%; height: 80px;">
+                @* <RadzenColumnSeries Data=@Data ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" /> *@
+                <RadzenColumnOptions Margin="0" />
+                <RadzenCategoryAxis Padding="20" Visible="false" />
+              </RadzenSparkline>
+            </RadzenStack>
+          </RadzenCard>
+
+
+          
+        </RadzenColumn>
+
+
+
+
+
+        }
+      }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</RadzenRow>
+
+@code {
+
+  public DateTime? selDate = DateTime.Now;
+  public CommonCode srtype { get; set; }
+
+
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      OnLoadWrk();
+    }
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+  public ResultInfo<Dictionary<string, object>> TotalData { get; set; }
+
+  protected async Task OnLoadWrk() {
+    OnLoadPay();
+    return;
+    // 차트용 데이터 가져오기
+    Data = await DbCont<Dictionary<string, object>>("sp_home_todo_exec", new Dictionary<string, string>() {
+      {"target_user", srtype?.Code},
+      {"target_day", selDate?.ToString("yyyyMMdd")},
+      //srtype
+    
+    });
+  StateHasChanged();
+  }
+
+
+  protected async Task OnLoadPay() {
+
+
+    TotalData = await DbCont<Dictionary<string, object>>("sp_home_todo_pay", new Dictionary<string, string>() {
+    {"target_user", srtype?.Code},
+    });
+
+    StateHasChanged();
+  }
+
+
+
+
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_home_todo_exec", dic);
+  }
+
+  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
+    await DbDelete<IDictionary<string, object>>("sp_home_todo_exec", dic);
+  }
+
+}

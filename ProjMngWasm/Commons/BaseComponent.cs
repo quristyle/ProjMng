@@ -1,23 +1,21 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using ProjMngWasm.Commons;
-using ProjMngWasm.Services;
+using WasmShear.Services;
 using ProjModel;
 using Radzen;
+using WasmShear;
+using WasmShear.Commons;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjMngWasm;
 
-public class BaseComponent : ComponentBase {
+public class BaseComponent : CommonComponent {
 
-  [Inject] private JsiniService? JsiniService { get; set; }
-  [Inject] protected UMSService? UmsService { get; set; }
-  [Inject] protected DevService? DevService { get; set; }
-  [Inject] protected FuneralService? FuneralService { get; set; }
-  [Inject] protected SysService? SysService { get; set; }
-  [Inject]  protected IJSRuntime? JSRuntime { get; set; }
-  [Inject] protected NavigationManager? NavigationManager { get; set; }
-  [Inject] protected AppData? appData { get; set; }
   [Inject] protected NotificationService? NotificationService { get; set; }
+  [Inject] protected AppProjData? appProjData { get; set; }
+  [Inject] protected DialogService DialogService { get; set; }
+  [Inject] protected ContextMenuService ContextMenuService { get; set; }
 
 
   protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
@@ -32,7 +30,7 @@ public class BaseComponent : ComponentBase {
       };
     }
 
-    var data = await JsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
+    var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -44,7 +42,7 @@ public class BaseComponent : ComponentBase {
 
   public async Task<ResultInfo<T>> SysCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type = "srch", bool isFast = false) {
 
-    var data = await SysService.GetList<T>(proc_name, dic, proc_type, isFast);
+    var data = await sysService.GetList<T>(proc_name, dic, proc_type, isFast);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -60,7 +58,7 @@ public class BaseComponent : ComponentBase {
       return null;
     }
 
-    var data = await JsiniService.GetList<T>(md_name, dic, proc_type, isFast);
+    var data = await jsiniService.GetList<T>(md_name, dic, proc_type, isFast);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -76,26 +74,40 @@ public class BaseComponent : ComponentBase {
 
     return await DbSave<T>( proc_name, req, isFast);
   }
-  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {    
-    return await DbCont<T>( proc_name, dic, "save", isFast);
+  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
+    var data = await DbCont<T>( proc_name, dic, "save", isFast);
+    Notify(data);
+    return data;
   }
+
+
+  protected async Task<ResultInfo<T>> DbDelete<T>(string proc_name, IDictionary<string, object> dic, bool isFast = false) {
+    var req = WasmUtil.JoinConvert(dic);
+    return await DbDelete<T>(proc_name, req, isFast);
+  }
+
+
   protected async Task<ResultInfo<T>> DbDelete<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
+
     return await DbCont<T>(proc_name, dic, "delete", isFast);
   }
 
-  protected async Task<ResultInfo<T>> JsCont<T>(string action_name, Dictionary<string, string> dic) {
 
-    var data = await DevService.GetList<T>(action_name, dic);
+  protected async Task<ResultInfo<T>> JsCont<T>(string action_name, Dictionary<string, string> dic  ) {
+
+    if (dic == null) dic = new Dictionary<string, string>() { };
+
+    var data = await devService.GetList<T>(action_name, dic);
 
     if (data.Code < 0) {
-      Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
+      Notify(NotificationSeverity.Error, "Error Message", data.Message, 10000, true);
     }
    
     return data;
   }
   protected async Task<ResultInfo<T>> JsContQuery<T>(CommonCode db, string query) {
 
-    var data = await DevService.GetListQuery<T>(db.Others["db_nick"], query);
+    var data = await devService.GetListQuery<T>(db.Others["db_nick"], query);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", $"다이렉트 쿼리 준비:{data.Message}", 50000, true);
@@ -119,6 +131,22 @@ public class BaseComponent : ComponentBase {
 
 
 
+
+
+
+
+  protected void Notify<T>(ResultInfo<T> data ) {
+
+    NotificationSeverity ns = NotificationSeverity.Success;
+    int waitTime = 2;
+    if (data.Code < 0) {
+      waitTime = 50;
+      ns = NotificationSeverity.Error;
+    }
+    Notify(ns, "Message", data.Message, waitTime * 1000);
+  }
+
+
   protected void Notify(NotificationSeverity severity, string summary, string detail, int duration, bool isProgress=false) {
     NotificationService.Notify(new NotificationMessage {
       Severity = severity,
@@ -129,5 +157,60 @@ public class BaseComponent : ComponentBase {
       Payload = DateTime.Now
     });
   }
+
+
+
+
+
+
+
+
+  protected async Task<List<CommonCode>> GetCommon(string _codeId, string _key) {
+
+    var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon", new Dictionary<string, string>() {
+                { "code_id", _codeId },
+                { "etc0", _key }
+            });
+
+
+    List<CommonCode> dic = new List<CommonCode>();
+    foreach (var d in data.Data) {
+
+      dic.Add(
+
+        new CommonCode() {
+          Code = d["code"],
+          Name = d["name"],
+          Desc = d["desc"],
+          Others = d,
+        }
+
+        );
+    }
+
+    return dic;
+
+
+  }
+
+
+
+  protected string DicValue(IDictionary<string, object> args, string key) {
+    var value = args.FirstOrDefault(kvp => kvp.Key.Equals(key, StringComparison.OrdinalIgnoreCase)).Value;
+    return value?.ToString() ?? string.Empty;
+  }
+
+
+
+  protected bool DicIsSameValue(IDictionary<string, object> args, string key, string svalue) {
+    var value = args.FirstOrDefault(kvp => kvp.Key.Equals(key, StringComparison.OrdinalIgnoreCase)).Value;
+    return (value?.ToString() == svalue) ;
+  }
+
+
+
+
+
+
 
 }

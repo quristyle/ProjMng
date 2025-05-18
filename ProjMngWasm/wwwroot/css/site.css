@@ -22,7 +22,7 @@
 
 
 #app {
-  background-color: #2e2e2e;
+/*  background-color: #2e2e2e;*/
 }
 
 a.ui-button:hover {
@@ -662,3 +662,97 @@ svg.illustration {
   }
 
 
+  /* grid page 숨기기*/
+.rz-pager-element {
+  display: none !important;
+}
+
+
+
+/* grid 하단 버튼 디자인 */
+/*.action-btn a {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;*/
+/*  padding: 1px 5px;*/
+  /*color: #ffffff;
+}
+
+  .action-btn a:hover {
+    font-weight: bold;
+    color:red;
+    text-shadow: 1px 1px 6px #ffffff;
+  }*/
+
+
+a[class^=action] {
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  padding-right: 3px;
+  float: left;
+  /*  color: var(--rz-grid-cell-color);*/
+  color: inherit;
+}
+
+a[class^=action]:hover {
+  font-weight: bold;
+  color: red;
+/*  text-shadow: 1px 1px 6px #ffffff;*/
+}
+
+
+
+
+/* grid 편집상태일때 안쪽 에디터의 크기를 꽉 체우기 */
+.rz-cell-data .rz-textbox {
+  width: 100%;
+}
+
+
+/* body 스크롤 없에기 */
+.rz-layout .rz-body {
+/*  overflow: unset;*/
+}
+
+
+/* badge 크기는 무조건 요크기 */
+.badge {
+  font-size: 11px !important;
+  font-weight: 100 !important;
+  border-radius: var(--rz-badge-border-radius);
+}
+
+.rz-badge {
+  font-size: 11px !important;
+  font-weight: 100 !important;
+}
+
+
+
+.main-body-context {
+  height: calc(100vh - 130px);
+}
+
+.main-page-context {
+  height: calc(100vh - 140px);
+}
+
+.context-body-row {
+  height: calc(100vh - 220px) !important;
+}
+
+
+.context-body-rowcol {
+  max-height: 100% !important;
+}
+
+
+
+/*알림창 위치*/
+.rz-notification {
+  inset-block-start: unset !important;
+/*  inset-inline-end: calc(100% - 57%) !important;*/
+  bottom: 0px;
+  right: 1rem;
+}

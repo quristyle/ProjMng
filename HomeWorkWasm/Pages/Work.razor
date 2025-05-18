@@ -1,0 +1,350 @@
+﻿@page "/work"
+
+  
+@inherits CommonPageComponent
+
+<div class="row row-cards">
+
+
+  <div class="col-12">
+
+    <a class="btn btn-primary" @onclick=@(e=>OnLoadWrk())>Reload</a>
+
+
+    <a href="/new-work" class="btn btn-green text-end">신규등록</a>
+
+
+  </div>
+
+
+  <div class="col-12">
+
+    <h3><strong>@appData.User?.LastName</strong> 님! 오늘의 수입</h3>
+
+    <div class="row row-cards">
+
+  <div class="col-sm-6 col-lg-4">
+    <div class="card card-sm">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <span class="bg-primary text-white avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
+                <path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2"></path>
+                <path d="M12 3v3m0 12v3"></path>
+              </svg>
+            </span>
+          </div>
+              <div class="col">
+                <div class="h1 mb-0 me-2">@todayCompletePay</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+  <div class="col-sm-6 col-lg-4">
+    <div class="card card-sm">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <span class="bg-danger text-white avatar">
+            </span>
+          </div>
+              <div class="col">
+                <div class="h1 mb-0 me-2">@totalCompletePay</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+    </div>
+
+  </div>
+
+
+  <!-- 대상 목록 -->
+  <div class="col-12">
+
+
+    <h3>대상 목록</h3>
+
+    <div class="row row-cards">
+
+
+      @{
+
+        if (Data != null && Data.Data != null) {
+
+          foreach( var i in Data.Data){
+
+            if (DicIsSameValue(i, "is_complete", "True")) continue;
+            if (!DicIsSameValue(i, "todo_state", "R")) continue;
+
+
+
+            <div class="col-sm-6 col-lg-4">
+              <div class="card card-md">
+                <div class="card-body text-center">
+                  <div class="text-uppercase text-secondary font-weight-medium">@i["fix_point"]</div>
+                  <div class="display-5 fw-bold my-3">@i["title"]</div>
+
+                  <ul class="list-unstyled lh-lg">
+                    <li>@DicValue(i, "comments")</li>
+                  </ul>
+
+                  <div class="row">
+                      <div class="col-8">
+                        <a class="btn btn-green w-100" @onclick=@(e=>StateChange(i, DicValue(i, "todo_key"), "P"))>확인 요청</a>
+                      </div>
+                      <div class="col-4">
+                        <a class="btn btn-red w-100" @onclick=@(e=>StateChange(i, DicValue(i, "todo_key"), "D"))>삭제 요청</a>
+                      </div>
+                  </div>
+
+
+
+                </div>
+              </div>
+            </div>
+
+
+
+
+          }
+
+        }
+
+
+
+      }
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+  </div>
+
+
+  <hr />
+
+
+  <!-- 검토 목록 -->
+  <div class="col-12">
+
+
+    <h3>검토 목록</h3>
+
+    <div class="row row-cards">
+
+
+      @{
+
+        if (Data != null && Data.Data != null) {
+
+          foreach (var i in Data.Data) {
+
+            if (DicIsSameValue(i, "is_complete", "True")) continue;
+            if (DicIsSameValue(i, "todo_state", "R")) continue;
+
+
+            <div class="col-sm-6 col-lg-4">
+              <div class="card card-md">
+                <div class="card-body text-center">
+                  <div class="text-uppercase text-secondary font-weight-medium">@i["fix_point"]</div>
+                  <div class="display-5 fw-bold my-3">@i["title"]</div>
+                  <ul class="list-unstyled lh-lg">
+                    <li>@DicValue(i, "comments")</li>
+                  </ul>
+
+                </div>
+              </div>
+            </div>
+
+
+
+
+          }
+
+        }
+
+
+
+      }
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+  </div>
+
+
+  <hr />
+
+
+  <!-- 완료목록 -->
+  <div class="col-12">
+
+    <h3>완료 목록</h3>
+
+
+    <div class="row row-cards">
+
+
+      @{
+
+        if (Data != null && Data.Data != null) {
+
+          foreach (var i in Data.Data) {
+
+            if (DicIsSameValue(i, "is_complete", "False")) continue;
+
+
+
+            <div class="col-sm-6 col-lg-3">
+              <div class="card card-md">
+                <div class="card-body text-center">
+                  <div class="text-uppercase text-secondary font-weight-medium display-6">@i["fix_point"]</div>
+                  <div class="display-6 fw-bold my-3">@i["title"]</div>
+                  <ul class="list-unstyled lh-lg">
+                    <li>@DicValue(i, "comments")</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+
+
+
+          }
+
+        }
+
+
+
+      }
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+
+@code {
+  //오늘의 수익금
+  public int todayCompletePay { get; set; }
+  public int totalCompletePay { get; set; }
+  public string srtype { get; set; } = "";
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      OnLoadWrk();
+    }
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+  protected async Task OnLoadWrk() {
+
+
+    OnLoadPay();
+
+    Data = await DbCont<Dictionary<string, object>>("sp_home_todo_exec", new Dictionary<string, string>() {
+    {"target_user", appData.User?.UserId??"x"},
+    {"target_day", DateTime.Now.ToString("yyyyMMdd") },
+    });
+    todayCompletePay = 0;
+    foreach (var i in Data.Data) {
+      if (DicIsSameValue(i, "is_complete", "True")) {
+        todayCompletePay += Convert.ToInt32(DicValue(i, "fix_point"));
+      }
+    }
+
+
+    StateHasChanged();
+  }
+
+
+  protected async Task OnLoadPay() {
+
+
+    var payData = await DbCont<Dictionary<string, object>>("sp_home_todo_pay", new Dictionary<string, string>() {
+    {"target_user", appData.User?.UserId??"x"},
+    });
+    totalCompletePay = 0;
+
+    var pdt = payData.Data.FirstOrDefault();
+    totalCompletePay = Convert.ToInt32(DicValue(pdt, "total_pay"));
+
+    StateHasChanged();
+  }
+
+
+
+
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    //var saveobj = await DbSave<IDictionary<string, object>>("sp_home_todo_exec", dic);
+  }
+
+  private async Task StateChange(IDictionary<string, object> dic, string key, string state_code) {
+    dic["todo_state"] = state_code;
+    dic["todo_state_name"] = "요청";
+    await DbSave<IDictionary<string, object>>("sp_home_todo_exec", dic);
+    StateHasChanged();
+  }
+
+}

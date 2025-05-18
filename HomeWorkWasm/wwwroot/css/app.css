@@ -1,0 +1,17 @@
+﻿
+:root {
+  --tblr-font-sans-serif: "Inter";
+  /*      --tblr-primary: #F11D46;*/
+}
+
+* {
+  font-family: Play, 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
+  /*  font-weight: 100;*/
+}
+
+@media (min-width: 992px) {
+  :host, :root {
+    margin-left: unset !important ;
+  }
+}
+

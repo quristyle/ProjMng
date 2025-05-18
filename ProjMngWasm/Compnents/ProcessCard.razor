@@ -1,0 +1,122 @@
+﻿@inherits BaseComponent
+<RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+  <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+
+      <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenText TextStyle="TextStyle.H6">@Title</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1">@(_totalCount - _currentCount)    ( @_currentCount  / @_totalCount )</RadzenText>
+      </RadzenStack>
+
+
+      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@_currentPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
+    </RadzenStack>
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@_planPercentage ShowValue=true Visible=IsPlanVisible />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@_currentPercentage ShowValue=true Visible=IsCurrentVisible />
+  </RadzenStack>
+</RadzenCard>
+
+@code {
+  [Parameter] public string ProcName { get; set; }
+  [Parameter] public string DbNick { get; set; }
+  [Parameter] public string Title { get; set; }
+  [Parameter] public string CallType { get; set; }
+  [Parameter] public string TotalKey { get; set; }
+  [Parameter] public CommonCode Project { get; set; } = new CommonCode();
+
+  [Parameter] public string PlanKey { get; set; }
+  [Parameter] public string CurrentKey { get; set; }
+  bool IsPlanVisible { get { return !string.IsNullOrEmpty(PlanKey); } }
+  bool IsCurrentVisible { get { return !string.IsNullOrEmpty(CurrentKey); } }
+
+  double _planPercentage { get; set; } = 0;
+  double _currentPercentage { get; set; } = 0;
+  double _totalCount { get; set; } = 0;
+  double _planCount { get; set; } = 0;
+  double _currentCount { get; set; } = 0;
+
+  private string _previousDbNick;
+  private string _previousProcName;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      //await OnLoadWrk();
+    }
+  }
+
+  protected override async Task OnParametersSetAsync() {
+    Console.WriteLine("OnParametersSetAsync setted : ");
+
+    // Dbnick 또는 ProcName이 변경되었는지 확인
+    bool isDicChanged = _previousDbNick != DbNick;
+    bool isProcNameChanged = _previousProcName != ProcName;
+
+
+    if ((isDicChanged || isProcNameChanged) && !string.IsNullOrEmpty(DbNick) && !string.IsNullOrEmpty(ProcName)) {
+      // 이전 값을 현재 값으로 업데이트
+      _previousDbNick = DbNick;
+      _previousProcName = ProcName;
+
+      // OnLoadWrk 호출
+      await OnLoadWrk();
+    }
+
+    // 초기화 하고 재 호출할때 동작 되도록 하기 위함.
+    if (!string.IsNullOrEmpty(_previousDbNick) && string.IsNullOrEmpty(DbNick)) { _previousDbNick = DbNick; }
+    if (!string.IsNullOrEmpty(_previousProcName) && string.IsNullOrEmpty(ProcName)) { _previousProcName = ProcName; }
+
+  }
+
+
+  protected async Task OnLoadWrk() {
+    ResultInfo<Dictionary<string, object>> data = null;
+    Dictionary<string, string> Dic = new Dictionary<string, string>(){ 
+      { "dbnick", DbNick },
+      { "prj_rid", Project.Code }
+    };
+    if (CallType == "js"){
+      data = await JsCont<Dictionary<string, object>>(ProcName, Dic);
+    }
+    else if (CallType == "md") {
+      data = await MdCont<Dictionary<string, object>>(ProcName, Dic);
+    }
+    else if (CallType == "db") {
+      data = await DbCont<Dictionary<string, object>>(ProcName, Dic);
+    }
+
+    Dictionary<string,object> dt =  data.Data.FirstOrDefault();
+
+    _planPercentage = GetPercent( dt, TotalKey, PlanKey );
+    _currentPercentage = GetPercent( dt, TotalKey, CurrentKey );
+    _totalCount = GetDouble( dt, TotalKey );
+    _planCount = GetDouble( dt, PlanKey );
+    _currentCount = GetDouble( dt, CurrentKey );
+
+  }
+
+  double GetDouble(Dictionary<string, object> dt, string c) {
+
+    if (string.IsNullOrEmpty(c) || dt == null || dt.Count == 0) {
+      return 0;
+    }
+    double r = double.Parse(dt[c].ToString());
+
+    return r;
+  }
+
+  double GetPercent(Dictionary<string, object> dt, string p, string c) {
+
+    if (string.IsNullOrEmpty(p) || string.IsNullOrEmpty(c) || dt == null || dt.Count == 0) {
+      return 0;
+    }
+
+
+    double total = double.Parse(dt[p].ToString());
+    double opppp = (c == null || string.IsNullOrEmpty(dt[c].ToString())) ? 0 : double.Parse(dt[c].ToString());
+
+    double r = Math.Round((total <= 0) ? 0 : ((opppp * 100) / total), 1);
+
+    return r;
+  }
+
+}

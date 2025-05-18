@@ -1,23 +1,43 @@
-﻿@if (ready) {
+﻿@inherits BaseComponent
+
+@if (ready) {
   <RadzenCard class="rz-p-0 rz-material-3-demo-card">
     <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="example-tabs" RenderMode="TabRenderMode.Client" @ref="@ProjTabs">
         <Tabs>
       @if ( ProjItems != null && ProjItems?.Count > 0 ) {
       @foreach (var item in ProjItems) {
-            <RadzenTabsItem Text="@(item.ProjName)" title="@(item.ProjPath)">
-                    @if (item.ComponentType is not null) {
-              <DynamicComponent Type="item.ComponentType" />
-                    }
-              else {
-                <p> @item.ProjName </p>
-              <p> @item.ProjId </p>
-              <p> @item.ProjPath </p>
-              <p> @item.ComponentType </p>
-                        <p>컴포넌트를 찾을 수 없습니다.</p>
-                    }
 
-                </RadzenTabsItem>
-            }
+          <RadzenTabsItem Text="@(item.ProjName)" title="@(WasmUtil.ExtractLastSegment( item.ProjPath ) +" - "+  item.Url)"
+                            >
+              <Template>
+
+
+                <span class="rz-tabview-title" @oncontextmenu=@(args => ShowContextMenuWithContent(args, item)) @oncontextmenu:preventDefault="true">@(item.ProjName)</span>
+
+                <span class="float-end" style="margin-left: 10px;margin-top: 1px;" @onclick=RemoveItem><i class="bi bi-x-circle-fill"></i></span>
+
+              </Template>
+              <ChildContent >
+                <div class="main-page-context">
+
+                @if (item.ComponentType is not null) {
+                  <DynamicComponent Type="item.ComponentType" />
+                }
+                else {
+                  <p> @item.ProjName </p>
+                  <p> @item.ProjId </p>
+                  <p> @item.ProjPath </p>
+                  <p> @item.ComponentType </p>
+                  <p>컴포넌트를 찾을 수 없습니다.</p>
+                }
+
+
+                </div>
+              </ChildContent >
+
+
+          </RadzenTabsItem>
+        }
       }
         </Tabs>
     </RadzenTabs>
@@ -60,7 +80,7 @@
 
   int selectedIndex = 0;
 
-  public void AddItem( string fullname, string title, string name, string dir) {
+  public void AddItem(string fullname, string title, string name, string url, string dir) {
 
     bool isExsit = false;
     for(int i = 0; i < _projItems.Count; i++){
@@ -77,6 +97,7 @@
       ProgramInfo ppp = new ProgramInfo(fullname, fullname) {
           ProjName = title,
           ProjId = name,
+          Url=url,
           ProjPath = fullname
         };
 
@@ -87,6 +108,59 @@
     //ProjTabs?.Reload();
 
   }
+
+
+
+  public void RemoveItem() {
+    _projItems.RemoveAt(selectedIndex);
+    if (selectedIndex >= _projItems.Count) selectedIndex = _projItems.Count - 1;
+    ProjTabs.Reload();
+  }
+
+
+
+
+
+  void ShowContextMenuWithContent(MouseEventArgs args, ProgramInfo item) => ContextMenuService.Open(args, ds =>
+  @<RadzenMenu Click="@( ee =>  OnMenuItemClick(ee, item))">
+    <RadzenMenuItem Text="Open Url" Value="1"></RadzenMenuItem>
+    <RadzenMenuItem Text="Close Url Page" Value="99"></RadzenMenuItem>
+    <RadzenMenuItem Text="More items" Value="3">
+      <RadzenMenuItem Text="More sub items" Value="4">
+        <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
+        <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
+      </RadzenMenuItem>
+    </RadzenMenuItem>
+  </RadzenMenu>);
+
+  void OnMenuItemClick(MenuItemEventArgs args, ProgramInfo item) {
+
+
+    Console.WriteLine($"Clicked on {args.Value}");
+
+
+    if (args.Value.Equals(1)) {
+      // Open URL
+      string url = item.Url;
+      if (!string.IsNullOrEmpty(url)) {
+        navigationManager.NavigateTo(url);
+      }
+    }
+    else if (args.Value.Equals(99)) {
+      navigationManager.NavigateTo("/");
+    }
+    else if (args.Value.Equals(3)) {
+      // Do something else
+    }
+    else if (args.Value.Equals(4)) {
+      // Do something else
+    }
+    if (!args.Value.Equals(3) && !args.Value.Equals(4)) {
+      ContextMenuService.Close();
+    }
+  }
+
+
 
 
 }

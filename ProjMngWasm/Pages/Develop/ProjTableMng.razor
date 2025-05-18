@@ -195,7 +195,7 @@
   //public IList<IDictionary<string, object>> selectedTProc { get; set; } = new List<IDictionary<string, object>>() { new Dictionary<string, object>() { { "dsl_query", "empty" } } };
 
 
-  public ResultInfo<Dictionary<string, object>> DataProc { get; set; }
+  public ResultInfo<Dictionary<string, object>> DataProc { get; set; } = new ResultInfo<Dictionary<string, object>>();
 
 
 
@@ -246,8 +246,7 @@
       {"stp", "columnsOftable"},
       {"table_name", tableInfo.TableName},
 
-      };
-
+    };
 
     var ri = await JsCont<ColumnInfo>("columnsOftable", dic);
     dataCol = ri.Data;
@@ -269,39 +268,89 @@
       {"same_talbe", IsSameTable?"Y":""  },
       {"exsit_desc", IsExsitDesc?"Y":""  },
 
-      };
+    };
 
     var ri = await JsCont<Dictionary<string, object>>("columnOftable", dic);
     DataMenu = ri;
 
 
     isLoading3 = false;
-
+    FindProc();
   }
 
 
+  List<ProcInfo> procList {get;set;}
 
-  // 왼쪽 테이블의 칼럼 선택
+  // 왼쪽 테이블의 칼럼 에 해당하는 프로시저 문자열 조회
   async Task FindProc() {
     isLoading4 = true;
 
-    Dictionary<string, string> dic2 = new Dictionary<string, string>() {
-      {"db",dbType2.Others["db_type"]},
-      {"dbnick",dbType2.Others["db_nick"]},
-      {"schema",dbType2.Others["db_schema"]},
-      {"stp", "proclistFind"},
-      {"table_name", selectedColumn[0].TableName},
-      {"column_name", selectedColumn[0].ColunmName},
-      {"same_talbe", IsSameTable?"Y":""  },
-      {"exsit_desc", IsExsitDesc?"Y":""  },
+    if (procList == null){
+      Dictionary<string, string> dic2 = new Dictionary<string, string>() {
+        {"db",dbType2.Others["db_type"]},
+        {"dbnick",dbType2.Others["db_nick"]},
+        {"schema",dbType2.Others["db_schema"]},
+        {"stp", "proclist"},
+        };
 
+      var ri = await JsCont<ProcInfo>("proclist", dic2);
+
+      procList = ri.Data.Where(i => i.PgType != "sql").ToList();
+
+
+      DataProc.Cols = new Dictionary<string,string>(){
+      {"ProcedureName", "System.String"},
+      {"Description", "System.String"},
+      {"FindString", "System.String"},
+      {"FindComment", "System.String"},
       };
 
+    }
 
-    var ri2 = await JsCont<Dictionary<string, object>>("proclistFind", dic2);
-    DataProc = ri2;
+    var colName = selectedColumn[0].ColunmName;
+
+
+    var result = procList
+        .Where(i => i.Routine_Definition != null && i.Routine_Definition.Contains(colName))
+        .Select(i => {
+          var lines = i.Routine_Definition.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+          string findLine = null;
+          string findComment = null;
+
+          foreach (var line in lines) {
+            var idx = line.IndexOf(colName);
+            if (idx < 0) continue;
+            var dashIdx = line.IndexOf("--", idx + colName.Length);
+            if (dashIdx < 0) continue;
+            var afterDash = line.Substring(dashIdx + 2).Trim();
+            if (!string.IsNullOrEmpty(afterDash)) {
+              findLine = line;
+              findComment = afterDash;
+              break;
+            }
+          }
+
+          return new Dictionary<string, object>
+      {
+            { "ProcedureName", i.ProcedureName },
+            { "Description", i.Description },
+            { "ROUTINE_DEFINITION", i.Routine_Definition },
+            { "PgType", i.PgType },
+            { "FindString", findLine ?? string.Empty },
+            { "FindComment", findComment ?? string.Empty }
+              };
+        })
+        .Where(dic => !string.IsNullOrEmpty(dic["FindComment"] as string))
+        .ToList();
+
+    Console.WriteLine($"proc count : {result.Count}");
+
+    DataProc.Data = result;
+
+    //DataProc = ri2;
 
     isLoading4 = false;
+    StateHasChanged();
 
   }
 

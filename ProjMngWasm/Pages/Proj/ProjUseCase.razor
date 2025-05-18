@@ -1,0 +1,82 @@
+﻿@page "/use-case"
+@{
+  /* description : 업무 흐름도
+  * title : USE CASE
+  * sort : 4
+  * credt : 2025-04-13
+  * author : quristyle
+  */
+}
+
+@inject IJSRuntime JS
+@using ProjMngWasm.Models;
+@using System.Diagnostics.CodeAnalysis
+@using System.Text.Json
+
+@inherits PageBaseComponent
+<PageTitle>Jsini | UseCase</PageTitle>
+
+<RadzenCard>
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
+      <QuriDropDown @bind-Value="wbsType" CodeId="wbsflowlist" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
+
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
+      <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>
+    </RadzenStack>
+  </RadzenStack>
+</RadzenCard>
+
+<QuriDiagramEditor @ref="diagram" />
+
+
+
+@code {
+
+  QuriDiagramEditor diagram { get; set; }
+  CommonCode? projectName { get; set; }
+  CommonCode? wbsType { get; set; }
+  
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+    }
+  }
+
+  
+  protected async Task OnLoad() {
+
+    // 기존 JSON 데이터 로드
+    var loadobj = await DbCont<IDictionary<string, object>>("sp_dev_proj_prop_exec", new Dictionary<string, string>() {
+      {"prop_type", "USE_CASE"},
+      {"prj_rid", projectName.Code},
+      {"prop_cd", wbsType.Code},
+    });
+
+    string db_pvalue = string.Empty;
+    if (loadobj.Data.Count > 0) {
+      db_pvalue = loadobj.Data[0]["prop_val"].ToString();
+    }
+
+    await diagram.LoadDiagramFromObjectXml(db_pvalue);
+
+  }
+
+
+  protected async Task OnSave() {
+
+    var xml = await diagram.SaveAsObjectXml();
+
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_proj_prop_exec", new Dictionary<string, string>(){
+      {"prop_type", "USE_CASE"},
+      {"prj_rid", projectName.Code},
+      {"prop_cd", wbsType.Code},
+      {"prop_val", xml},
+    });
+
+  }
+
+
+}

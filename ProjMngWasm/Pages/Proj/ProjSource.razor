@@ -24,20 +24,18 @@
   </RadzenStack>
 </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row">
   <RadzenColumn Size="12" >
 
     <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent RowClickEvent=OnLoadWrk_dtl ReqData=Data  />
 
   </RadzenColumn>
 
+  <RadzenColumn Size="12">
 
-        <RadzenColumn Size="12">
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent_dtl DeleteBtnEvent=DeleteBtnEvent_dtl ReqData=Data_dtl />
 
-          <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent_dtl DeleteBtnEvent=DeleteBtnEvent_dtl ReqData=Data_dtl />
-
-        </RadzenColumn>
-
+  </RadzenColumn>
 
 </RadzenRow>
 
