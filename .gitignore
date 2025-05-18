@@ -1,4 +1,4 @@
-ProjMngWasm/obj/project.assets.json
+﻿ProjMngWasm/obj/project.assets.json
 ProjMngWasm/obj/project.nuget.cache
 ProjMngWasm/obj/ProjMngWasm.csproj.nuget.dgspec.json
 ProjMngWasm/obj/ProjMngWasm.csproj.nuget.g.props
@@ -1486,8 +1486,7 @@ ProjMngServer/obj/
 /ProjMngVuejs/obj/Debug
 /ProjMngVuejs/.vscode
 /ProjMngVuejs/projmngvuejs.esproj.user
-/HomeWorkWasm/bin/Debug/net8.0
-/HomeWorkWasm/obj
-/WasmShear/bin/Debug/net8.0
-/WasmShear/obj
 /ProjMngWasm_bk
+/WasmShear/bin/Debug/net8.0
+/WasmShear/obj/Debug/net8.0
+/WasmShear/obj
