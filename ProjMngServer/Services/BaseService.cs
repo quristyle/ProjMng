@@ -32,7 +32,10 @@ public class BaseService {
   }
 
   public static List<Dictionary<string, object>> ConvertToListOfDictionaries(IEnumerable<dynamic> data) {
-    var result = new List<Dictionary<string, object>>();
+  
+      var result = new List<Dictionary<string, object>>();
+    if (data == null) return result;
+
     foreach (var item in data) {
       var dict = new Dictionary<string, object>();
       if (item is IDictionary<string, string> stringDict) {

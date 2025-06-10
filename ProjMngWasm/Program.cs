@@ -21,8 +21,11 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenQueryStringThemeService();
 
 builder.Services.AddHttpClient<UMSService>(client => {        client.BaseAddress = new Uri("https://nums.api.hanjucorp.co.kr");            });
-
+#if DEBUG
+builder.Services.AddHttpClient("jsini", client => { client.BaseAddress = new Uri("http://localhost:51668"); });
+#else
 builder.Services.AddHttpClient("jsini", client => { client.BaseAddress = new Uri("https://api.jsini.co.kr"); });
+#endif
 
 builder.Services.AddHttpClient<FuneralService>(client => { client.BaseAddress = new Uri("https://funeralfr.jsini.co.kr");   });
 
