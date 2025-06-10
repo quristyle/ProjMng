@@ -3,30 +3,23 @@ let installButton = null;
 
 
 window.addEventListener('load', () => {
-
-
-console.log('lllllllllllllllllllllllllllllload');
-
-  installButton = document.querySelector("#install");
-console.log('installButton', installButton);
-  installButton.addEventListener('click', installPWA );
-  
+  //installButton = document.querySelector("#install");
+  //installButton.addEventListener('click', installPWA );
 });
 
 
-window.addEventListener( 'beforeinstallprompt', saveBeforeInstallPromptEvent );
+//window.addEventListener( 'beforeinstallprompt', saveBeforeInstallPromptEvent );
 
 
 function saveBeforeInstallPromptEvent ( evt ) {
 //  evt.prevenDefault();
   deferredInstallPrompt = evt;
-  installButton.removeAttribute('hidden');
+  //installButton.removeAttribute('hidden');
 }
 
 
 
 function installPWA ( ) {
-
   deferredInstallPrompt.prompt();
 }
 
