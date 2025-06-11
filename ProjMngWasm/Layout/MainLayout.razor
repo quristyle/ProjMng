@@ -68,14 +68,14 @@
 
             <RadzenRow class="rz-mx-auto main-body-context " Style="">
                             
-              <RadzenColumn Size="12" class="" >        
+              <RadzenColumn Size="12" class=" qurimaincont" >        
                 @* Visible=IsBodyUrl *@
                 <CascadingValue Value="projItems">
                   <MainCont @ref="_main" />
                 </CascadingValue>
               </RadzenColumn>
 
-              <RadzenColumn Size="12" class="" Visible=!IsBodyUrl>
+              <RadzenColumn Size="12" class=" quriUrlcont" Visible=!IsBodyUrl>
                 @Body
               </RadzenColumn>
 

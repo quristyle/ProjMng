@@ -14,27 +14,33 @@
 
 @inherits BaseComponent
 
-<h3>Diagram</h3>
+<div class="diagramMain" style="height:calc(100vh - 200px);">
+    
+<div class="toolbar" style="font-size:1.2rem;width: 24px;
+    float: left;
+    height: 100%;">
+  <a @onclick="AddEntity" title="add"><i class="bi bi-plus-square"></i></a>
+  <a @onclick="RemoveSelected" title="선택된 엔터티 삭제"><i class="bi bi-x-square"></i></a>
+  <a @onclick="AutoLayout" title="자동 정렬"><i class="bi bi-filter-square"></i></a>
 
-<div class="toolbar" style="margin-bottom:10px;">
-  <button @onclick="AddEntity">엔터티 추가</button>
+@*   
   <button @onclick="SaveDiagram">xml 저장</button>
   <button @onclick="LoadDiagram">xml 불러오기</button>
-  <button @onclick="RemoveSelected">선택된 엔터티 삭제</button>
-  <button @onclick="AutoLayout">자동 정렬</button>
 
   <button @onclick="SaveAsObjectJson">객체형 JSON 저장</button>
-  <button @onclick="LoadFromObjectJson">객체형 JSON 불러오기</button>
+  <button @onclick="LoadFromObjectJson">객체형 JSON 불러오기</button> 
+*@
+
+</div>
+<div  style="float:left;height:100%;width:calc(100% - 25px);overflow:auto;">
+  <div id="@ContainerId"></div>
+</div>
 
 </div>
 
-<div id="@ContainerId" style="height:70vh; border:1px solid #ccc;"></div>
-
-<p><strong>선택한 노드:</strong> @_selectedNode</p>
-
 <textarea id="diagramData"
-                style="width:100%; height:150px; margin-top:10px;"
-                @bind="_diagramXml"></textarea>
+          style="width:100%; height:150px; margin-top:10px;display:none;"
+          @bind="_diagramXml"></textarea>
 
 
 
@@ -43,7 +49,7 @@
   private DotNetObjectReference<QuriDiagram>? _dotNetRef;
   private string ContainerId = $"graph-container-{Guid.NewGuid()}";
 
-  private string _selectedNode = "없음";
+  private string _selectedNode = "없음"; //선택한 노드
   private string SelectERD = "";
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
