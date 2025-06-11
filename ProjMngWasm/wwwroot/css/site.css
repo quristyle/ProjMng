@@ -729,7 +729,7 @@ a[class^=action]:hover {
 }
 
 
-
+/*
 .main-body-context {
   height: calc(100vh - 130px);
 }
@@ -746,7 +746,7 @@ a[class^=action]:hover {
 .context-body-rowcol {
   max-height: 100% !important;
 }
-
+*/
 
 
 /*알림창 위치*/
@@ -765,3 +765,7 @@ a[class^=action]:hover {
 }
 
 
+
+a{
+    color: unset;
+}

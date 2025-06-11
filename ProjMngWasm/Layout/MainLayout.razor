@@ -84,14 +84,7 @@
               </RadzenColumn>
 
             </RadzenRow>
-            <!-- footer-->
-            <RadzenRow>
-              <RadzenColumn Size="12">
-                <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" class="rz-mt-12">
-                  <span>Quristyle, &copy; 2022-2025 Jsini.</span>
-                </RadzenText>
-              </RadzenColumn>
-            </RadzenRow>
+
 
           </RadzenColumn>
         </RadzenRow>
@@ -106,9 +99,9 @@
         Placeholder="Find page ..." 
         type="search" 
         @oninput="@FilterPanelMenu" 
-        style="width: 100%" 
+        style="width: calc(100% - 25px);" 
         class="rz-search-input" aria-label="find" />
-      <a class="action" @onclick=OnLoadMenu ><i class="bi bi-arrow-clockwise"></i></a>
+      <a class="action" style="    margin-top: 10px;" @onclick=OnLoadMenu ><i class="bi bi-arrow-clockwise"></i></a>
     </div>
 
 
