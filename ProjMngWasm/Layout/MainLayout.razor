@@ -24,6 +24,9 @@
 
 <RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
   
+
+
+
   <RadzenHeader>
     <ChildContent>
       <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
@@ -65,7 +68,8 @@
       <RadzenContentContainer Name="main">
         <RadzenRow>
           <RadzenColumn Size="12">
-
+              
+            <!-- main content-->
             <RadzenRow class="rz-mx-auto main-body-context " Style="">
                             
               <RadzenColumn Size="12" class=" qurimaincont" >        
@@ -80,7 +84,7 @@
               </RadzenColumn>
 
             </RadzenRow>
-
+            <!-- footer-->
             <RadzenRow>
               <RadzenColumn Size="12">
                 <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" class="rz-mt-12">
@@ -122,12 +126,33 @@
               @foreach (var p in _Data) {
 
               @if( di.dir == p["dir"].ToString() ){
-
+                
+            <div @oncontextmenu="(e => ShowContextMenuWithContent(e, p))"  @oncontextmenu:preventDefault="true"   >
               <RadzenPanelMenuItem 
-                Click=@(()=>AddCallTab(p)) Text="@p["title"].ToString()"
+                                       Click=@(()=>AddCallTab(p)) Text="@p["title"]?.ToString()"
                 Icon="" aria-label=""
-                title="@(@p["sort"].ToString() +". "+ @p["description"].ToString())"
-                                       ContextMenu=@((MouseEventArgs args) => ShowContextMenuWithContent(args, p)) @oncontextmenu:preventDefault="true" />
+                title="@(@p["sort"]?.ToString() +". "+ @p["description"]?.ToString())"
+
+
+                                       >
+
+
+
+
+                                       
+            </RadzenPanelMenuItem>
+            </div>
+                                     
+            
+            
+                 @* ContextMenu=@(args => ShowContextMenuWithItems(args))  *@
+
+                @* Click=@(()=>AddCallTab(p)) Text="@p["title"]?.ToString()"
+                Icon="" aria-label=""
+                title="@(@p["sort"]?.ToString() +". "+ @p["description"]?.ToString())" *@
+
+                                       
+                                       @* ContextMenu=@(args => ShowContextMenuWithContent(args, p))  *@
 
               }
 
@@ -186,6 +211,9 @@
   bool sidebarExpanded = true;
   bool configSidebarExpanded = false;
   bool rendered;
+
+
+  
 
 
   bool IsBodyUrl{get;set;} = true;
@@ -476,13 +504,20 @@
   }
 
 
-
+  
+    // <RadzenMenuItem Text=@("Open "+item["url"]?.ToString()) Value="1"></RadzenMenuItem>
+    // <RadzenMenuItem Text=@( item["fullname"]?.ToString()) Value="2"></RadzenMenuItem>
 
 
   void ShowContextMenuWithContent(MouseEventArgs args, Dictionary<string, object> item) => ContextMenuService.Open(args, ds =>
   @<RadzenMenu Click="@( ( MenuItemEventArgs ee) =>  OnMenuItemClick(ee, item))">
-    <RadzenMenuItem Text=@("Open "+item["url"].ToString()) Value="1"></RadzenMenuItem>
-    <RadzenMenuItem Text=@( item["fullname"].ToString()) Value="2"></RadzenMenuItem>
+
+  
+  
+    <RadzenMenuItem Text=@("Open "+item["url"]?.ToString()) Value="1"></RadzenMenuItem>
+    <RadzenMenuItem Text=@( item["fullname"]?.ToString()) Value="2"></RadzenMenuItem>
+
+
     <RadzenMenuItem Text="More items" Value="3">
       <RadzenMenuItem Text="More sub items" Value="4">
         <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>

@@ -72,7 +72,7 @@
   public async Task<string> SaveAsObjectJson() { _diagramXml = await JS.InvokeAsync<string>("saveDiagramAsObjectJson", ContainerId); return _diagramXml; }
   
   private async Task LoadFromObjectJson() => await JS.InvokeVoidAsync("loadDiagramFromObjectJson", ContainerId, _diagramXml);
-    private async Task RemoveSelected() =>  await JS.InvokeVoidAsync("removeSelectedEntity");
+    private async Task RemoveSelected() =>  await JS.InvokeVoidAsync("removeSelectedEntity", ContainerId);
 
 
 
