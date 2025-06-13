@@ -30,42 +30,30 @@
 
 <RadzenTabs TabPosition="TabPosition.Top" 
 RenderMode="TabRenderMode.Client"
-tabindex="@tabIndex"
-SelectedIndexChanged="@OnTableChange" >
+
+@bind-SelectedIndex="@tabIndex"
+ >
   <Tabs>
     <RadzenTabsItem Text="Proc">
 
 
         
-<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:calc(100vh - 200px);">
+<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:calc(100vh - 250px);">
 
 
   <!-- 왼쪽 -->
   <RadzenSplitterPane  Size="20%" Min="10%" Max="90%">
 
-      
-            <RadzenDataGrid @bind-Value=@selectedItems
-            Style="height:100%;"
-            Data="@data"
-            TItem="ProcInfo"
-            IsLoading=@isLoading
-            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-            LogicalFilterOperator="LogicalFilterOperator.And"                      
-            AllowFiltering="true" 
-            AllowColumnResize="true" 
-            FilterMode="FilterMode.Simple"
-            SelectionMode="DataGridSelectionMode.Single"
-            AllowPaging="false" 
-            AllowSorting="true"
-            PagerHorizontalAlign="HorizontalAlign.Left"
-
-            ShowPagingSummary="true">
+            <QuriGrid 
+                 @ref=@ProcGrd
+                @bind-Value=@selectedItems
+            TItem="ProcInfo">
               <Columns>
-                <RadzenDataGridColumn title="ProcName" Property="ProcedureName" />
-                      <RadzenDataGridColumn title="Desc" Property="Description" />
+                <RadzenDataGridColumn  TItem="ProcInfo" title="ProcName" Property="ProcedureName" />
+                      <RadzenDataGridColumn  TItem="ProcInfo" title="Desc" Property="Description" />
                       @* <RadzenDataGridColumn title="cont" Property="Routine_Definition" /> *@
               </Columns>
-            </RadzenDataGrid>
+            </QuriGrid>
 
 
 
@@ -106,34 +94,15 @@ SelectedIndexChanged="@OnTableChange" >
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             <RadzenCard class="rz-my-6">
 
               <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
                 <RadzenColumn Size="5">
 
-                  <RadzenDataGrid @bind-Value=@FnSelectedItems
-                                  Style="height:60vh;"
-                                  Data="@FnData"
+                  <RadzenDataGrid
+                      @bind-Value=@FnSelectedItems
+                                  Style="height:100%;"
                                   TItem="ProcInfo"
-                                  IsLoading=@isLoading
                                   FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                   LogicalFilterOperator="LogicalFilterOperator.And"
                                   AllowFiltering="true"
@@ -167,116 +136,70 @@ SelectedIndexChanged="@OnTableChange" >
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     </RadzenTabsItem>
 
-    @* table *@
+
+
+
+
+
+
+
     <RadzenTabsItem Text="Table">
 
 
 
 
+        
+<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:calc(100vh - 250px);">
 
-      <RadzenCard class="rz-my-6">
 
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-          <RadzenColumn Size="4">
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="20%" Min="10%" Max="90%">
 
-            <RadzenDataGrid @bind-Value=@selectedTable
-            Style="height:60vh;"
-            Data="@dataTb"
+      
+            <QuriGrid 
+                @ref=_tableGrd
+                @bind-Value=@selectedTable
+                RowSelect="@OnRowSelect"
             TItem="TableInfo"
-            IsLoading=@isLoading2
-            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-            LogicalFilterOperator="LogicalFilterOperator.And"
-            AllowFiltering="true"
-            AllowColumnResize="true"
-            FilterMode="FilterMode.Simple"
-            SelectionMode="DataGridSelectionMode.Single"
-            AllowPaging="false"
-            AllowSorting="true"
-            PagerHorizontalAlign="HorizontalAlign.Left"
-            RowSelect="@OnRowSelect"
-            ShowPagingSummary="true">
+            >
               <Columns>
-                <RadzenDataGridColumn title="TableName" Property="TableName" />
-                <RadzenDataGridColumn title="Desc" Property="Description" />
+                <RadzenDataGridColumn TItem="TableInfo" title="TableName" Property="TableName" />
+                <RadzenDataGridColumn TItem="TableInfo" title="Desc" Property="Description" />
               </Columns>
-            </RadzenDataGrid>
+            </QuriGrid>
 
-          </RadzenColumn>
+      
+      </RadzenSplitterPane>
+      
+  <!-- 오른쪽 -->
+  <RadzenSplitterPane  Size="80%" Min="10%" Max="90%">
 
-
-
-          <RadzenColumn Size="8">
-
-            <RadzenDataGrid 
-            Style="height:60vh;"
+      
+            <QuriGrid 
+                @ref=_ColGrd 
             Data="@dataCol"
             TItem="ColumnInfo"
-            IsLoading=@isLoading3
-            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-            LogicalFilterOperator="LogicalFilterOperator.And"
-            AllowColumnResize="true"
-            SelectionMode="DataGridSelectionMode.Single"
-            AllowPaging="false"
-            AllowSorting="true"
-
-            PagerHorizontalAlign="HorizontalAlign.Left"
-            ShowPagingSummary="true">
+            >
               <Columns>
-                <RadzenDataGridColumn title="ColunmName" Property="ColunmName" />
-                <RadzenDataGridColumn title="Desc" Property="Description" Width="150px" />
-                <RadzenDataGridColumn title="Type" Property="Type_NM" />
-                <RadzenDataGridColumn title="Length" Property="Max_LENGTH" />
-                <RadzenDataGridColumn title="Null" Property="NullAble" />
-                <RadzenDataGridColumn title="Ident" Property="Ident" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="ColunmName" Property="ColunmName" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Desc" Property="Description" Width="150px" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Type" Property="Type_NM" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Length" Property="Max_LENGTH" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Null" Property="NullAble" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Ident" Property="Ident" />
               </Columns>
-            </RadzenDataGrid>
-
-          </RadzenColumn>
+            </QuriGrid>
 
 
 
-        </RadzenRow>
 
-      </RadzenCard>
+      </RadzenSplitterPane>
+
+      </RadzenSplitter>
+
+
 
 
 
@@ -397,6 +320,17 @@ SelectedIndexChanged="@OnTableChange" >
   CommonCode? projectName { get; set; }
   CommonCode? dbType { get; set; }
 
+
+  QuriGrid<ProcInfo> ProcGrd{ get; set; }
+  QuriGrid<TableInfo> _tableGrd{ get; set; }
+
+
+  QuriGrid<ColumnInfo> _ColGrd{ get; set; }
+
+
+
+
+
   private QuriCodeEditor? _editor;
   private QuriCodeEditor? _FnEditor;
   private QuriCodeEditor? _editProc;
@@ -433,13 +367,11 @@ SelectedIndexChanged="@OnTableChange" >
 
   int tabIndex { get; set; } = 0;
 
-  public IEnumerable<ProcInfo>? data { get; set; }
   public IEnumerable<ProcInfo>? FnData { get; set; }
-  public IEnumerable<TableInfo>? dataTb { get; set; }
   public IEnumerable<ColumnInfo>? dataCol { get; set; }
-  bool isLoading = false;
-  bool isLoading2 = false;
-  bool isLoading3 = false;
+  //bool isLoading = false;
+  //bool isLoading2 = false;
+  //bool isLoading3 = false;
 
 
   string DBSpMakeString;
@@ -452,6 +384,14 @@ SelectedIndexChanged="@OnTableChange" >
       return;
     }
 
+    if (tabIndex == 0)    {
+      //  isLoading = true;
+    }
+    else if (tabIndex == 1) {
+    }
+    else if (tabIndex == 2) {
+      //isLoading2 = true;
+    }
 
 
     var dbLogicItem = await DbCont<Dictionary<string, string>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
@@ -482,9 +422,9 @@ SelectedIndexChanged="@OnTableChange" >
       await LoadProc();
     }
     else if (tabIndex == 1) {
-      await LoadTable();
     }
     else if (tabIndex == 2) {
+      await LoadTable();
     }
   }
 
@@ -503,25 +443,37 @@ SelectedIndexChanged="@OnTableChange" >
     Dictionary<string, string> dic = getParams();
     //dic.Add("stp", "proclist");
 
-    isLoading = true;
-    var ri = await devService.GetList<ProcInfo>("proclist", dic);
-    FnData = ri.Data.Where(i => i.PgType == "sql").ToList();
-    data = ri.Data.Where(i => i.PgType != "sql").ToList();
+    await ProcGrd.Load("proclist", dic);
+    return;
 
-    if (data != null && data.ToList().Count > 0 ){
-      selectedItems = new List<ProcInfo>(){ data.ToList().FirstOrDefault() };
-    }
-    isLoading = false;
+    // isLoading = true;
+    // var ri = await devService.GetList<ProcInfo>("proclist", dic);
+    // FnData = ri.Data.Where(i => i.PgType == "sql").ToList();
+    // data = ri.Data.Where(i => i.PgType != "sql").ToList();
+
+    // if (data != null && data.ToList().Count > 0 ){
+    //   selectedItems = new List<ProcInfo>(){ data.ToList().FirstOrDefault() };
+    // }
+    //  isLoading = false;
   }
 
 
   protected async Task LoadTable() {
+
+
     Dictionary<string, string> dic = getParams();
-    dic.Add("stp", "tablelist");
-    isLoading2 = true;
-    var ri = await devService.GetList<TableInfo>("tablelist", dic);
-    dataTb = ri.Data;
-    isLoading2 = false;
+
+
+    await _tableGrd.Load("tablelist", dic);
+    return;
+
+
+
+    // dic.Add("stp", "tablelist");
+    // isLoading2 = true;
+    // var ri = await devService.GetList<TableInfo>("tablelist", dic);
+    // dataTb = ri.Data;
+    // isLoading2 = false;
   }
 
 
@@ -555,6 +507,10 @@ SelectedIndexChanged="@OnTableChange" >
         prefix = "p_";
         break;
       case "EDB":
+        prefix = "IN p_";
+        prefix2 = "p_";
+        varstr = "character varying";
+        break;
       case "POSTGRESQL":
         prefix = "IN p_";
         prefix2 = "p_";
@@ -572,11 +528,15 @@ SelectedIndexChanged="@OnTableChange" >
     }
 
     Dictionary<string, string> dic = getParams();
-    dic.Add("stp", "columnsOftable");
     dic.Add("table_name", tableInfo.TableName ?? string.Empty);
-    isLoading3 = true;
-    var ri = await devService.GetList<ColumnInfo>("columnsOftable", dic);
-    dataCol = ri.Data;
+
+   dataCol = await _ColGrd.Load("columnsOftable", dic);
+
+
+
+
+   // var ri = await devService.GetList<ColumnInfo>("columnsOftable", dic);
+   // dataCol = ri.Data;
 
     SelectedTableProp = "";
     SelectedTableGridColum = "";
@@ -606,15 +566,11 @@ SelectedIndexChanged="@OnTableChange" >
 
   await  _editProc.SetValue(spStr);
 
-    isLoading3 = false;
     StateHasChanged();
 
   }
 
 
-async void OnTableChange(int index) {
-  tabIndex = index;
-}
 
 
 }

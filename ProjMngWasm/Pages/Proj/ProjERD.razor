@@ -1,7 +1,4 @@
 ﻿@page "/erd"
-
-
-
 @{
   /* description : ER Diagram
   * title : ERD
@@ -9,8 +6,7 @@
   * credt : 2025-04-06
   * author : quristyle
   */
-      }
-
+}
 
 @inject IJSRuntime JS
 @using ProjMngWasm.Models;
@@ -18,23 +14,23 @@
 @using System.Text.Json
 
 @inherits PageBaseComponent
-      <PageTitle>Jsini | ERD</PageTitle>
+<PageTitle>Jsini | ERD</PageTitle>
 
-      <RadzenCard>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-            <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
-            <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
+<RadzenCard>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+    <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
+    <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
 
-          </RadzenStack>
-          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-            <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
-            <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>
-          </RadzenStack>
-        </RadzenStack>
-      </RadzenCard>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+    <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
+    <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>
+    </RadzenStack>
+</RadzenStack>
+</RadzenCard>
 
-      <QuriDiagram @ref="diagram" />
+<QuriDiagram @ref="diagram" />
 
 @code {
 

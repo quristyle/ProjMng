@@ -768,4 +768,5 @@ a[class^=action]:hover {
 
 a{
     color: unset;
+    cursor:pointer;
 }

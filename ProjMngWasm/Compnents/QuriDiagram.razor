@@ -61,7 +61,7 @@
 
   private string _diagramXml = "";
 
-  private async Task AddEntity() =>    await JS.InvokeVoidAsync("addEntityNode");
+  private async Task AddEntity() =>    await JS.InvokeVoidAsync("addEntityNode", ContainerId);
 
   public async Task<string> SaveDiagram() { _diagramXml = await JS.InvokeAsync<string>("saveDiagramXml", ContainerId); return _diagramXml; }
 
