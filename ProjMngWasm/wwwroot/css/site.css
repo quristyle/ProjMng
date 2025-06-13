@@ -622,7 +622,7 @@ svg.illustration {
 
 /* 코드 에디터 */
 .code-editor {
-  height: 60vh;
+  height: 100%;
 }
 
 /* notification */

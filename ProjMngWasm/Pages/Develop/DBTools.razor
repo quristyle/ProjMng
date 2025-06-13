@@ -36,15 +36,16 @@ SelectedIndexChanged="@OnTableChange" >
     <RadzenTabsItem Text="Proc">
 
 
+        
+<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:calc(100vh - 200px);">
 
 
-      <RadzenCard class="rz-my-6">
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="20%" Min="10%" Max="90%">
 
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-          <RadzenColumn Size="5">
-
+      
             <RadzenDataGrid @bind-Value=@selectedItems
-            Style="height:60vh;"
+            Style="height:100%;"
             Data="@data"
             TItem="ProcInfo"
             IsLoading=@isLoading
@@ -62,26 +63,44 @@ SelectedIndexChanged="@OnTableChange" >
               <Columns>
                 <RadzenDataGridColumn title="ProcName" Property="ProcedureName" />
                       <RadzenDataGridColumn title="Desc" Property="Description" />
-                      <RadzenDataGridColumn title="cont" Property="Routine_Definition" />
+                      @* <RadzenDataGridColumn title="cont" Property="Routine_Definition" /> *@
               </Columns>
             </RadzenDataGrid>
 
-          </RadzenColumn>
-
-          <RadzenColumn Size="7">
 
 
+      </RadzenSplitterPane>
+      
+  <!-- 오른쪽 -->
+  <RadzenSplitterPane  Size="80%" Min="10%" Max="90%">
+
+      
                   <QuriCodeEditor @ref="_editor" />
 
 
-          </RadzenColumn>
-        </RadzenRow>
 
-      </RadzenCard>
+      </RadzenSplitterPane>
+
+      </RadzenSplitter>
+
 
 
 
     </RadzenTabsItem>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <RadzenTabsItem Text="Fn">
 
@@ -377,7 +396,7 @@ SelectedIndexChanged="@OnTableChange" >
 
   CommonCode? projectName { get; set; }
   CommonCode? dbType { get; set; }
-  
+
   private QuriCodeEditor? _editor;
   private QuriCodeEditor? _FnEditor;
   private QuriCodeEditor? _editProc;
@@ -413,7 +432,7 @@ SelectedIndexChanged="@OnTableChange" >
   string compnentTag = "RadzenDataGridColumn";
 
   int tabIndex { get; set; } = 0;
-  
+
   public IEnumerable<ProcInfo>? data { get; set; }
   public IEnumerable<ProcInfo>? FnData { get; set; }
   public IEnumerable<TableInfo>? dataTb { get; set; }
@@ -441,17 +460,18 @@ SelectedIndexChanged="@OnTableChange" >
     });
     if (dbLogicItem.Data.Count == 0) {
       string dbtype = dbType?.Others["db_type"];
-      
-    switch (dbtype) {
+
+      switch (dbtype) {
         case "MSSQL":
           DBSpMakeString = WasmUtil.MssqlProcMakeBase;
-        break;
+          break;
+        case "EDB":
         case "POSTGRESQL":
           DBSpMakeString = WasmUtil.PostgresqlProcMakeBase;
-        break;
-      default:
-        break;
-    }
+          break;
+        default:
+          break;
+      }
 
     }
     else {
@@ -534,6 +554,7 @@ SelectedIndexChanged="@OnTableChange" >
       case "AWG":
         prefix = "p_";
         break;
+      case "EDB":
       case "POSTGRESQL":
         prefix = "IN p_";
         prefix2 = "p_";
@@ -566,22 +587,22 @@ SelectedIndexChanged="@OnTableChange" >
     }
 
     string nowdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-  
-    
-
-    
 
 
-    spStr = spStr.Replace("quri_TableName_quri", tableInfo.TableName);
-    spStr = spStr.Replace("quri_date_quri", nowdate);
-    spStr = spStr.Replace("quri_cols_quri", string.Join($"{System.Environment.NewLine},", dataCol.Select(c => c.ColunmName + $" -- " + c.Description)));
-    spStr = spStr.Replace("quri_in_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => $"{prefix}" + c.ColunmName + $" {varstr}" + $" -- " + c.Description)));
-    spStr = spStr.Replace("quri_schema_quri", dbSchema);
-    spStr = spStr.Replace("quri_keycol_quri", dataCol.Select(c => c.ColunmName).First());
-    spStr = spStr.Replace("quri_p_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => $"{prefix2}" + c.ColunmName + $" -- " + c.Description)));
-    spStr = spStr.Replace("quri_up_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => c.ColunmName + $" = {prefix2}" + c.ColunmName + $" -- " + c.Description)));
-    spStr = spStr.Replace("quri_cols_comment_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => c.ColunmName + $" -- " + c.Description)));
 
+
+
+    if (!string.IsNullOrEmpty(spStr)) {
+      spStr = spStr.Replace("quri_TableName_quri", tableInfo.TableName);
+      spStr = spStr.Replace("quri_date_quri", nowdate);
+      spStr = spStr.Replace("quri_cols_quri", string.Join($"{System.Environment.NewLine},", dataCol.Select(c => c.ColunmName + $" -- " + c.Description)));
+      spStr = spStr.Replace("quri_in_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => $"{prefix}" + c.ColunmName + $" {varstr}" + $" -- " + c.Description)));
+      spStr = spStr.Replace("quri_schema_quri", dbSchema);
+      spStr = spStr.Replace("quri_keycol_quri", dataCol.Select(c => c.ColunmName).First());
+      spStr = spStr.Replace("quri_p_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => $"{prefix2}" + c.ColunmName + $" -- " + c.Description)));
+      spStr = spStr.Replace("quri_up_cols_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => c.ColunmName + $" = {prefix2}" + c.ColunmName + $" -- " + c.Description)));
+      spStr = spStr.Replace("quri_cols_comment_quri", string.Join($"{System.Environment.NewLine}, ", dataCol.Select(c => c.ColunmName + $" -- " + c.Description)));
+    }
 
   await  _editProc.SetValue(spStr);
 

@@ -28,6 +28,7 @@ public class DbInfo {
         result = string.Format(mssqlConstrFormat, Db_ip, Db_port, Db_database, Db_id, Db_pwd, Db_cert);
         break;
       case "POSTGRESQL":
+      case "EDB":
         result = string.Format(postgresqlConstrFormat, Db_ip, Db_port, Db_database, Db_id, Db_pwd, Db_schema, Db_cert);
         break;
       case "MYSQL":

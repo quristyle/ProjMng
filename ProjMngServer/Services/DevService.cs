@@ -34,7 +34,7 @@ public class DevService : BaseService {
     IDataReader rdr = null;
     try {
 
-      if (di.Db_type == "POSTGRESQL") {
+      if (di.Db_type == "POSTGRESQL" || di.Db_type == "EDB") {
         db = new NpgsqlConnection(di.ToConnectionString());
       }
       else if (di.Db_type == "MSSQL") {
@@ -145,7 +145,7 @@ public class DevService : BaseService {
     IDataReader rdr = null;
     try {
 
-      if (dsr.Dsl_type == "POSTGRESQL") {
+      if (dsr.Dsl_type == "POSTGRESQL" || dsr.Dsl_type == "EDB") {
         db = new NpgsqlConnection(di.ToConnectionString());
       }
       else if (dsr.Dsl_type == "MSSQL") {
