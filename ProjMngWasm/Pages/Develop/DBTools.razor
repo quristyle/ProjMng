@@ -289,21 +289,12 @@ RenderMode="TabRenderMode.Client"
 
 
 
-      <RadzenCard>
+      <div style=" height:calc(100vh - 250px);">
 
 
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
+                <QuriCodeEditor @ref="_editProc" />
 
-
-          <RadzenColumn Size="7">
-            <QuriCodeEditor @ref="_editProc" />
-
-          </RadzenColumn>
-        </RadzenRow>
-
-
-      </RadzenCard>
-
+      </div>
 
 
 
