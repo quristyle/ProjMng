@@ -10,56 +10,76 @@
 
 @inherits PageBaseComponent
 
-      <RadzenCard >
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+ 
 
-          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-            <RadzenTextBox @bind-Value="srtype" />
-          </RadzenStack>
-
-          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-            <RadzenButton Click="@OnLoadWrk" Text="Search" />
-          </RadzenStack>
-
-        </RadzenStack>
-      </RadzenCard>
-
-
-      <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row">
-        <RadzenColumn Size="12">
-
-
-          <RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:100%;">
+          <RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08); ">
 
             <!-- 왼쪽 -->
-            <RadzenSplitterPane Size="30%" Min="10%" Max="90%">
+            <RadzenSplitterPane Size="50%" Min="10%" Max="90%">
 
-              <QuriDynamicGrid 
-              SaveBtnEvent=SaveBtnEvent 
-              ReqData=@Data 
-              SItemsChanged=OnMainCommChange
-              HiddenCols="cm_rid,cm_prop,cm_pcd,cm_val,cm_val2,cm_val3" />
+              
+                <RadzenTextBox 
+                    AutoCompleteType="AutoCompleteType.Off" 
+                    placeholder="Find component ..." type="search" @oninput="@Filter" 
+                    style="width:100%" class="rz-search-input" aria-label="find" />
+
+
+                    <RadzenTree Style="height:calc(100% - 200px);width:100%;"
+                    
+                     ItemContextMenu="ItemContextMenu"
+                    
+                    >
+                      
+                      <RadzenTree Data=@Data Style="height: 100%" ItemContextMenu="ItemContextMenu">
+                        <RadzenTreeLevel TextProperty="mnu_nm" ChildrenProperty="children"
+                                         Expanded=@(i => true)
+                                        HasChildren=@(i => ((MenuInfo)i).children?.Any() == true)
+                                         
+                                         />
+
+
+
+
+
+
+
+                                             @* HasChildren=@(i => ((MenuInfo)i).Children?.Any() == true) *@
+
+
+
+
+
+
+                    </RadzenTree>
+        </RadzenTree>
+
+
+
+
+
+
+
+
+
+
+
+
+
             </RadzenSplitterPane>
             <!-- 오른쪽 -->
-            <RadzenSplitterPane Size="70%" Min="10%" Max="90%">
+            <RadzenSplitterPane Size="50%" Min="10%" Max="90%">
 
-              <QuriDynamicGrid 
-              SaveBtnEvent=SaveBtnEvent2 
-              AddBtnEvent=AddBtnEvent2
-              ReqData=@Data2
-              HiddenCols="cm_rid,cm_prop" />
+
+
+
+
             </RadzenSplitterPane>
           </RadzenSplitter>
 
-        </RadzenColumn>
-      </RadzenRow>
+    
 
+@code {
 
-
-      @code {
-
-  public string srtype { get; set; } = "";
-  public IDictionary<string, object> MainSItem { get; set; }
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
@@ -67,34 +87,76 @@
     }
   }
 
-  public ResultInfo<Dictionary<string, object>> Data { get; set; }
-  public ResultInfo<Dictionary<string, object>> Data2 { get; set; }
+  public List<MenuInfo> Data { get; set; }
 
   protected async Task OnLoadWrk() {
-    Data = await DbCont<Dictionary<string, object>>("sp_devcomm_exec", new Dictionary<string, string>() {
+    var rdata = await DbCont<MenuInfo>("sp_dev_menu_exec", new Dictionary<string, string>() {
     { "srch_type",  "main" }
     });
+
+    MenuInfo mi = new MenuInfo();
+    mi.mnu_nm = "ROOT";
+    mi.mnu_id= "ROOT";
+    rdata.Data.Add(mi);
+
+    Data = rdata.Data;
     StateHasChanged();
   }
 
-  private async Task OnMainCommChange(IList<IDictionary<string, object>> args) {
-    MainSItem = args.FirstOrDefault();
-    Data2 = await DbCont<Dictionary<string, object>>("sp_devcomm_exec", new Dictionary<string, string>() {
-    { "cm_pcd",  MainSItem["cm_cd"].ToString() }
-    });
+
+  void Filter(ChangeEventArgs args)    {
+    var term = $"{args.Value}";
+
+    //examples = string.IsNullOrEmpty(term) ? ExampleService.Examples : ExampleService.Filter(term);
   }
 
-  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
-    var saveobj = await DbSave<IDictionary<string, object>>("sp_devcomm_exec", dic);
-  }
-  private async Task SaveBtnEvent2(IDictionary<string, object> dic) {
-    var saveobj = await DbSave<IDictionary<string, object>>("sp_devcomm_exec", dic);
-  }
 
-  private void AddBtnEvent2(IDictionary<string, object> args) {
+  async Task ItemContextMenu(TreeItemContextMenuEventArgs args)    { 
+    ContextMenuService.Open(args,
+        new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "하위 메뉴 추가", Value = 1, Icon = "home" },
+                new ContextMenuItem(){ Text = "메뉴 삭제", Value = 2, Icon = "search" }
+                },
+        async (e) =>        {
 
-    args["cm_pcd"] = MainSItem["cm_cd"];
-    StateHasChanged();
+          if( (int)e.Value == 1)          {
 
-  }
+            MenuInfo ownerMenu =(MenuInfo)args.Value;
+            if( ownerMenu.children == null ){
+              ownerMenu.children = new List<MenuInfo>();
+            }
+            else{
+
+            }
+
+            
+            
+            var rdata = await DbSave<MenuInfo>("sp_dev_menu_exec", new Dictionary<string, string>() {
+            { "mnu_nm",  "new menu" },
+            {"owner_id", ownerMenu.mnu_id}
+            });
+
+           MenuInfo mi =  rdata.Data[0];
+
+            ((MenuInfo)args.Value).children.Add(new MenuInfo() { mnu_nm= mi.mnu_nm , mnu_id = mi.mnu_id  });
+
+
+
+
+          }
+          else          {
+
+              string aaaa = "";
+              
+           // ((MenuInfo)args.Value).Children.Add(new MenuInfo() { mnu_nm="new menu"});
+            
+          }
+          ContextMenuService.Close();
+          //console.Log($"Menu item with Value={e.Value} clicked. Tree item: {args.Text}, EmployeeID: {((Employee)args.Value).EmployeeID}");
+          StateHasChanged();
+            }
+         );
+    }
+
+
 }

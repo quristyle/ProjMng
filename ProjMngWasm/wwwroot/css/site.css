@@ -738,9 +738,6 @@ a[class^=action]:hover {
   height: calc(100vh - 140px);
 }
 
-.context-body-row {
-  height: calc(100vh - 220px) !important;
-}
 
 
 .context-body-rowcol {
@@ -748,6 +745,9 @@ a[class^=action]:hover {
 }
 */
 
+.context-body-row {
+    height: calc(100vh - 220px) !important;
+}
 
 /*알림창 위치*/
 .rz-notification {
