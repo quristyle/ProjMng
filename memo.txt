@@ -1,0 +1,5 @@
+break 를 위한 주입
+
+SelectMenu
+
+"inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"

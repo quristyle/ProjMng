@@ -10,6 +10,22 @@
 
 @inherits PageBaseComponent
 
+
+      <RadzenCard >
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+          
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+            <RadzenTextBox  />
+          </RadzenStack>
+
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+            <RadzenButton Click="@OnLoadWrk" Text="Search" />
+            <RadzenButton  Text="Save" />
+          </RadzenStack>
+
+        </RadzenStack>
+      </RadzenCard>
+
  
 
           <RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08); ">
@@ -24,13 +40,21 @@
                     style="width:100%" class="rz-search-input" aria-label="find" />
 
 
-                    <RadzenTree Style="height:calc(100% - 200px);width:100%;"
-                    
-                     ItemContextMenu="ItemContextMenu"
-                    
-                    >
                       
-                      <RadzenTree Data=@Data Style="height: 100%" ItemContextMenu="ItemContextMenu">
+                      <RadzenTree 
+                        Data=@Data 
+
+                        
+                        @bind-Value="SelectMenu"
+
+                        Style="height:calc(100% - 200px);width:100%;" 
+                        
+
+
+                      ItemContextMenu="ItemContextMenu"
+                      
+                      
+                      >
                         <RadzenTreeLevel TextProperty="mnu_nm" ChildrenProperty="children"
                                          Expanded=@(i => true)
                                         HasChildren=@(i => ((MenuInfo)i).children?.Any() == true)
@@ -43,17 +67,8 @@
 
 
 
-                                             @* HasChildren=@(i => ((MenuInfo)i).Children?.Any() == true) *@
-
-
-
-
-
 
                     </RadzenTree>
-        </RadzenTree>
-
-
 
 
 
@@ -70,6 +85,62 @@
             <RadzenSplitterPane Size="50%" Min="10%" Max="90%">
 
 
+              <RadzenFieldset Text="Menu Info">
+                <RadzenStack  Gap="1rem">
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Menu Type" Component="CardId" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenDropDown @bind-Value="order.CardId" AllowClear="true" Placeholder="Select something" Data="@cards" Style="width: 100%;" TextProperty="CardNr" ValueProperty="CardId" Name="CardId"></RadzenDropDown>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Menu CD" Component="CardNr"/>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Menu Name" Component="CardNr"/>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Card #" Component="CardNr"/>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Expiry Date" Component="ExpiryDate"/>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenDatePicker Style="width: 100%;" Name="ExpiryDate" @bind-Value="order.ExpiryDate" />
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenLabel Text="Cardholder" Component="CardHolder"/>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox Style="width: 100%;" Name="CardHolder" />
+                    </RadzenColumn>
+                </RadzenRow>
+                </RadzenStack>
+            </RadzenFieldset>
 
 
 
@@ -81,27 +152,107 @@
 @code {
 
 
-  protected override async Task OnAfterRenderAsync(bool firstRender) {
-    if (firstRender) {
-      OnLoadWrk();
+  
+    public class Order
+    {
+        public int CardId { get; set; }
+        public string CardNr { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public string CardHolder { get; set; }
+        public string Name { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Zip { get; set; }
+        public int Country { get; set; }
+        public int StoreId { get; set; }
+        public string Warehouse { get; set; }
+        public string Region { get; set; }
+        public string System { get; set; }
+        public int TransId { get; set; }
+        public string Register { get; set; }
+        public string Clerk { get; set; }
+        public decimal Amount { get; set; }
+        public decimal Tax { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime ShipDate { get; set; }
     }
-  }
 
-  public List<MenuInfo> Data { get; set; }
+    public class CreditCard
+    {
+        public int CardId { get; set; }
+        public string CardNr { get; set; }
+    }
 
-  protected async Task OnLoadWrk() {
-    var rdata = await DbCont<MenuInfo>("sp_dev_menu_exec", new Dictionary<string, string>() {
+    public class Country
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    Order order = new Order()
+    {
+        ExpiryDate = DateTime.Parse("10/10/2022"),
+        OrderDate = DateTime.Now,
+        ShipDate = DateTime.Now
+    };
+
+    List<CreditCard> cards = new List<CreditCard>()
+{
+        new CreditCard() { CardId = 1, CardNr = "5555555555554444" },
+        new CreditCard() { CardId = 2, CardNr = "4012888888881881" }
+    };
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender) {
+            OnLoadWrk();
+        }
+    }
+
+
+    public object SelectMenu{get;set;}
+
+    public List<MenuInfo> Data { get; set; }
+
+    protected async Task OnLoadWrk()    {
+        var rdata = await DbCont<MenuInfo>("sp_dev_menu_exec", new Dictionary<string, string>() {
     { "srch_type",  "main" }
     });
 
-    MenuInfo mi = new MenuInfo();
-    mi.mnu_nm = "ROOT";
-    mi.mnu_id= "ROOT";
-    rdata.Data.Add(mi);
+        //Data = rdata.Data;
 
-    Data = rdata.Data;
-    StateHasChanged();
-  }
+
+       Data = BuildMenuTree(rdata.Data);
+        StateHasChanged();
+    }
+
+
+
+    public List<MenuInfo> BuildMenuTree(List<MenuInfo> source)    {
+        var menuMap = new Dictionary<string, MenuInfo>();
+        var rootMenus = new List<MenuInfo>();
+
+        // 1. 모든 메뉴를 사전에 저장
+        foreach (var menu in source)        {
+            menuMap[menu.mnu_id] = menu;
+        }
+
+        // 2. 부모 메뉴와 자식 메뉴 연결
+        foreach (var menu in source)        {
+            if (menu.owner_id == "ROOT")            {
+                rootMenus.Add(menu); // 최상위 메뉴
+            }
+            else if (menuMap.TryGetValue(menu.owner_id, out var parent))            {
+                menu.OwnerMenu = parent;       // 부모 참조 설정
+                parent.children.Add(menu);     // 자식 리스트에 추가
+            }
+        }
+
+        return rootMenus;
+    }
+
 
 
   void Filter(ChangeEventArgs args)    {
@@ -114,6 +265,7 @@
   async Task ItemContextMenu(TreeItemContextMenuEventArgs args)    { 
     ContextMenuService.Open(args,
         new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "선택위치 메뉴 추가", Value = 0, Icon = "home" },
                 new ContextMenuItem(){ Text = "하위 메뉴 추가", Value = 1, Icon = "home" },
                 new ContextMenuItem(){ Text = "메뉴 삭제", Value = 2, Icon = "search" }
                 },
@@ -129,8 +281,6 @@
 
             }
 
-            
-            
             var rdata = await DbSave<MenuInfo>("sp_dev_menu_exec", new Dictionary<string, string>() {
             { "mnu_nm",  "new menu" },
             {"owner_id", ownerMenu.mnu_id}

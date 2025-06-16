@@ -1,6 +1,8 @@
 ﻿namespace ProjMngWasm.Models {
   public class MenuInfo : BaseModel {
 
+
+    public MenuInfo OwnerMenu { get; set; }
     public string owner_id { get; set; }
     public string mnu_cd { get; set; }
     public string mnu_nm { get; set; }
