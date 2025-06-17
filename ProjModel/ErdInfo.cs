@@ -1,5 +1,6 @@
-﻿namespace ProjMngWasm.Models {
-  public class ErdInfo {
+﻿
+namespace ProjModel;
+public class ErdInfo {
     public List<EntityInfo> entities { get; set; } = new List<EntityInfo>();
     public List<RelationInfo> relations { get; set; } = new List<RelationInfo>();
   }
@@ -21,4 +22,4 @@
     public string label { get; set; } = string.Empty;
   }
 
-}
+

@@ -92,76 +92,8 @@
     </ChildContent>
   </RadzenBody>
 
+  <SideBarMenu />
 
-  <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" class="" style="display: flex; flex-direction: column">
-    <div style="padding: 1rem">
-      <RadzenTextBox id="find" 
-        Placeholder="Find page ..." 
-        type="search" 
-        @oninput="@FilterPanelMenu" 
-        style="width: calc(100% - 25px);" 
-        class="rz-search-input" aria-label="find" />
-      <a class="action" style="    margin-top: 10px;" @onclick=OnLoadMenu ><i class="bi bi-arrow-clockwise"></i></a>
-    </div>
-
-
-
-
-    <div style="flex: 1; overflow: auto">
-
-      <RadzenPanelMenu Match="NavLinkMatch.Prefix">
-
-        @if (_Data != null) {
-
-          @foreach (var di in dirs) {
-
-            <RadzenPanelMenuItem  Text=@di.dir Icon="" @bind-Expanded=@di.expend >
-              @foreach (var p in _Data) {
-
-              @if( di.dir == p["dir"].ToString() ){
-                
-            <div @oncontextmenu="(e => ShowContextMenuWithContent(e, p))"  @oncontextmenu:preventDefault="true"   >
-              <RadzenPanelMenuItem 
-                                       Click=@(()=>AddCallTab(p)) Text="@p["title"]?.ToString()"
-                Icon="" aria-label=""
-                title="@(@p["sort"]?.ToString() +". "+ @p["description"]?.ToString())"
-
-
-                                       >
-
-
-
-
-                                       
-            </RadzenPanelMenuItem>
-            </div>
-                                     
-            
-            
-                 @* ContextMenu=@(args => ShowContextMenuWithItems(args))  *@
-
-                @* Click=@(()=>AddCallTab(p)) Text="@p["title"]?.ToString()"
-                Icon="" aria-label=""
-                title="@(@p["sort"]?.ToString() +". "+ @p["description"]?.ToString())" *@
-
-                                       
-                                       @* ContextMenu=@(args => ShowContextMenuWithContent(args, p))  *@
-
-              }
-
-            }
-
-            </RadzenPanelMenuItem>
-
-          }
-
-
-        }
-
-      </RadzenPanelMenu>
-
-    </div>
-  </RadzenSidebar>
   <RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack class="rz-p-4" Gap="0">
       <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
@@ -199,6 +131,11 @@
 }
 
 @code {
+
+  
+  [Inject] protected IJSRuntime? jsRuntime { get; set; }
+
+
   RadzenButton? wcagColorsInfo;
   RadzenButton? freeThemesInfo;
   bool sidebarExpanded = true;
@@ -533,7 +470,9 @@
       }
     }
     else if (args.Value.Equals(2)) {
-      // Do something else
+    var str = item["fullname"]?.ToString();
+     jsRuntime.InvokeVoidAsync("copyClipboard", str);
+  
     }
     else if (args.Value.Equals(3)) {
       // Do something else
