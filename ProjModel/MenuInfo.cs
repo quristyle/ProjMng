@@ -35,6 +35,45 @@ public class MenuInfo : BaseModel {
     public List<MenuInfo> Children { get; set; } //= new List<MenuInfo>();
 
 
+
+
+
+  public static List<MenuInfo> BuildMenuTree(List<MenuInfo> source) {
+    var menuMap = new Dictionary<string, MenuInfo>();
+    var rootMenus = new List<MenuInfo>();
+
+    // 1. 모든 메뉴를 사전에 저장
+    foreach (var menu in source) {
+      menuMap[menu.mnu_id] = menu;
+    }
+
+    // 2. 부모 메뉴와 자식 메뉴 연결
+    foreach (var menu in source) {
+      if (menu.owner_id == "ROOT") {
+        rootMenus.Add(menu); // 최상위 메뉴
+      }
+      else if (menuMap.TryGetValue(menu.owner_id, out var parent)) {
+        menu.OwnerMenu = parent;       // 부모 참조 설정
+
+        if (parent.Children == null) {
+          parent.Children = new List<MenuInfo>();
+        }
+
+        parent.Children.Add(menu);     // 자식 리스트에 추가
+      }
+    }
+
+    foreach (var menu in source) {
+      menu.isChanged = false; // 초기화
+    }
+
+    return rootMenus;
+  }
+
+
+
+
+
 }
 
 [AddINotifyPropertyChangedInterface]
@@ -49,10 +88,9 @@ public class BaseModel {
 
 
   public void OnPropertyChanged(string propertyName) {
-    if ( propertyName != nameof(isChanged) ) {
+    if (propertyName != nameof(isChanged)) {
       isChanged = true;
     }
   }
 
 }
-

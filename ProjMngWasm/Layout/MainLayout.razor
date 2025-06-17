@@ -92,7 +92,7 @@
     </ChildContent>
   </RadzenBody>
 
-  <SideBarMenu />
+  <SideBarMenu  OnCallTab="AddCallTab" @bind-SidebarExpanded="sidebarExpanded" />
 
   <RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack class="rz-p-4" Gap="0">
@@ -153,44 +153,6 @@
   }
 
 
-  void FilterPanelMenu(ChangeEventArgs args) {
-    var term = args.Value??string.Empty;
-    if (string.IsNullOrEmpty(term?.ToString())) {
-
-      dirs.ForEach(menuDir =>
-{
-    Console.WriteLine($"Before2: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-        menuDir.expend = menuDir.pre_expend; // 값 복사
-
-        menuDir.first_memory = false;
-    Console.WriteLine($"After2: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-});
-
-      _Data = _Data2;
-    }
-    else {
-
-
-      dirs.ForEach(menuDir =>
-{
-    Console.WriteLine($"Before: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-      if(  !menuDir.first_memory ){
-    menuDir.pre_expend = menuDir.expend; // 값 복사
-          menuDir.first_memory = true;
-      }
-    menuDir.expend = true; // 새로운 값 설정
-    Console.WriteLine($"After: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-});
-
-      _Data = _Data2?.Where(x => 
-        x["title"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)||
-        x["description"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase) ||
-        x["url"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)
-      );
-    }
-    StateHasChanged();
-  }
-
   void ChangeTheme(object value) {
     ThemeService.SetTheme($"{value}");
   }
@@ -215,9 +177,6 @@
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
       rendered = true;
-
-
-      await OnLoadMenu();
 
     }
     var currentUrl = UriHelper.Uri;
@@ -315,10 +274,6 @@
 
   MainCont? _main{get;set;}
 
-  public List<MenuDir> dirs { get; set; } = new List<MenuDir>();
-  //public ResultInfo<Dictionary<string, object>>? Data { get; set; }
-  public IEnumerable<Dictionary<string, object>>? _Data { get; set; }
-  public IEnumerable<Dictionary<string, object>>? _Data2 { get; set; }
 
 
   [Inject] AppProjData appData { get; set; }
@@ -335,7 +290,6 @@
 
 
   public async Task<bool> AuthCheck() {
-
 
     // 인증체크
     if (appData.User == null) {
@@ -364,140 +318,22 @@
   }
 
 
+  
+
+  public void AddCallTab(MenuInfo p) {
 
 
-
-
-
-
-  protected async Task OnLoadMenu() {
-    if (jsiniService != null) {
-      try {
-        var data = await jsiniService.GetList<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>(){{"prj_rid","3"}});
-
-        if (data != null && data.Data != null) {
-          dirs.Clear(); // 기존 데이터를 초기화하여 중복된 키를 방지
-
-          var groupedData = data.Data
-              .Where(d => d.ContainsKey("dir"))
-              .GroupBy(d => d["dir"].ToString())
-              .Select(g => g.First());
-
-          foreach (var d in groupedData) {
-            dirs.Add(new MenuDir() {
-                  dir = d["dir"].ToString(),
-                  expend = false
-                });
-           // dirs[d["dir"].ToString()] = d["dir"].ToString();
-          }
-
-          _Data2 = data.Data.OrderBy(d => d["sort"].ToString());
-
-          _Data = _Data2;
-        }
-        else {
-          Console.WriteLine("Data or Data.Data is null.");
-        }
-      }
-      catch (Exception ex) {
-        Console.WriteLine($"An error occurred: {ex.Message}");
-      }
-      finally {
-        // 비동기 작업이 완료된 후 상태 변경을 반영
-        StateHasChanged();
-      }
-      
-    }
-    else {
-      Console.WriteLine("JsiniService is null.");
-    }
-  }
-
-  private void AddCallTab(Dictionary<string, object> p) {
-
-    if (p.ContainsKey("fullname") && p["fullname"] != null &&
-        p.ContainsKey("title") && p["title"] != null &&
-        p.ContainsKey("name") && p["name"] != null &&
-        p.ContainsKey("url") && p["url"] != null &&
-        p.ContainsKey("dir") && p["dir"] != null) {
-
-      _main.AddItem(p["fullname"].ToString()??string.Empty,
-                    p["title"].ToString() ?? string.Empty,
-                    p["name"].ToString() ?? string.Empty,
-                    p["url"].ToString() ?? string.Empty,
-                    p["dir"].ToString() ?? string.Empty);
-    }
-    else {
-      Console.WriteLine("One or more keys are missing or null in the dictionary.");
-    }
+      _main.AddItem(p.pgm_id,
+                    p.mnu_nm,
+                    p.mnu_nm,
+                    p.mnu_url,
+                    p.mnu_cd);
+   
     
   }
-
+  
 
   
-    // <RadzenMenuItem Text=@("Open "+item["url"]?.ToString()) Value="1"></RadzenMenuItem>
-    // <RadzenMenuItem Text=@( item["fullname"]?.ToString()) Value="2"></RadzenMenuItem>
-
-
-  void ShowContextMenuWithContent(MouseEventArgs args, Dictionary<string, object> item) => ContextMenuService.Open(args, ds =>
-  @<RadzenMenu Click="@( ( MenuItemEventArgs ee) =>  OnMenuItemClick(ee, item))">
-
-  
-  
-    <RadzenMenuItem Text=@("Open "+item["url"]?.ToString()) Value="1"></RadzenMenuItem>
-    <RadzenMenuItem Text=@( item["fullname"]?.ToString()) Value="2"></RadzenMenuItem>
-
-
-    <RadzenMenuItem Text="More items" Value="3">
-      <RadzenMenuItem Text="More sub items" Value="4">
-        <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
-        <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
-      </RadzenMenuItem>
-    </RadzenMenuItem>
-  </RadzenMenu>);
-
-  void OnMenuItemClick(MenuItemEventArgs args, Dictionary<string, object> item) {
-
-
-    Console.WriteLine($"Clicked on {args.Value}");
-
-
-    if (args.Value.Equals(1)) {
-      // Open URL
-      string url = item["url"].ToString();
-      if (!string.IsNullOrEmpty(url)) {
-        NavigationManager.NavigateTo(url);
-      }
-    }
-    else if (args.Value.Equals(2)) {
-    var str = item["fullname"]?.ToString();
-     jsRuntime.InvokeVoidAsync("copyClipboard", str);
-  
-    }
-    else if (args.Value.Equals(3)) {
-      // Do something else
-    }
-    else if (args.Value.Equals(4)) {
-      // Do something else
-    }
-    if (!args.Value.Equals(3) && !args.Value.Equals(4)) {
-    ContextMenuService.Close();
-    }
-  }
-
-
-
-
-
-
-
-  public class MenuDir {
-    public string? dir { get; set; }
-    public bool expend { get; set; } = false;
-    public bool pre_expend { get; set; } = false;
-    public bool first_memory { get; set; } = false;
-  }
-
 
 
 

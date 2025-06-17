@@ -169,7 +169,7 @@
 
         //rdata.Data.Add(new MenuInfo(){mnu_id="ROOT",mnu_cd="ROOT",mnu_nm="ROOT"});
         Source = rdata.Data;
-       Data = BuildMenuTree(rdata.Data);
+       Data = MenuInfo.BuildMenuTree(rdata.Data);
        StateHasChanged();
     }
 
@@ -204,6 +204,8 @@
     }
 
 
+    /*
+
     public List<MenuInfo> BuildMenuTree(List<MenuInfo> source)    {
         var menuMap = new Dictionary<string, MenuInfo>();
         var rootMenus = new List<MenuInfo>();
@@ -236,7 +238,7 @@
         return rootMenus;
     }
 
-
+    */
 
   void Filter(ChangeEventArgs args)    {
     var term = $"{args.Value}";
