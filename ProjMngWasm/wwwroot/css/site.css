@@ -770,3 +770,38 @@ a{
     color: unset;
     cursor:pointer;
 }
+
+
+.quri_sidebarmenu .rz-expander .rz-expander {
+  background-color: var(--rz-panel-menu-item-2nd-level-background-color);
+  padding-inline-start: calc( var(--rz-panel-menu-item-2nd-level-offset) / 2);
+}
+
+  .quri_sidebarmenu .rz-expander .rz-expander .rz-navigation-item-wrapper {
+    background-color: unset !important;
+  }
+
+.rz-navigation-item {
+/*  background-color: var(--rz-panel-menu-item-2nd-level-background-color);*/
+}
+
+.rz-expander .rz-navigation-item-link {
+}
+
+
+
+.quri_sidebarmenu .rz-expander .rz-navigation-menu .rz-navigation-item.menu-fold > .rz-navigation-item-wrapper {
+  background-color: unset !important;
+}
+
+.quri_sidebarmenu .rz-expander .rz-navigation-menu .rz-navigation-item.menu-fold > .rz-navigation-item-wrapper .rz-navigation-item-link {
+  font-weight: 600;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+/*
+
+.rz-expander .rz-navigation-menu .rz-navigation-item:hover {
+  background-color: unset !important;
+}*/
