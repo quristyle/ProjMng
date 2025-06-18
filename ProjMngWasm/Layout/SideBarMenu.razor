@@ -151,68 +151,16 @@
  
 
 
-     RenderFragment RenderMenuItem(MenuInfo menu) => builder =>    {
-        int seq = 0;
-        if (string.IsNullOrEmpty(menu.pgm_id))        {
-            builder.OpenComponent<RadzenPanelMenuItem>(seq++);
-            builder.AddAttribute(seq++, "Text", menu.mnu_nm);
-            builder.AddAttribute(seq++, "Icon", "");
-            builder.AddAttribute(seq++, "Expanded", menu.Children?.Count > 0);
-
-            if (menu.Children != null && menu.Children.Count > 0)            {
-                builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(childBuilder =>                {
-                    foreach (var child in menu.Children)                    {
-                        childBuilder.AddContent(seq++, RenderMenuItem(child));
-                    }
-                }));
-            }
-            builder.CloseComponent();
-        }
-        else        {
-            builder.OpenElement(seq++, "div");
-            builder.AddAttribute(seq++, "oncontextmenu", EventCallback.Factory.Create<MouseEventArgs>(this, e => ShowContextMenuWithContent(e, menu)));
-            builder.AddAttribute(seq++, "oncontextmenu:preventDefault", true);
-
-            builder.OpenComponent<RadzenPanelMenuItem>(seq++);
-            builder.AddAttribute(seq++, "Text", menu.mnu_nm);
-            builder.AddAttribute(seq++, "Icon", "");
-            builder.AddAttribute(seq++, "title", menu.pgm_id);
-            builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => AddCallTab(menu)));
-          // builder.AddAttribute(seq++, "Click", EventCallback.Factory.Create(this, () => AddCallTab(menu)));
-            builder.CloseComponent();
-
-            builder.CloseElement();
-        }
-    };
-
-    RenderFragment RenderMenuMarkup2(MenuInfo menu) => 
-    @<RadzenPanelMenuItem Text="@(menu.mnu_nm +"  "+ menu.Children?.Count)" Icon="" Expanded="@(menu.Children?.Count > 0)" title="@menu.pgm_id">
-        @if (menu.Children != null && menu.Children.Count > 0)        {
-            @foreach (var child in menu.Children)            {
-                @RenderMenuMarkup2(child)
-            }
-        }
-        else if (!string.IsNullOrEmpty(menu.pgm_id))        {
-            <div @oncontextmenu="(e => ShowContextMenuWithContent(e, menu))" @oncontextmenu:preventDefault="true">
-                <RadzenPanelMenuItem
-                    Text="@menu.mnu_nm"
-                    Icon=""
-                    title="@menu.pgm_id"
-                    Click="() => AddCallTab(menu)">
-                </RadzenPanelMenuItem>
-            </div>
-        }
-    </RadzenPanelMenuItem>;
-
-
-
-
-
-
     
     RenderFragment RenderMenuMarkup(MenuInfo p2) => 
                     @<div>@if( string.IsNullOrEmpty( p2.pgm_id) ){
-                      <RadzenPanelMenuItem  Text=@p2.mnu_nm Icon="" Expanded=@(@p2.Children.Count>0) class="@((@p2.Children.Count>0)?"menu-fold":"")" >
+                      <RadzenPanelMenuItem  
+                      Text=@p2.mnu_nm 
+                      Icon="" 
+                      Click="@(() => OnMenuExpand(p2))"
+
+                      @bind-Expanded=@p2.Expanded 
+                      class="@((@p2.Children.Count>0)?"menu-fold":"")" >
                         @if (p2.Children != null && p2.Children.Count > 0)        {
                             @foreach (var child in p2.Children)            {
                                 @RenderMenuMarkup(child)
@@ -237,35 +185,28 @@
 
 
 
+  public List<MenuInfo> Data { get; set; } = new List<MenuInfo>();
 
 
 
 
-
-
-
-
-
-    void OnPanelMenuItemClick(MenuItemEventArgs args){
-
-      Console.WriteLine($"OnPanelMenuItemClick : {args.Text} {args.Value}");
-
-
-    // args.Value에 MenuInfo가 들어있지 않으면, Text 등으로 찾아야 할 수 있음
-    var menu = (MenuInfo)args.Value; // FindMenuByName(Data, args.Text);
-    if (menu != null && !string.IsNullOrEmpty(menu.pgm_id))
-    {
-        AddCallTab(menu);
+void OnMenuExpand(MenuInfo menu){
+    // menu의 모든 상위 메뉴의 mnu_id를 HashSet에 저장
+    var parentIds = new HashSet<string>();
+    var current = menu;
+    while (current != null)    {
+        parentIds.Add(current.mnu_id);
+        current = current.OwnerMenu;
     }
+
+    // 최상위 메뉴(Data) 중에서, menu와 그 부모가 아닌 것만 Expanded = false
+    foreach (var root in Data)    {
+        if (!parentIds.Contains(root.mnu_id))        {
+            root.Expanded = false;
+        }
+    }
+    StateHasChanged();
 }
-
-
-  
-
-  //public List<MenuDir> dirs { get; set; } = new List<MenuDir>();
-  //public ResultInfo<Dictionary<string, object>>? Data { get; set; }
-  public List<MenuInfo> Data { get; set; }
-  //public IEnumerable<Dictionary<string, object>>? _Data2 { get; set; }
 
 
   protected async Task OnLoadMenu() {

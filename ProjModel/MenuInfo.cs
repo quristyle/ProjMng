@@ -23,22 +23,25 @@ public class MenuInfo : BaseModel {
   public string mnu_url { get; set; }
 
   public string disp_seq { get; set; }
-    public string parent_mnu_cd { get; set; }
-    public string mnu_grp_yn { get; set; }
-    public string pgm_id { get; set; }
+  public string parent_mnu_cd { get; set; }
+  public string mnu_grp_yn { get; set; }
+  public string pgm_id { get; set; }
 
-    public string mnu_id { get; set; }
+  public string mnu_id { get; set; }
   public string use_yn { get; set; }
   public string pgm_ty { get; set; }
 
-    public bool Expanded { get; set; }
-    public List<MenuInfo> Children { get; set; } //= new List<MenuInfo>();
+  public bool Expanded { get; set; }
+  public List<MenuInfo> Children { get; set; } //= new List<MenuInfo>();
 
 
 
 
 
   public static List<MenuInfo> BuildMenuTree(List<MenuInfo> source) {
+
+    bool isFirstExpanded = false;
+
     var menuMap = new Dictionary<string, MenuInfo>();
     var rootMenus = new List<MenuInfo>();
 
@@ -58,7 +61,10 @@ public class MenuInfo : BaseModel {
         if (parent.Children == null) {
           parent.Children = new List<MenuInfo>();
         }
-
+        if (!isFirstExpanded) {
+          parent.Expanded = true;
+          isFirstExpanded = true;
+        }
         parent.Children.Add(menu);     // 자식 리스트에 추가
       }
     }
