@@ -1,8 +1,7 @@
 ﻿@inherits BaseComponent
 
 @if (ready) {
-  <RadzenCard class="rz-p-0 rz-material-3-demo-card">
-    <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="example-tabs" RenderMode="TabRenderMode.Client" @ref="@ProjTabs">
+    <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="rz-h-100" RenderMode="TabRenderMode.Client" @ref="@ProjTabs">
         <Tabs>
       @if ( ProjItems != null && ProjItems?.Count > 0 ) {
       @foreach (var item in ProjItems) {
@@ -41,7 +40,6 @@
       }
         </Tabs>
     </RadzenTabs>
-  </RadzenCard>
 }
 @code {
    RadzenTabs? ProjTabs{get;set;} 

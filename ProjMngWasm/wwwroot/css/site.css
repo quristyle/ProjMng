@@ -6,23 +6,42 @@
 }
 */
 
+@font-face {
+  font-family: 'S-CoreDream-3Light';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'NanumSquareL';
+  src: url('https://cdn.jsdelivr.net/gh/wizfile/font/NanumSquareL.eot');
+  src: url('https://cdn.jsdelivr.net/gh/wizfile/font/NanumSquareL.woff') format('woff');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'GmarketSansTTFLight';
+  src: url('https://cdn.jsdelivr.net/gh/wizfile/font/GmarketSansTTFLight.eot');
+  src: url('https://cdn.jsdelivr.net/gh/wizfile/font/GmarketSansTTFLight.woff') format('woff');
+  font-style: normal;
+}
+				
+
 /*@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css");*/
-
-
 :root {
   --rz-layout-body-padding: 0.04rem 0 0 0.04rem !important;
-/*  --rz-body-font-size: 0.825rem !important;*/
+  /*  --rz-body-font-size: 0.825rem !important;*/
   --rz-tabs-padding: 0.25rem !important;
+  --rz-root-font-size: 12px !important;
 }
 
 * {
-  font-family: Play, 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
-/*  font-weight: 100;*/
+  font-family: Play, 'GmarketSansTTFLight', 'S-CoreDream-3Light', 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
+  /*  font-weight: 100;*/
 }
 
 
 #app {
-/*  background-color: #2e2e2e;*/
+  background-color: #2e2e2e;
 }
 
 a.ui-button:hover {
@@ -120,9 +139,10 @@ text-decoration: none;
 /* next-demos */
 
 body {
-/*    -webkit-font-smoothing: antialiased;
+  /*    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;*/
-    --rz-body-font-size: 0.825rem;
+/*  --rz-body-font-size: 9px;*/
+  margin: 0;
 }
 
 .light {
@@ -746,8 +766,14 @@ a[class^=action]:hover {
 */
 
 .context-body-row {
-    height: calc(100vh - 220px) !important;
+    height: calc(100vh - 175px) !important;
 }
+
+.rz-tabview-panel {
+  height: 100%;
+}
+
+
 
 /*알림창 위치*/
 .rz-notification {

@@ -66,13 +66,11 @@
   <RadzenBody >
     <ChildContent>
       <RadzenContentContainer Name="main">
-        <RadzenRow>
-          <RadzenColumn Size="12">
               
             <!-- main content-->
-            <RadzenRow class="rz-mx-auto main-body-context " Style="">
+            <RadzenRow class="rz-mx-auto main-body-context rz-h-100" Style="">
                             
-              <RadzenColumn Size="12" class=" qurimaincont" >        
+              <RadzenColumn Size="12" class=" qurimaincont rz-h-100" >        
                 @* Visible=IsBodyUrl *@
                 <CascadingValue Value="projItems">
                   <MainCont @ref="_main" />
@@ -86,8 +84,6 @@
             </RadzenRow>
 
 
-          </RadzenColumn>
-        </RadzenRow>
       </RadzenContentContainer>
     </ChildContent>
   </RadzenBody>
