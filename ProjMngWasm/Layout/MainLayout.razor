@@ -166,13 +166,13 @@
 
   void BodyVisible(){    
     
-    Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}        { _main.PageCount} ");
+    Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}        { _main?.PageCount} ");
     
-      if( !IsBodyUrl && _main.PageCount > 0){
+      if( !IsBodyUrl && _main != null && _main?.PageCount > 0){
         IsBodyUrl = true;
         StateHasChanged();
       }
-      else if( IsBodyUrl && _main.PageCount <= 0){
+      else if( IsBodyUrl  && ( _main == null || _main?.PageCount <= 0 ) ){
         IsBodyUrl = false;
         StateHasChanged();
       }
