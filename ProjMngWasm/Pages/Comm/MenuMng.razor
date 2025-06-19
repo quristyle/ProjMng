@@ -84,30 +84,16 @@
             <!-- 오른쪽 -->
             <RadzenSplitterPane Size="50%" Min="10%" Max="90%">
 
-              
               <div class="rz-p-0 rz-p-md-12">
 
                   <RadzenRow Gap="1rem">
                       <RadzenColumn Size="12" SizeSM="6">
                           <RadzenStack>
-                              <RadzenFormField Text="mnu_id" Variant="@variant">
-                                  <RadzenTextBox @bind-Value=@SelectMenu.mnu_id />
-                              </RadzenFormField>
-                              <RadzenFormField Text="mnu_cd" Variant="@variant">
-                                  <RadzenTextBox @bind-Value=@SelectMenu.mnu_cd />
-                              </RadzenFormField>
-                              <RadzenFormField Text="mnu_nm" Variant="@variant">
-                                  <RadzenTextBox @bind-Value="@SelectMenu.mnu_nm" />
-                              </RadzenFormField>
-                              <RadzenFormField Text="pgm_id" Variant="@variant">
-                                  <RadzenTextBox @bind-Value=@SelectMenu.pgm_id />
-                              </RadzenFormField>
-                              <RadzenFormField Text="isChanged" Variant="@variant">
-                                  <RadzenCheckBox @bind-Value=@SelectMenu.isChanged />
-                              </RadzenFormField>
-                              <RadzenFormField Text="owner_id" Variant="@variant">
-                                  <RadzenTextBox @bind-Value=@SelectMenu.owner_id />
-                              </RadzenFormField>
+                              <QuriFormTextField @bind-Value=@SelectMenu.mnu_id Text="mnu_id" Disable=true />
+                              <QuriFormTextField @bind-Value=@SelectMenu.mnu_cd Text="mnu_cd" />
+                              <QuriFormTextField @bind-Value=@SelectMenu.mnu_nm Text="mnu_nm" />
+                              <QuriFormTextField @bind-Value=@SelectMenu.owner_id Text="owner_id" Disable=true />
+                              <QuriFormCheckField @bind-Value=@SelectMenu.isChanged Text="isChanged" Disable=true />
                               <RadzenFormField Text="사용여부" Variant="@variant">
                                   <RadzenRadioButtonList @bind-Value=@SelectMenu.use_yn class="rz-m-4 rz-mt-8">
                                       <Items>
@@ -121,12 +107,11 @@
 
                       <RadzenColumn Size="12" SizeSM="6">
                           <RadzenStack>
-                              <RadzenFormField Text="url" Variant="@variant">
-                                  <RadzenTextBox @bind-Value=@SelectMenu.mnu_url />
-                              </RadzenFormField>
-                              <RadzenFormField Text="RadzenTextArea" Variant="@variant">
-                                  <RadzenTextArea  Rows="4" />
-                              </RadzenFormField>
+                              <QuriFormTextField @bind-Value=@SelectMenu.pgm_id Text="pgm_id" />
+                              <QuriFormTextField @bind-Value=@SelectMenu.mnu_url Text="url" />                              
+                              <QuriFormNumberField @bind-Value=@SelectMenu.disp_seq Text="disp_seq" />                              
+                              <QuriFormTextAreaField @bind-Value=@SelectMenu.mnu_desc Text="mnu_desc" />
+
                           </RadzenStack>
                       </RadzenColumn>
                   </RadzenRow>
@@ -189,6 +174,7 @@
             {"mnu_cd", mn.mnu_cd},
             {"mnu_url", mn.mnu_url},
             {"pgm_id", mn.pgm_id},
+            {"disp_seq", mn.disp_seq?.ToString()},
             });
             mn.isChanged = false; // 저장 후 변경 상태 초기화
         }

@@ -32,7 +32,10 @@ public class BaseComponent : CommonComponent {
 
     var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
 
-    if (data.Code < 0) {
+    if(data == null) {
+      Notify(NotificationSeverity.Warning, "Warning Message", $"{proc_name} Data is null", 50000, true);
+    }
+    else if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
     }
 

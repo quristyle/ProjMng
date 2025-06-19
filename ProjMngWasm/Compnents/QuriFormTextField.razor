@@ -1,0 +1,38 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@using System.Linq.Expressions
+
+<RadzenFormField Text="@Text" Variant=Variant.Outlined AllowFloatingLabel="false">
+    <RadzenTextBox Value="@Value" Placeholder="@Placeholder" Style="@InputStyle"
+    
+        ValueChanged="OnValueChanged"
+        ValueExpression="ValueExpression"
+    
+    Disabled=Disable
+    
+    
+    />
+</RadzenFormField>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public string Placeholder { get; set; }
+    [Parameter] public string InputStyle { get; set; }
+    [Parameter] public bool Disable { get; set; }
+
+    [Parameter]    public string Value { get; set; }
+
+    [Parameter]    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]    public Expression<Func<string>> ValueExpression { get; set; }
+
+    
+    private async Task OnValueChanged(string value)    {
+      if (Value != value)        {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+      }
+    }
+
+
+}

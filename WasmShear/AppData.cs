@@ -8,7 +8,19 @@ namespace WasmShear;
 public class AppData {
   public IDictionary<string, List<CommonCode>> GlobalDic { get; set; } = new Dictionary<string, List<CommonCode>>();
 
-  public Member User { get; set; }
+
+  public event Action? UserChanged;
+
+  private Member _user;
+  public Member User {
+    get => _user;
+    set {
+      if (_user != value) {
+        _user = value;
+        UserChanged?.Invoke();
+      }
+    }
+  }
 
   // session 값 비교를 통해 로그인 여부를 판단
   public bool IsLogin { get; set; }
@@ -53,7 +65,7 @@ public class Member {
   public string LastName { get; set; }
   public string Password { get; set; }
   public string Email { get; set; }
-  public string Phone { get; set; }
+  public string Phone_num { get; set; }
   public string Address { get; set; }
   public string City { get; set; }
   public string State { get; set; }
@@ -62,4 +74,10 @@ public class Member {
   public string EmpId { get; set; }
   public string UserId { get; set; }
   public string SessionId { get; set; }
+  public string User_photo { get; set; }
+  public string Remark { get; set; }
+
+  
+
+
 }

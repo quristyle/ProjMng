@@ -16,7 +16,7 @@
 
       <RadzenPanelMenu 
         
-        
+        Multiple=false
         Match="NavLinkMatch.Prefix">
 
         @if (Data != null) {
@@ -150,6 +150,8 @@
 
  
 
+  
+                      // Click="@(() => OnMenuExpand(p2))"
 
     
     RenderFragment RenderMenuMarkup(MenuInfo p2) => 
@@ -157,7 +159,6 @@
                       <RadzenPanelMenuItem  
                       Text=@p2.mnu_nm 
                       Icon="" 
-                      Click="@(() => OnMenuExpand(p2))"
 
                       @bind-Expanded=@p2.Expanded 
                       class="@((@p2.Children.Count>0)?"menu-fold":"")" >
@@ -191,6 +192,7 @@
 
 
 void OnMenuExpand(MenuInfo menu){
+  return;
     // menu의 모든 상위 메뉴의 mnu_id를 HashSet에 저장
     var parentIds = new HashSet<string>();
     var current = menu;
@@ -217,10 +219,11 @@ void OnMenuExpand(MenuInfo menu){
         { "srch_type",  "main" }
         });
         
+        if( rdata != null ){
        //Data = rdata.Data;
        Data = MenuInfo.BuildMenuTree(rdata.Data);
 
-
+        }
    
       
     }

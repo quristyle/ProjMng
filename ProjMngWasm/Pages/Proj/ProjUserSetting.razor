@@ -1,0 +1,71 @@
+﻿@page "/proj-user-setting"
+@{
+  /* description : 프로젝의 사용자 관리
+  * title : User
+  * sort : 3
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard >
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Reload" />
+      <RadzenButton Click="@OnSaveWrk" Text="Save" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+        <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
+                  <RadzenRow Gap="1rem">
+                      <RadzenColumn Size="12" SizeSM="12">
+                          <RadzenStack>
+                              <QuriFormTextField @bind-Value=@appData.User.UserId Text="UserId" Disable=true />
+                              <QuriFormTextField @bind-Value=@appData.User.FirstName Text="FirstName"  />
+                              <QuriFormTextField @bind-Value=@appData.User.LastName Text="LastName"  />
+                              <QuriFormTextField @bind-Value=@appData.User.Email Text="Email"  />
+                              <QuriFormTextField @bind-Value=@appData.User.Phone_num Text="Phone_num"  />
+
+                              <RadzenImage 
+                                Path=@appData.User.User_photo class="rz-border-radius-10" 
+                                Style="width: 80px; height: 80px;" AlternateText="@(appData.User.FirstName + " " + appData.User.LastName)" />
+                            
+
+                              <QuriFormTextField @bind-Value=@appData.User.User_photo Text="User_photo"  />
+                              @* <QuriFormTextField @bind-Value=@appData.User.Password Text="Password"  /> *@
+                              <QuriFormTextField @bind-Value=@appData.User.Remark Text="Remark"  />
+                          </RadzenStack>
+                      </RadzenColumn>
+
+                  </RadzenRow>
+                  </RadzenCard>
+
+@code {
+  
+  protected async Task OnLoadWrk() {
+    // Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
+    // { "user_name", "" },{ "prj_rid", srtype?.Code }
+    // });
+  }
+
+  
+  protected async Task OnSaveWrk() {
+    var Data = await DbSave<Dictionary<string, object>>("sp_dev_user_exec", new Dictionary<string, string>() {
+    { "user_name_eng", appData.User.FirstName },
+    { "user_name", appData.User.LastName },
+    { "email", appData.User.Email },
+    { "user_id", appData.User.UserId },
+    { "phone_num", appData.User.Phone_num },
+    });
+  }
+
+
+}

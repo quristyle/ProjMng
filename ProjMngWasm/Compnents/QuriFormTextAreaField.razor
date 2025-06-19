@@ -1,0 +1,26 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@using System.Linq.Expressions
+
+<RadzenFormField Text="@Text" Variant=Variant.Outlined AllowFloatingLabel="false">
+    <RadzenTextArea @bind-Text="Value" Rows="4" Placeholder="@Placeholder" Style="@InputStyle" 
+    
+    
+    Disabled=Disable
+    
+    
+    />   
+</RadzenFormField>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "input contents ...";
+    [Parameter] public string InputStyle { get; set; }
+    [Parameter] public bool Disable { get; set; }
+
+    [Parameter]    public string Value { get; set; }
+
+    [Parameter]    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]    public Expression<Func<string>> ValueExpression { get; set; }
+}

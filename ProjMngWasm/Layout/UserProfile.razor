@@ -1,0 +1,55 @@
+﻿@inherits BaseComponent
+
+<RadzenProfileMenu Click=OnProfileMenuClick >
+  <Template>
+    <img src="@appData.User?.User_photo" alt="@appData.User?.LastName" class="avatar" />
+  </Template>
+  <ChildContent>
+
+      @* <RadzenProfileMenuItem Text="Buttons" Value="adsfadsf"  Icon="account_circle"></RadzenProfileMenuItem>
+      <RadzenProfileMenuItem Text="Menu"  Value="adsfadsdsddddddddddddddddf" Icon="line_weight"></RadzenProfileMenuItem>
+      <RadzenProfileMenuItem Text="FileInput" Value="adsfacccccccccccccccccccccccdsf"  Icon="attach_file"></RadzenProfileMenuItem>
+      <RadzenProfileMenuItem Text="Dialog" Value="adsfaeeeeeeeeeeeeeeeeeeeeeeeeedsf"  Icon="perm_media"></RadzenProfileMenuItem> *@
+      <RadzenProfileMenuItem Text="Setting" Value="ProjMngWasm.Pages.Proj.ProjUserSetting"  Icon="settings"></RadzenProfileMenuItem>
+      @* <li class="rz-navigation-item">
+        <div class="rz-navigation-item-wrapper">
+          <a class="rz-navigation-item-link rz-px-5" @onclick="@(() =>OnSettingClick())" ><i class="rzi bi bi-gear"></i>Setting</a>
+      </div></li> *@
+    
+      <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+
+      <RadzenProfileMenuItem Text="Log Out" Path="login" Icon="exit_to_app"></RadzenProfileMenuItem>
+
+
+  </ChildContent>
+</RadzenProfileMenu>
+
+
+@code {
+  
+    [Parameter] public EventCallback<(string title, string path)> OnSettingClickCallback { get; set; }
+
+    private async Task OnProfileMenuClick( RadzenProfileMenuItem rpm ){
+      Console.WriteLine($"rpm : {rpm.Text} {rpm.Value}  ");
+      if (OnSettingClickCallback.HasDelegate){
+        await OnSettingClickCallback.InvokeAsync((rpm.Text, rpm.Value));
+      }
+    }
+
+
+    protected override void OnInitialized()    {
+        appData.UserChanged += OnUserChanged;
+    }
+
+    private void OnUserChanged()    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()    {
+        appData.UserChanged -= OnUserChanged;
+    }
+
+
+
+
+}

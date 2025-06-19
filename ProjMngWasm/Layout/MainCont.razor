@@ -60,6 +60,12 @@
     }
   }
 
+  public int PageCount{get{
+    return _projItems.Count;}
+  }
+
+
+
     bool ready;
     protected override async Task OnAfterRenderAsync(bool firstRender)    {
         if (firstRender)        {

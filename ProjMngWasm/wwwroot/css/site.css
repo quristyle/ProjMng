@@ -831,3 +831,11 @@ a{
 .rz-expander .rz-navigation-menu .rz-navigation-item:hover {
   background-color: unset !important;
 }*/
+
+
+.avatar {
+  vertical-align: middle;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}

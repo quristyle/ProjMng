@@ -41,19 +41,8 @@
 
 
           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
-            <RadzenProfileMenu>
-              <Template>
-                <RadzenGravatar Email="user@example.com">
-                </RadzenGravatar>
-              </Template>
-              <ChildContent>
-                <RadzenProfileMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenProfileMenuItem>
-                <RadzenProfileMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenProfileMenuItem>
-                <RadzenProfileMenuItem Text="FileInput" Path="fileinput" Icon="attach_file"></RadzenProfileMenuItem>
-                <RadzenProfileMenuItem Text="Dialog" Path="dialog" Icon="perm_media"></RadzenProfileMenuItem>
-                <RadzenProfileMenuItem Text="Log Out" Path="login" Icon="exit_to_app"></RadzenProfileMenuItem>
-              </ChildContent>
-            </RadzenProfileMenu>
+            <UserProfile OnSettingClickCallback="@(args => HandleSettingClick(args.title, args.path))" />
+
          
             <RadzenAppearanceToggle class="rz-mx-2" />
             <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
@@ -70,14 +59,14 @@
             <!-- main content-->
             <RadzenRow class="rz-mx-auto main-body-context rz-h-100" Style="">
                             
-              <RadzenColumn Size="12" class=" qurimaincont rz-h-100" >        
-                @* Visible=IsBodyUrl *@
+              <RadzenColumn Size="12" class=" qurimaincont rz-h-100" Visible=IsBodyUrl>        
+                
                 <CascadingValue Value="projItems">
                   <MainCont @ref="_main" />
                 </CascadingValue>
               </RadzenColumn>
 
-              <RadzenColumn Size="12" class=" quriUrlcont" Visible=!IsBodyUrl>
+              <RadzenColumn Size="12" class=" quriUrlcont" Visible=IsBodyUrl2>
                 @Body
               </RadzenColumn>
 
@@ -141,8 +130,7 @@
 
   
 
-
-  bool IsBodyUrl{get;set;} = true;
+  
 
   protected override void OnInitialized() {
     System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ko");
@@ -170,6 +158,55 @@
     </RadzenStack>
   </div>, options);
 
+
+
+  
+  bool IsBodyUrl{get;set;} = false;
+  bool IsBodyUrl2{get;set;} = false;
+
+  void BodyVisible(){    
+    
+    Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}        { _main.PageCount} ");
+    
+      if( !IsBodyUrl && _main.PageCount > 0){
+        IsBodyUrl = true;
+        StateHasChanged();
+      }
+      else if( IsBodyUrl && _main.PageCount <= 0){
+        IsBodyUrl = false;
+        StateHasChanged();
+      }
+  }
+
+  
+  void BodyVisible2(){    
+    
+    Console.WriteLine($"BodyVisible: {_relativeUrl}");
+
+      if( _relativeUrl.Length > 0 ){        
+        IsBodyUrl2 = true;
+      }
+      else{         
+        IsBodyUrl2 = false;
+      }
+    Console.WriteLine($"IsBodyUrl: {IsBodyUrl}         {IsBodyUrl2} ");
+      StateHasChanged();
+  }
+
+  
+  string _relativeUrl {get;set;} = "";
+  string relativeUrl {
+    get{return _relativeUrl;}
+    set{ 
+      if( _relativeUrl != value){
+        _relativeUrl = value;
+        BodyVisible2();
+      }
+    }
+  }
+
+
+
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
       rendered = true;
@@ -177,23 +214,65 @@
     }
     var currentUrl = UriHelper.Uri;
     var baseUri = UriHelper.BaseUri;
-    var relativeUrl = currentUrl.Replace(baseUri, string.Empty);
-    Console.WriteLine($"Relative URL: {relativeUrl}");
+    var calcUrl = currentUrl.Replace(baseUri, string.Empty);
 
+    if( calcUrl.StartsWith('?')){
+      relativeUrl = calcUrl.Substring(0, calcUrl.IndexOf('?'));
+    }
+    else{
+      relativeUrl = calcUrl;
+    }
+    
+    Console.WriteLine($"OnAfterRenderAsync Call: {IsBodyUrl}         {IsBodyUrl2} ");
+    BodyVisible();
+    return;
+    Console.WriteLine($"Relative URL: {relativeUrl}");
+    
     Console.WriteLine($"Current URL: {currentUrl}");
+    Console.WriteLine($"_openPageUrl URL: {_openPageUrl}");
+
+    //projItems
+
+    
+      // if( projItems.Count <= 0){
+      // IsBodyUrl = false;
+      // }
+      
+      if( projItems.Count <= 0){
+      IsBodyUrl = false;
+      }
+      else {
+      IsBodyUrl = true;
+      }
+
 
     if ((_openPageUrl != relativeUrl) && !string.IsNullOrEmpty(relativeUrl) && !relativeUrl.StartsWith('?')) {
       _openPageUrl = relativeUrl;
-      IsBodyUrl = false;
+
+      
+      IsBodyUrl2 = true;
+      // if( projItems.Count <= 0){
+      // IsBodyUrl = false;
+      // }
+      // else {
+      // IsBodyUrl = true;
+      // }
+      
+    Console.WriteLine($"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: {IsBodyUrl}");
+
+
       StateHasChanged();
     }
 
     if ( !IsBodyUrl && (_openPageUrl != relativeUrl)  ) {
       _openPageUrl = relativeUrl;
       IsBodyUrl = true;
+      IsBodyUrl2 = false;
+    Console.WriteLine($"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: {IsBodyUrl}");
       StateHasChanged();
     }
-
+    Console.WriteLine($"IsBodyUrl : {IsBodyUrl}      {IsBodyUrl2}");
+    //StateHasChanged();
 
   }
 
@@ -271,8 +350,9 @@
   MainCont? _main{get;set;}
 
 
-
-  [Inject] AppProjData appData { get; set; }
+  
+  // [Inject] AppProjData appData { get; set; }
+  [Inject] AppData appData { get; set; }
 
 
   protected override async Task OnInitializedAsync() {
@@ -330,7 +410,9 @@
   
 
   
-
+  void HandleSettingClick(string title, string path)    {        
+      _main.AddItem(path,title,title,title,title);
+    }
 
 
 

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using ProjModel;
 using System.Net.Http.Json;
 
@@ -36,8 +37,20 @@ public class BaseService  {
     ResultInfo<T> result = null;
     if (!string.IsNullOrWhiteSpace(responseString)) {
 
+      //JObject jobj = JObject.Parse(responseString);
+      //result = jobj.ToObject<ResultInfo<T>>();
+
+
       JObject jobj = JObject.Parse(responseString);
-      result = jobj.ToObject<ResultInfo<T>>();
+      var settings = new JsonSerializerSettings {
+        ContractResolver = new DefaultContractResolver {
+          NamingStrategy = new DefaultNamingStrategy() // 대소문자 구분 없이 매핑
+        }
+      };
+      result = jobj.ToObject<ResultInfo<T>>(JsonSerializer.Create(settings));
+
+
+
 
       /*
 
