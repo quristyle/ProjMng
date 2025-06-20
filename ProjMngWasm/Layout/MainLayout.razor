@@ -59,10 +59,11 @@
             <!-- main content-->
             <RadzenRow class="rz-mx-auto main-body-context rz-h-100" Style="">
                             
-              <RadzenColumn Size="12" class=" qurimaincont rz-h-100" Visible=IsBodyUrl>        
+              <RadzenColumn Size="12" class=" qurimaincont rz-h-100" Style=@("display:"+(IsBodyUrl?"block":"none")+";")
+              >        
                 
                 <CascadingValue Value="projItems">
-                  <MainCont @ref="_main" />
+                  <MainCont @ref="_main" OnChanged="OnMainContChanged" />
                 </CascadingValue>
               </RadzenColumn>
 
@@ -129,7 +130,9 @@
 
 
   
-
+  void OnMainContChanged()    {
+    StateHasChanged();
+  }
   
 
   protected override void OnInitialized() {
@@ -166,7 +169,7 @@
 
   void BodyVisible(){    
     
-    Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}        { _main?.PageCount} ");
+    Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}   { _main == null}      { _main?.PageCount} ");
     
       if( !IsBodyUrl && _main != null && _main?.PageCount > 0){
         IsBodyUrl = true;

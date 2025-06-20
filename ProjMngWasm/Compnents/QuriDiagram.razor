@@ -15,9 +15,7 @@
 
 <div class="diagramMain" style="height:calc(100vh - 200px);">
     
-<div class="toolbar" style="font-size:1.2rem;width: 24px;
-    float: left;
-    height: 100%;">
+<div class="toolbar" style="font-size:1.2rem;width: 24px; float: left; height: 100%;">
   <a @onclick="AddEntity" title="add"><i class="bi bi-plus-square"></i></a>
   <a @onclick="RemoveSelected" title="선택된 엔터티 삭제"><i class="bi bi-x-square"></i></a>
   <a @onclick="AutoLayout" title="자동 정렬"><i class="bi bi-filter-square"></i></a>
@@ -66,7 +64,7 @@
 
     private async Task LoadDiagram() => await JS.InvokeVoidAsync("loadDiagramXml", _diagramXml);
 
-    private async Task AutoLayout() => await JS.InvokeVoidAsync("autoLayout");
+    private async Task AutoLayout() => await JS.InvokeVoidAsync("autoLayout", ContainerId);
 
   public async Task<string> SaveAsObjectJson() { _diagramXml = await JS.InvokeAsync<string>("saveDiagramAsObjectJson", ContainerId); return _diagramXml; }
   

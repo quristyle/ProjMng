@@ -268,6 +268,56 @@ public class QuriDynamicGridBase : BaseComponent {
 
   }
 
+
+  protected async Task CopyAfterRow(IDictionary<string, object> row) {
+    if (!ordersGrid.IsValid) return;
+
+    if (editMode == DataGridEditMode.Single) {
+      Reset();
+    }
+
+    int findIndex = 0;
+    var firstItem = SItems?.FirstOrDefault();
+    if (firstItem != null) {
+      findIndex = orders.FindIndex(order => order.SequenceEqual(firstItem)); // 항목이 존재 하는데 -1 리턴한다. 고쳐라..
+      Console.WriteLine($"Index of the first item in SItems within orders: {findIndex}");
+
+      // 이때만 copy 하자..
+
+
+      if (findIndex < 0) findIndex = 0;
+
+      var order = CreateData();
+
+      foreach( var o in firstItem) {
+        order[o.Key] = o.Value;
+      }
+
+
+      orders.Insert(findIndex, order);
+
+      await ordersGrid.EditRow(order);
+
+      RecordCount = orders.Count;
+
+      await ordersGrid.RefreshDataAsync();
+
+    }
+    else {
+      Console.WriteLine("SItems is empty or null.");
+    }
+
+
+    //await AddBtnEvent.InvokeAsync(order);
+
+  }
+
+
+
+
+
+
+
   protected async Task OnCreateRow(IDictionary<string, object> order) {
 
     await DataSave(order);

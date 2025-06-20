@@ -15,7 +15,7 @@
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
           
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-            <RadzenTextBox  />
+            
           </RadzenStack>
 
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
@@ -93,7 +93,6 @@
                               <QuriFormTextField @bind-Value=@SelectMenu.mnu_cd Text="mnu_cd" />
                               <QuriFormTextField @bind-Value=@SelectMenu.mnu_nm Text="mnu_nm" />
                               <QuriFormTextField @bind-Value=@SelectMenu.owner_id Text="owner_id" Disable=true />
-                              <QuriFormCheckField @bind-Value=@SelectMenu.isChanged Text="isChanged" Disable=true />
                               <RadzenFormField Text="사용여부" Variant="@variant">
                                   <RadzenRadioButtonList @bind-Value=@SelectMenu.use_yn class="rz-m-4 rz-mt-8">
                                       <Items>

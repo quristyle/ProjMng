@@ -21,7 +21,7 @@
     SelectionMode="DataGridSelectionMode.Single"
     AllowSorting="true"
     Count=@RecordCount
-    
+
     Style="width:100%;height:100%;"
     IsLoading="@IsLoading"
     TItem="IDictionary<string, object>"
@@ -164,6 +164,7 @@
       <div class="action-btn px-1 py-1">
         @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
           <a class="action float-start" @onclick=@(() => InsertAfterRow(null))><i class="bi bi-plus-square"></i></a>
+          <a class="action float-start" @onclick=@(() => CopyAfterRow(null))><i class="bi bi-copy"></i></a>
         }
 
         <a class="action float-end" @onclick=@(() => ToggleFilter())><i class="bi bi-filter"></i></a>

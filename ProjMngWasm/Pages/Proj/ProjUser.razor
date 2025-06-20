@@ -26,24 +26,33 @@
   </RadzenStack>
 </RadzenCard>
 
-
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
   <RadzenColumn Size="6" >
 
+    
+    @* SaveBtnEvent=SaveBtnEvent 
+    DeleteBtnEvent=DeleteBtnEvent
+    RowClickEvent=RowClickEvent *@
+
+
+
     <QuriDynamicGrid 
-    SaveBtnEvent=SaveBtnEvent 
+    ReqData=Data 
+                     @bind-SItems=_selectedItems
+
+                     SaveBtnEvent=SaveBtnEvent 
     DeleteBtnEvent=DeleteBtnEvent
     RowClickEvent=RowClickEvent
-    ReqData=Data 
-                     SItems=_selectedItems
-                     IsLoading=gridLoding />
+
+
+                      />
 
   </RadzenColumn>
 
   <RadzenColumn Size="6">
 
     <QuriDynamicGrid SaveBtnEvent=SaveBtnEventProj
-                     ReqData=DataProj  IsLoading=gridProjLoding />
+                     ReqData=DataProj   />
 
   </RadzenColumn>
 </RadzenRow>
@@ -53,7 +62,6 @@
   CommonCode? srtype { get; set; }
   public ResultInfo<Dictionary<string, object>>? Data { get; set; }
   const string _spName = "sp_dev_user_exec";
-  bool gridLoding { get; set; } = false;
   public IList<IDictionary<string, object>>? _selectedItems { get; set; }
 
   protected override async Task OnInitializedAsync() {
@@ -62,11 +70,9 @@
   }
 
   protected async Task OnLoadWrk() {
-    gridLoding = true;
     Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
     { "user_name", "" },{ "prj_rid", srtype?.Code }
     });
-    gridLoding = false;
   }
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {    
@@ -80,35 +86,34 @@
   }
 
 
-
-  //project choice
-
   public ResultInfo<Dictionary<string, object>> DataProj { get; set; }
-  bool gridProjLoding {get;set;}= false;
-
+ 
 
   string _spNameProj = "sp_dev_proj_user_map_exec";
-  protected async Task ProjectUser() {
-    gridProjLoding = true;
+  protected async Task ProjectUser(IDictionary<string, object> args) {
     DataProj = await DbCont<Dictionary<string, object>>(_spNameProj, new Dictionary<string, string>() {
-    { "user_id", user_id }
+    { "user_id", args["user_id"].ToString() }
     });
-    gridProjLoding = false;
+    //gridProjLoding = false;
+    //Console.WriteLine($" ProjectUser {_selectedItems}");
     StateHasChanged();
   }
 
   private async Task SaveBtnEventProj(IDictionary<string, object> dic) {
     var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {
-    { "user_id", user_id }
+    { "user_id", _selectedItems?.FirstOrDefault()["user_id"].ToString() }
     });
     await DbSave<Dictionary<string, object>>(_spNameProj, req);
   }
-  string user_id { get; set; }
-  private void RowClickEvent(IDictionary<string, object> args)  {
+  //string user_id { get; set; }
+  private void RowClickEvent(IDictionary<string, object> args)  { 
     //args.Data["user_id"]
 
-    user_id = args.TryGetValue("user_id", out object oojb) ? oojb.ToString() : "";
+    //Console.WriteLine($" RowClickEvent {_selectedItems}");
 
-    ProjectUser(     );
+    //user_id = args.TryGetValue("user_id", out object oojb) ? oojb.ToString() : "";
+    
+    //Console.WriteLine($" RowClickEvent {_selectedItems}");
+    ProjectUser(   args   );
   }
 }

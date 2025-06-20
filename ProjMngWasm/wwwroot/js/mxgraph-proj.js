@@ -203,6 +203,33 @@ window.saveDiagramAsObjectJson = (containerId) => {
   return JSON.stringify(json, null, 2);
 };
 
+
+// 전역에 한글자 픽셀 길이 저장
+let monoCharWidth = null;
+
+function getMonoCharWidth(fontSize = 11, fontFamily = 'Play') {
+  if (monoCharWidth !== null) return monoCharWidth;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  // '가'는 한글, 'A'는 영문, 고정폭 폰트에서 둘 다 같은 폭
+  monoCharWidth = ctx.measureText('h').width; // 한글로 가 ... 로 하는게 좋타.
+  return monoCharWidth;
+}
+
+// label의 width 계산 (가장 긴 줄 기준)
+function getLabelWidthByCharCount(label, padding = 0) {
+  const lines = label.split('\n');
+  let maxLen = 0;
+  for (let line of lines) {
+    if (line.length > maxLen) maxLen = line.length;
+  }
+  const charWidth = getMonoCharWidth();
+  return Math.ceil(maxLen * charWidth + padding);
+}
+
+
+
 window.loadDiagramFromObjectJson = (containerId, jsonStr) => {
   var iniObj = GetGraObj(containerId);
   if (!iniObj.graph) return "";
@@ -215,8 +242,9 @@ window.loadDiagramFromObjectJson = (containerId, jsonStr) => {
     iniObj.graph.removeCells(iniObj.graph.getChildCells(parent, true, true)); // clear
     for (let entity of json.entities) {
       const label = entity.name + '\n' + entity.desc;// + '\n' + entity.fields.join('\n');
-      var ww = entity.w || 120;
-      var hh = entity.h || 50;
+      //var ww = entity.w || 150;
+      var ww = getLabelWidthByCharCount(label);
+      var hh = entity.h || 40;
       const node = iniObj.graph.insertVertex(parent, entity.id, label, entity.x, entity.y, ww, hh);
       nodes[entity.id] = node;
     }
@@ -244,13 +272,50 @@ window.loadDiagramFromObjectJson = (containerId, jsonStr) => {
   }
 };
 
-window.autoLayout = (containerId) => {
+window.autoLayout_xxxxx = (containerId) => {
   var iniObj = GetGraObj(containerId);
   if (!iniObj.graph) return "";
   const layout = new mxHierarchicalLayout(iniObj.graph);
   layout.execute(iniObj.graph.getDefaultParent());
 };
 
+
+window.autoLayout = (containerId, gap = 5, maxWidth = 1800) => {
+
+  var iniObj = GetGraObj(containerId);
+  if (!iniObj.graph) return "";
+
+  const parent = iniObj.graph.getDefaultParent();
+  const cells = iniObj.graph.getChildVertices(parent);
+
+  let x = gap;
+  let y = gap;
+  let rowMaxHeight = 0;
+
+  iniObj.graph.getModel().beginUpdate();
+  try {
+    for (let cell of cells) {
+      const geo = cell.geometry;
+      if (!geo) continue;
+
+      // 줄바꿈 필요하면 y 증가, x 초기화
+      if (x + geo.width + gap > maxWidth) {
+        x = gap;
+        y += rowMaxHeight + gap;
+        rowMaxHeight = 0;
+      }
+
+      geo.x = x;
+      geo.y = y;
+
+      x += geo.width + gap;
+      if (geo.height > rowMaxHeight) rowMaxHeight = geo.height;
+    }
+  } finally {
+    iniObj.graph.getModel().endUpdate();
+    iniObj.graph.refresh(); // 이 부분이 중요!
+  }
+};
 
 
 

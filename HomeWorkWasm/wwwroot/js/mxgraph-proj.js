@@ -45,8 +45,8 @@ window.mxGraphInit = (containerId, dotNetRef) => {
   iniObj.graphModel.beginUpdate();
   try {
     const parent = iniObj.graph.getDefaultParent();
-    const v1 = iniObj.graph.insertVertex(parent, null, 'Customer', 100, 100, 100, 50);
-    const v2 = iniObj.graph.insertVertex(parent, null, 'Order', 300, 100, 100, 50);
+    const v1 = iniObj.graph.insertVertex(parent, null, 'Customer', 100, 100, 100, 50, 'fontSize=9;');
+    const v2 = iniObj.graph.insertVertex(parent, null, 'Order', 300, 100, 100, 50, 'fontSize=9;');
     const e1 = iniObj.graph.insertEdge(parent, null, '1:N', v1, v2);
 
     const edge = iniObj.graph.insertEdge(parent, null, '', v1, v2);
@@ -116,7 +116,7 @@ window.addEntityNode = (containerId) => {
 
   iniObj.graphModel.beginUpdate();
   try {
-    iniObj.graph.insertVertex(parent, null, 'Entity', x, y, w, h);
+    iniObj.graph.insertVertex(parent, null, 'Entity', x, y, w, h, 'fontSize=9;');
   } finally {
     iniObj.graphModel.endUpdate();
   }
@@ -217,7 +217,7 @@ window.loadDiagramFromObjectJson = (containerId, jsonStr) => {
       const label = entity.name + '\n' + entity.desc;// + '\n' + entity.fields.join('\n');
       var ww = entity.w || 120;
       var hh = entity.h || 50;
-      const node = iniObj.graph.insertVertex(parent, entity.id, label, entity.x, entity.y, ww, hh);
+      const node = iniObj.graph.insertVertex(parent, entity.id, label, entity.x, entity.y, ww, hh, 'fontSize=9;');
       nodes[entity.id] = node;
     }
 
@@ -318,7 +318,7 @@ window.initMxGraphEditor = (containerId) => {
   const parent = editor.graph.getDefaultParent();
   editor.graph.getModel().beginUpdate();
   try {
-    editor.graph.insertVertex(parent, null, 'Node', 20, 20, 80, 30);
+    editor.graph.insertVertex(parent, null, 'Node', 20, 20, 80, 30, 'fontSize=9;');
   } finally {
     editor.graph.getModel().endUpdate();
   }

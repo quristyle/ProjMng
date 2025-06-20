@@ -7227,14 +7227,16 @@ var mxUtils =
 	 * 
 	 * Defines the default family for all fonts. Default is Arial,Helvetica.
 	 */
-	DEFAULT_FONTFAMILY: 'Arial,Helvetica',
+	 //DEFAULT_FONTFAMILY: 'Arial,Helvetica',
+	 DEFAULT_FONTFAMILY: 'Play,GmarketSansTTFLight,S-CoreDream-3Light',
 
 	/**
 	 * Variable: DEFAULT_FONTSIZE
 	 * 
 	 * Defines the default size (in px). Default is 11.
 	 */
-	DEFAULT_FONTSIZE: 11,
+	//DEFAULT_FONTSIZE: 11,
+	 DEFAULT_FONTSIZE: 9,
 
 	/**
 	 * Variable: DEFAULT_TEXT_DIRECTION
