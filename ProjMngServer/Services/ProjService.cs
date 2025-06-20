@@ -21,22 +21,26 @@ public class ProjService : BaseService {
     IEnumerable<dynamic> aaa = Enumerable.Empty<dynamic>();
     IDictionary<string, string> bbb = null;
 
-    if (string.IsNullOrWhiteSpace(procedureName)) { }
+    var connectionString = _configuration.GetConnectionString("jsini");
+    if (string.IsNullOrWhiteSpace(procedureName) || string.IsNullOrWhiteSpace(connectionString) ) {
+
+      ri.Code = -88;
+      ri.Message = "연결 정보에 문제가 있습니다.";
+    }
     else {
-      var connectionString = _configuration.GetConnectionString("jsini");
-
-      var consDic = connectionString
-     .Split(';', StringSplitOptions.RemoveEmptyEntries)
-     .Select(part => part.Split('=', 2))
-     .Where(part => part.Length == 2)
-     .ToDictionary(sp => sp[0].Trim(), sp => sp[1].Trim());
-
-      string schema_name = consDic.TryGetValue("SearchPath", out var schemaValue) && schemaValue != null ? schemaValue.ToString() : string.Empty;
-
-      IEnumerable<dynamic> procParams;
-      var parameters = new DynamicParameters();
 
       try {
+
+        var consDic = connectionString
+       .Split(';', StringSplitOptions.RemoveEmptyEntries)
+       .Select(part => part.Split('=', 2))
+       .Where(part => part.Length == 2)
+       .ToDictionary(sp => sp[0].Trim(), sp => sp[1].Trim());
+
+        string schema_name = consDic.TryGetValue("SearchPath", out var schemaValue) && schemaValue != null ? schemaValue.ToString() : string.Empty;
+
+        IEnumerable<dynamic> procParams;
+        var parameters = new DynamicParameters();
         using (IDbConnection db = new NpgsqlConnection(connectionString)) {
 
           string getProcParamsQuery = $@"

@@ -25,28 +25,55 @@
   </RadzenStack>
 </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-  <RadzenColumn Size="12" >
 
-    <QuriDynamicGrid 
-        SaveBtnEvent=SaveBtnEvent 
-        DeleteBtnEvent=DeleteBtnEvent ReqData=Data  SItemsChanged=OnDbInfoChange />
 
-  </RadzenColumn>
-</RadzenRow>
+<RadzenSplitter Orientation="Orientation.Vertical" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal">
-  <RadzenColumn Size="4">
+    
+  <!-- 위쪽 -->
+  <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
 
-    <QuriDynamicGrid ReqData=DbPropData SaveBtnEvent=SaveDBPropEvent SItemsChanged=OnDbPropChange />
+        <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent
+                         DeleteBtnEvent=DeleteBtnEvent ReqData=Data SItemsChanged=OnDbInfoChange />
 
-  </RadzenColumn>
-  <RadzenColumn Size="8">
 
-    <QuriCodeEditor @ref="_editProc" />
+    </RadzenSplitterPane>
+    <!-- 아래쪽 -->
+    <RadzenSplitterPane Size="60%" Min="10%" Max="90%">
 
-  </RadzenColumn>
-</RadzenRow>
+        
+    <RadzenSplitter Orientation="Orientation.Horizontal">
+        
+        <!-- 왼쪽 -->
+        <RadzenSplitterPane Size="40%" Min="20%" Max="80%">
+
+                <QuriDynamicGrid ReqData=DbPropData SaveBtnEvent=SaveDBPropEvent SItemsChanged=OnDbPropChange />
+        </RadzenSplitterPane>
+        <!-- 오른쪽 -->
+        <RadzenSplitterPane Size="60%" Min="20%" Max="80%">
+
+                <QuriCodeEditor @ref="_editProc" />
+
+        </RadzenSplitterPane>
+
+
+
+
+
+        </RadzenSplitter>
+
+
+
+
+
+
+    </RadzenSplitterPane>
+
+    </RadzenSplitter>
+
+
+
+
 
 
 @code {

@@ -35,8 +35,8 @@
 }
 
 * {
-  font-family: Play, 'GmarketSansTTFLight', 'S-CoreDream-3Light', 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
-  /*  font-weight: 100;*/
+    font-family: Play, 'NanumBarunPen', 'GmarketSansTTFLight', 'S-CoreDream-3Light', 'Pretendard ', 'Starcraft', sans-serif, Tahoma, 'ChosunKm', Verdana, Arial;
+    /*  font-weight: 100;*/
 }
 
 
@@ -757,10 +757,12 @@ a[class^=action]:hover {
 
 
 
-.context-body-rowcol {
-  max-height: 100% !important;
-}
 */
+
+.context-body-rowcol {
+    height: 100% !important;
+/*    max-height: 100% !important;*/
+}
 
 .main-page-context {
   height: calc(100vh - 6.4rem);

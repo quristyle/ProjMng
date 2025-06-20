@@ -1,11 +1,11 @@
 cd c:\projects\ProjMng\ProjMngServer\
 
-start "serverrun" cmd /k "dotnet run"
+start "server" cmd /k "dotnet run"
 
 
 cd c:\projects\ProjMng\ProjMngWasm\
 
 
-start "serverrun" cmd /k "dotnet watch"
+start "wasm" cmd /k "dotnet watch"
 
 
