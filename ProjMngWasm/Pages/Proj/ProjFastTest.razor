@@ -1,4 +1,4 @@
-﻿@* @page "/proj-fasttest" *@
+﻿@page "/proj-fasttest"
 
 
 @inherits PageBaseComponent
@@ -22,49 +22,13 @@
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
   <RadzenColumn Size="12" >
 
-
-    @* FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" *@
-
-    @* LogicalFilterOperator="LogicalFilterOperator.And" *@
-
-
-    <RadzenDataGrid 
-                    AllowFiltering="true"
-                    AllowColumnResize="true"
-                    FilterMode="FilterMode.Simple"
-                    SelectionMode="DataGridSelectionMode.Single"
-                    AllowPaging="true"
-                    AllowSorting="true"
-                    PageSize=10
-                    PagerHorizontalAlign="HorizontalAlign.Left"
-                    PagerAlwaysVisible=true
-                    PagerPosition=PagerPosition.TopAndBottom
-                    ShowPagingSummary="true"
-                    
-                    Data=Data>
-      <Columns>
-
-        <RadzenDataGridColumn Property="datetime"
-                              Type="@Type.GetType("System.DateTime")"
-                                  Title="datetime" 
-            MinWidth="7rem">
+    
+          <QuriDynamicGrid 
+          SaveBtnEvent=SaveBtnEvent
+          ReqData=Data 
+          HiddenCols="dev_user,dev_sdt,dev_edt,plan_sdt,prj_rid,wbs_id,proc_lvl,build_user,build_status,dev_chk,build_chk,build_chk_dt,qc_user,qc_chk,qc_chk_dt,cre_user,cre_dt,mod_user,mod_dt,comm,proc_id,gb1,gb2,proc_nm,proc_tp,plan_gap,wbs_state" />
 
 
-
-          </RadzenDataGridColumn>
-
-        <RadzenDataGridColumn Property="aaa"
-                              Type="@Type.GetType("System.String")"
-                              Title="name"
-                              MinWidth="7rem">
-
-
-
-        </RadzenDataGridColumn>
-
-
-    </Columns>
-    </RadzenDataGrid>
 
   </RadzenColumn>
 </RadzenRow>
@@ -72,29 +36,22 @@
 
 
 @code {
-
-public IEnumerable<TestClass> Data { get; set; } 
+  
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
+   await OnLoadWrk();
   }
 
-  protected async Task OnLoadWrk() {
-
-    List<TestClass> testClasses = new List<TestClass>();
-
-    testClasses.Add(new TestClass() { datetime = DateTime.Now });
-    testClasses.Add(new TestClass() { datetime = DateTime.Now, aaa="aaa" });
-    testClasses.Add(new TestClass() { aaa = "bbb"  });
-
-    Data = testClasses;
+  protected async Task OnLoadWrk() {    
+    Data = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+     { "prj_rid", "7" },
+    });
+  }
+  
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
   }
 
-
-  public class TestClass {
-    public DateTime? datetime { get; set; }
-    public string? aaa { get; set; }
-
-  }
 
 }

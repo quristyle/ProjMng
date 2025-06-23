@@ -169,7 +169,7 @@
 
   void BodyVisible(){    
     
-    Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}   { _main == null}      { _main?.PageCount} ");
+    // Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}   { _main == null}      { _main?.PageCount} ");
     
       if( !IsBodyUrl && _main != null && _main?.PageCount > 0){
         IsBodyUrl = true;
@@ -184,7 +184,7 @@
   
   void BodyVisible2(){    
     
-    Console.WriteLine($"BodyVisible: {_relativeUrl}");
+    // Console.WriteLine($"BodyVisible: {_relativeUrl}");
 
       if( _relativeUrl.Length > 0 ){        
         IsBodyUrl2 = true;
@@ -192,7 +192,7 @@
       else{         
         IsBodyUrl2 = false;
       }
-    Console.WriteLine($"IsBodyUrl: {IsBodyUrl}         {IsBodyUrl2} ");
+    // Console.WriteLine($"IsBodyUrl: {IsBodyUrl}         {IsBodyUrl2} ");
       StateHasChanged();
   }
 
@@ -226,13 +226,13 @@
       relativeUrl = calcUrl;
     }
     
-    Console.WriteLine($"OnAfterRenderAsync Call: {IsBodyUrl}         {IsBodyUrl2} ");
+    // Console.WriteLine($"OnAfterRenderAsync Call: {IsBodyUrl}         {IsBodyUrl2} ");
     BodyVisible();
     return;
-    Console.WriteLine($"Relative URL: {relativeUrl}");
+    // Console.WriteLine($"Relative URL: {relativeUrl}");
     
-    Console.WriteLine($"Current URL: {currentUrl}");
-    Console.WriteLine($"_openPageUrl URL: {_openPageUrl}");
+    // Console.WriteLine($"Current URL: {currentUrl}");
+    // Console.WriteLine($"_openPageUrl URL: {_openPageUrl}");
 
     //projItems
 
@@ -261,7 +261,7 @@
       // IsBodyUrl = true;
       // }
       
-    Console.WriteLine($"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: {IsBodyUrl}");
+    // Console.WriteLine($"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: {IsBodyUrl}");
 
 
       StateHasChanged();
@@ -271,10 +271,10 @@
       _openPageUrl = relativeUrl;
       IsBodyUrl = true;
       IsBodyUrl2 = false;
-    Console.WriteLine($"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: {IsBodyUrl}");
+    // Console.WriteLine($"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: {IsBodyUrl}");
       StateHasChanged();
     }
-    Console.WriteLine($"IsBodyUrl : {IsBodyUrl}      {IsBodyUrl2}");
+    // Console.WriteLine($"IsBodyUrl : {IsBodyUrl}      {IsBodyUrl2}");
     //StateHasChanged();
 
   }

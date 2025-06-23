@@ -19,43 +19,72 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
       <QuriDropDown CodeId="projlist" @bind-Value=srtype />
+      <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-      <RadzenButton  Text="Search" />
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
     </RadzenStack>
 
   </RadzenStack>
 </RadzenCard>
 
-      <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
-                       TextProperty="Text" SelectedIndex="1"
-                       SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender MonthSelect=@OnMonthSelect>
-        <RadzenMonthView />
-        <RadzenYearPlannerView StartMonth="@startMonth" />
-        <RadzenYearTimelineView StartMonth="@startMonth" />
-        <RadzenYearView StartMonth="@startMonth" />
-      </RadzenScheduler>
+<RadzenScheduler 
+  @ref=@scheduler 
+  SlotRender=@OnSlotRender 
+  class="context-body-row" 
+  TItem="WbsInfo" 
+  Data=@Data 
+  StartProperty="plan_sdt" 
+  EndProperty="plan_edt"
+  TextProperty="proc_nm" 
+  SelectedIndex="0"
+  SlotSelect=@OnSlotSelect 
+  AppointmentSelect=@OnAppointmentSelect 
+  AppointmentRender=@OnAppointmentRender 
+  MonthSelect=@OnMonthSelect
+
+  AppointmentMove=@OnAppointmentMove
+
+
+>
+  <RadzenMonthView />
+  <RadzenYearPlannerView StartMonth="@startMonth" />
+  <RadzenYearTimelineView StartMonth="@startMonth" />
+  <RadzenYearView StartMonth="@startMonth" />
+</RadzenScheduler>
 
 @code {
 
   CommonCode srtype { get; set; }
+  CommonCode compstat { get; set; } 
 
-  RadzenScheduler<Appointment> scheduler;
+  RadzenScheduler<WbsInfo> scheduler;
 
-  Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+  //Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
   Month startMonth = Month.January;
 
-  IList<Appointment> appointments = new List<Appointment>
-    {
-        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
-        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
-        new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
-        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
-        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
-        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
-        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
-    };
+
+  List<WbsInfo> Data {get;set;}
+    
+
+  
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      //compstat = new CommonCode(){ Code="DISCOMP" };
+    }
+  }
+
+
+  protected async Task OnLoadWrk() {
+    var data = await DbCont<WbsInfo>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+     { "prj_rid", srtype?.Code },
+     { "compstat", compstat?.Code },
+    });
+    Data = data.Data;
+  }
+
+
 
   void OnSlotRender(SchedulerSlotRenderEventArgs args) {
     // Highlight today in month view
@@ -73,11 +102,11 @@
 
 
     if (args.View.Text != "Year") {
-      Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
-          new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+      WbsInfo data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+          new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End }, {"PrjRid", srtype?.Code} });
 
       if (data != null) {
-        appointments.Add(data);
+        Data.Add(data);
         // Either call the Reload method or reassign the Data property of the Scheduler
         await scheduler.Reload();
       }
@@ -89,21 +118,47 @@
     await Task.CompletedTask;
   }
 
-  async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args) {
+  async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<WbsInfo> args) {
 
 
-    await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
+    await DialogService.OpenAsync<EditAppointmentPage>("Edit WbsInfo", new Dictionary<string, object> { { "Appointment", args.Data } });
 
     await scheduler.Reload();
   }
 
-  void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args) {
+  void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<WbsInfo> args) {
     // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
 
-    if (args.Data.Text == "Birthday") {
+    if (args.Data.proc_nm == "Birthday") {
       args.Attributes["style"] = "background: red";
     }
   }
+
+
+
+  async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)    {
+        var draggedAppointment = Data.FirstOrDefault(x => x == args.Appointment.Data);
+
+        if (draggedAppointment != null)        {
+            var duration = draggedAppointment.plan_edt - draggedAppointment.plan_sdt;
+
+            if (args.SlotDate.TimeOfDay == TimeSpan.Zero)            {
+                draggedAppointment.plan_sdt = args.SlotDate.Date.Add(draggedAppointment.plan_sdt.Value.TimeOfDay);
+            }
+            else            {
+                draggedAppointment.plan_sdt = args.SlotDate;
+            }
+
+            draggedAppointment.plan_edt = draggedAppointment.plan_sdt.Value.Add(duration.Value);
+
+            await scheduler.Reload();
+            
+            await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", draggedAppointment.ToDictionary());
+
+        }
+    }
+
+
 
 
 

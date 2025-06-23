@@ -20,6 +20,7 @@ public class QuriDynamicGridBase : BaseComponent {
 
   public IDictionary<string, string> cols { get; set; } = new Dictionary<string, string>();
 
+  [Parameter] public EventCallback<IDictionary<string, object>> CopyBtnEvent { get; set; }
   [Parameter] public EventCallback<IDictionary<string, object>> AddBtnEvent { get; set; }
   [Parameter] public EventCallback<IDictionary<string, object>> SaveBtnEvent { get; set; }
   [Parameter] public EventCallback<IDictionary<string, object>> DeleteBtnEvent { get; set; }
@@ -67,7 +68,7 @@ public class QuriDynamicGridBase : BaseComponent {
     set {
       if (value != _selectedItems) {
         _selectedItems = value;
-        Console.WriteLine($" qurigrid set : {value}");
+        //Console.WriteLine($" qurigrid set : {value}");
         SItemsChanged.InvokeAsync(SItems);
       }
     }
@@ -289,18 +290,24 @@ public class QuriDynamicGridBase : BaseComponent {
 
       var order = CreateData();
 
-      foreach( var o in firstItem) {
+
+
+      foreach ( var o in firstItem) {
+
+        if (isHiddenCol(o.Key)) { continue; } // 숨긴 칼럼은 복제 하지 않는다.
         order[o.Key] = o.Value;
       }
 
 
-      orders.Insert(findIndex, order);
+      orders.Insert(findIndex+1, order);
 
       await ordersGrid.EditRow(order);
 
       RecordCount = orders.Count;
 
       await ordersGrid.RefreshDataAsync();
+
+      await CopyBtnEvent.InvokeAsync(order);
 
     }
     else {

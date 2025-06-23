@@ -2,6 +2,7 @@
 
 
 using PropertyChanged;
+using System.Reflection;
 
 namespace ProjModel;
 
@@ -92,10 +93,12 @@ public class MenuInfo : BaseModel {
 [AddINotifyPropertyChangedInterface]
 public class BaseModel {
   public string cre_id { get; set; }
-  public string cre_dt { get; set; }
+  public DateTime? cre_dt { get; set; }
   public string mod_id { get; set; }
-  public string mod_dt { get; set; }
+  public DateTime? mod_dt { get; set; }
 
+  public string cre_user { get; set; }
+  public string mod_user { get; set; }
   public bool isChanged { get; set; }
 
 
@@ -105,5 +108,50 @@ public class BaseModel {
       isChanged = true;
     }
   }
+
+
+
+
+
+
+
+}
+
+public static class BaseModelExtensions {
+
+
+
+
+  public static Dictionary<string, string> ToDictionary(this BaseModel wbs) {
+    var dict = new Dictionary<string, string>();
+    var props = wbs.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+    foreach (var prop in props) {
+      var value = prop.GetValue(wbs);
+
+      // DateTime 또는 DateTime? 처리
+      if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?)) {
+        var dt = value as DateTime?;
+        dict[prop.Name] = dt.HasValue ? dt.Value.ToString("yyyy-MM-dd HH:mm:ss") : "";
+      }
+      //else if (prop.PropertyType == typeof(DateOnly) || prop.PropertyType == typeof(DateOnly?)) {
+      //  var dt = value as DateOnly?;
+      //  dict[prop.Name] = dt.HasValue ? dt.Value.ToString("yyyy-MM-dd") : "";
+      //}
+      else if (value != null) {
+        dict[prop.Name] = value.ToString();
+      }
+      else {
+        dict[prop.Name] = "";
+
+
+      }
+    }
+    return dict;
+  }
+
+
+
+
 
 }

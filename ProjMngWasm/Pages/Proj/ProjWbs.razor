@@ -17,6 +17,7 @@
 
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
             <QuriDropDown CodeId="projlist" @bind-Value=srtype Change=OnProjChange />
+            <QuriDropDown CodeId="compstat" @bind-Value=compstat IsAll=true />
           </RadzenStack>
 
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
@@ -33,6 +34,7 @@
           SaveBtnEvent=SaveBtnEvent
           DeleteBtnEvent=DeleteBtnEvent
           AddBtnEvent=NewRowCreate
+          CopyBtnEvent=CopyRowEvent
           ReqData=Data 
           HiddenCols="prj_rid,wbs_id,proc_lvl,build_user,build_status,dev_chk,build_chk,build_chk_dt,qc_user,qc_chk,qc_chk_dt,cre_user,cre_dt,mod_user,mod_dt,comm" />
 
@@ -42,6 +44,7 @@
       @code {
 
   CommonCode srtype { get; set; }
+  CommonCode compstat { get; set; }
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
@@ -59,7 +62,8 @@
 
   protected async Task OnLoadWrk(CommonCode cc) {
     Data = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
-     { "prj_rid", cc.Code }
+     { "prj_rid", cc.Code },
+     { "compstat", compstat?.Code },
     });
   }
 
@@ -81,6 +85,13 @@
     args["prj_rid"] = srtype?.Code;
     StateHasChanged();
   }
+
+
+  private void CopyRowEvent(IDictionary<string, object> args)  {
+    args["prj_rid"] = srtype?.Code;
+    StateHasChanged();
+  }
+
   private async Task OnProjChange(object args) {
     CommonCode cc = args as CommonCode;
     await OnLoadWrk(cc);

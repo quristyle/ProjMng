@@ -103,10 +103,22 @@
 
         <EditTemplate Context="order">
           @if (col.Value == "System.DateTime") {
-            <RadzenDatePicker @bind-Value=@order[col.Key] DateFormat="yyyy-MM-dd"      />
+
+            @* @bind-Value=@order[col.Key] *@
+
+            <RadzenDatePicker  DateFormat="yyyy-MM-dd" 
+            
+             TValue="DateTime?" 
+          Value="@(order[col.Key] as DateTime?)" 
+          ValueChanged="@(v => order[col.Key] = v)" 
+            
+            />
           } 
           else if (col.Value == "System.Int32") {
-          <RadzenNumeric @bind-Value=@order[col.Key] />
+          <RadzenNumeric TValue="int?" 
+          Value="@(order[col.Key] as int?)" 
+          ValueChanged="@(v => order[col.Key] = v)" 
+          />
           }
           else if (col.Value == "System.Boolean") {
             <RadzenCheckBox @bind-Value=@order[col.Key] />

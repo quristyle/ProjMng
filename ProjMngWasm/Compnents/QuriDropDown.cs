@@ -13,6 +13,8 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   [Inject] private JsiniService? jsiniService { get; set; }
   [Inject] AppProjData? appData { get; set; }
 
+  [Parameter] public string? InitialCode { get; set; }
+
   public string? _codeId;
   //private string? _previousCodeId;
   [Parameter] public string? CodeId { get; set; }
@@ -43,7 +45,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   //bool isFrist = true;
   async Task LoadItems() {
 
-    if (IsEtcFix && string.IsNullOrEmpty(Etc0) ) {
+    if (IsEtcFix && string.IsNullOrEmpty(Etc0)) {
       return;
     }
 
@@ -52,7 +54,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     if (!string.IsNullOrEmpty(_codeId)) {
       // isRelod
 
-      if (!string.IsNullOrWhiteSpace(_etc0) && appData.GlobalDic.TryGetValue(_codeId+"_etc0_"+ _etc0, out var dictionary)) {
+      if (!string.IsNullOrWhiteSpace(_etc0) && appData.GlobalDic.TryGetValue(_codeId + "_etc0_" + _etc0, out var dictionary)) {
 
 
         Console.WriteLine($"isRelod LoadItems : {_codeId} etc0 : {_etc0}");
@@ -73,7 +75,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         Console.WriteLine($"LoadData LoadItems : {_codeId} etc0 : {_etc0}");
 
         // _codeId에 해당하는 딕셔너리가 없을 경우 처리
-        var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon",new Dictionary<string, string>() {
+        var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon", new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", Etc0 }
             });
@@ -94,7 +96,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
             );
         }
 
-        if(!appData.GlobalDic.ContainsKey(_codeId)) {
+        if (!appData.GlobalDic.ContainsKey(_codeId)) {
           appData.GlobalDic.Add(_codeId, dic);
         }
         tmp = WasmUtil.DeepCopy(dic);
@@ -105,23 +107,37 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
       tmp = new List<CommonCode>();
     }
 
-    if (IsAll) {      
-      tmp.Insert(0, new CommonCode() { Code="", Name="All", Desc="All items" });      
+    if (IsAll) {
+      tmp.Insert(0, new CommonCode() { Code = "", Name = "All", Desc = "All items" });
     }
 
     Data = tmp.AsEnumerable();
-    if (!IsAll && tmp.Count > 0) {
-      /* 고민.. */
-      Console.WriteLine("aaaaaaaaaaaaa");
-                object obj = tmp[0];
-                await ValueChanged.InvokeAsync((TValue)obj); // 바인딩된 변수에 반영
+
+
+    if (!string.IsNullOrEmpty(InitialCode)) {
+      var match = tmp.FirstOrDefault(x => x.Code == InitialCode);
+      if (match != null) {
+        await ValueChanged.InvokeAsync((TValue)(object)match);
+        Value = (TValue)(object)match;
+      }
     }
-            StateHasChanged(); // 다시 렌더링
+    else if (!IsAll && tmp.Count > 0) {
+      object obj = tmp[0];
+      await ValueChanged.InvokeAsync((TValue)obj);
+    }
+
+
+
+    //if (!IsAll && tmp.Count > 0) {
+    //  object obj = tmp[0];
+    //  await ValueChanged.InvokeAsync((TValue)obj); // 바인딩된 변수에 반영
+    //}
+    StateHasChanged(); // 다시 렌더링
   }
 
 
 
-    //[Parameter] public CommonCode Value { get; set; }              // 바인딩 값
-    //[Parameter] public EventCallback<CommonCode> ValueChanged { get; set; } // 변경 이벤트
+  //[Parameter] public CommonCode Value { get; set; }              // 바인딩 값
+  //[Parameter] public EventCallback<CommonCode> ValueChanged { get; set; } // 변경 이벤트
 
 }
