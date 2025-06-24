@@ -3,6 +3,7 @@ using ProjMngWasm.Commons;
 using ProjModel;
 using Radzen.Blazor;
 using System.Linq;
+using System.Text.RegularExpressions;
 using WasmShear;
 using WasmShear.Services;
 
@@ -74,11 +75,19 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
         Console.WriteLine($"LoadData LoadItems : {_codeId} etc0 : {_etc0}");
 
-        // _codeId에 해당하는 딕셔너리가 없을 경우 처리
-        var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon", new Dictionary<string, string>() {
+
+        RequestDto rd = new RequestDto() {
+          ProcName = "sp_projCommon",
+          MainParam = new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", Etc0 }
-            });
+            }
+        };
+
+
+
+        // _codeId에 해당하는 딕셔너리가 없을 경우 처리
+        var data = await jsiniService.GetList<Dictionary<string, string>>(rd);
 
 
         List<CommonCode> dic = new List<CommonCode>();
@@ -118,12 +127,21 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
       var match = tmp.FirstOrDefault(x => x.Code == InitialCode);
       if (match != null) {
         await ValueChanged.InvokeAsync((TValue)(object)match);
-        Value = (TValue)(object)match;
+        //Value = (TValue)(object)match;
       }
+      Console.WriteLine($"기본 선택자 선택 : {_codeId} InitialCode : {InitialCode}");
     }
     else if (!IsAll && tmp.Count > 0) {
       object obj = tmp[0];
       await ValueChanged.InvokeAsync((TValue)obj);
+      //Value = (TValue)obj;
+      Console.WriteLine($"첫번째 코드 선택 : {_codeId} etc0 : {_etc0}");
+    }
+    else if (IsAll) {
+      object obj = tmp[0];
+      await ValueChanged.InvokeAsync((TValue)obj);
+      //Value = (TValue)obj;
+      Console.WriteLine($"All 선택 : {_codeId} etc0 : {_etc0}");
     }
 
 

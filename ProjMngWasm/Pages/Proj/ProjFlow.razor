@@ -76,7 +76,13 @@
 
     // 새로 생성된 데이터
     Dictionary<string, string> dic = getParams();
-    var ri = await devService.GetList<TableInfo>("tablelist", dic);
+
+       RequestDto rd = new RequestDto() { 
+      ProcName="tablelist", MainParam = dic
+      };
+
+
+    var ri = await devService.GetList<TableInfo>(rd);
     List<TableInfo> dataTb = ri.Data;
 
     ErdInfo newErdInfo = new ErdInfo();

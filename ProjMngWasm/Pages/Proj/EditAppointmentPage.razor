@@ -8,6 +8,8 @@
       <RadzenLabel Text="Title" Style="width: 6rem;" />
       <RadzenTextBox @bind-Value="@model.proc_nm" Name="Text" Style="width: 12rem;" />
       <RadzenRequiredValidator Component="Text" Text="Title is required" />
+      <RadzenLabel Text="완료여부" Style="width: 6rem;" />
+      <RadzenCheckBox  @bind-Value="@model.isComplatge" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Start" Style="width: 6rem;" />
@@ -34,7 +36,15 @@
   }
 
   async Task OnSubmit(WbsInfo model) {
-    
+    if(model.isComplatge){
+      if( model.dev_sdt == null ) model.dev_sdt = DateTime.Now;
+      if( model.dev_edt == null ) model.dev_edt = DateTime.Now;
+      model.wbs_state = "COMP";
+    }
+    else{
+      model.dev_edt = null;
+      model.wbs_state = "RUNNING";
+    }
     Dictionary<string, string> dic = model.ToDictionary();
 
     await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);

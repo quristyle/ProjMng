@@ -129,6 +129,7 @@ public class QuriDynamicGridBase : BaseComponent {
   protected void Reset(IDictionary<string, object> order) {
     //ordersToInsert.Remove(order);
     ordersToUpdate.Remove(order);
+    ordersToUpdate.Clear();
   }
 
 
@@ -138,7 +139,7 @@ public class QuriDynamicGridBase : BaseComponent {
     if (editMode == DataGridEditMode.Single) {
       Reset();
     }
-
+    order["quri_ischange"] = true;
     ordersToUpdate.Add(order);
     await ordersGrid.EditRow(order);
   }
@@ -159,6 +160,10 @@ public class QuriDynamicGridBase : BaseComponent {
     foreach (var c in cols) {
       order.Add(c.Key, "");
     }
+
+
+
+
     return order;
   }
 
@@ -207,6 +212,12 @@ public class QuriDynamicGridBase : BaseComponent {
     await ordersGrid.Reload();
     StateHasChanged();
 
+  }
+
+  public async Task Reload() {
+    Reset();
+    await ordersGrid.Reload();
+    StateHasChanged();
   }
 
 

@@ -8,9 +8,9 @@ public class DevService : BaseService {
 
   public DevService(IHttpClientFactory httpClientFactory) : base(httpClientFactory.CreateClient("jsini")) { }
 
-  public async Task<ResultInfo<T>> GetList<T>(string action_name, IDictionary<string, string> dic, string proc_type = "srch") {
+  public async Task<ResultInfo<T>> GetList<T>(RequestDto rd) {
 
-    return await GetData<T>(action_name, dic, TargetDevUrl);
+    return await GetData<T>(rd, TargetDevUrl);
 
   }
 

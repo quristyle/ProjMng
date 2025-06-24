@@ -119,7 +119,7 @@ public class BaseService  {
   /// <param name="dic"></param>
   /// <param name="targetUrl"></param>
   /// <returns></returns>
-  protected async Task<ResultInfo<T>> GetData<T>(string stpStr,   IDictionary<string, string> dic, string targetUrl = TargetUrl, HttpCallType hctype = HttpCallType.PostJson) {
+  protected async Task<ResultInfo<T>> GetData__________x<T>(string stpStr,   IDictionary<string, string> dic, string targetUrl = TargetUrl, HttpCallType hctype = HttpCallType.PostJson) {
 
     ResultInfo<T> result = null;
     dic["stp"] = stpStr;
@@ -166,27 +166,52 @@ public class BaseService  {
   }
 
 
+  protected async Task<ResultInfo<T>> GetData<T>(RequestDto rd, string targetUrl = TargetUrl, HttpCallType hctype = HttpCallType.PostJson) {
 
-  /*
-  protected void ChangeDataType(Dictionary<string, string> cols, object obj) {
-    List<Dictionary<string, object?>> data = (List<Dictionary<string, object?>>)obj;
+    ResultInfo<T> result = null;
 
-    // 변환할 컬럼과 타입을 미리 캐싱
-    var intColumns = cols.Where(c => c.Value == "System.Int32").Select(c => c.Key).ToList();
+    try {
+      HttpResponseMessage response = null;
 
-    // 병렬 처리를 사용하여 데이터 변환
-    Parallel.ForEach(data, d => {
-      foreach (var ckey in intColumns) {
-        if (d.TryGetValue(ckey, out var value) && value != null && int.TryParse(value.ToString(), out int result)) {
-          d[ckey] = result;
-        }
-        else {
-          d[ckey] = 0; // 기본값을 설정하거나 다른 처리를 할 수 있습니다.
-        }
+      switch (hctype) {
+        case HttpCallType.Get:
+          response = await _httpClient.GetAsync(targetUrl);
+          break;
+        default:
+          response = await _httpClient.PostAsJsonAsync(targetUrl, rd, System.Text.Json.JsonSerializerOptions.Default);
+          break;
       }
-    });
+
+      if (response == null) {
+        SetResultCode<T>(result, -1001, $"호출타입정의 확인 필요 : {hctype.ToString()}");
+      }
+
+      //요청 성공 여부 확인
+      response.EnsureSuccessStatusCode();
+
+      if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        result = GetRi<T>(responseString);
+
+      }
+      else {
+        SetResultCode<T>(result, -96, $"응답 실패, 응답코드 : {response.StatusCode}");
+      }
+    }
+    catch (HttpRequestException ex) {
+      SetResultCode<T>(result, -95, $"HTTP 요청 실패: {ex.Message}");
+    }
+    catch (JsonException ex) {
+      SetResultCode<T>(result, -94, $"JSON 파싱 실패: {ex.Message}");
+    }
+    catch (Exception ex) {
+      SetResultCode<T>(result, -93, $"예외 발생: {ex.Message}");
+    }
+    return result;
   }
-  */
+
+
 
 
 }

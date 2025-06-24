@@ -22,6 +22,7 @@
 
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
             <RadzenButton Click="@OnLoadWrk" Text="Search" />
+            <RadzenButton Click="@OnSaveWrk" Text="Save" />
           </RadzenStack>
 
         </RadzenStack>
@@ -31,6 +32,7 @@
         <RadzenColumn Size="12" class="context-body-rowcol">
 
           <QuriDynamicGrid 
+            @ref=wbsgrid
           SaveBtnEvent=SaveBtnEvent
           DeleteBtnEvent=DeleteBtnEvent
           AddBtnEvent=NewRowCreate
@@ -43,6 +45,8 @@
 
       @code {
 
+
+        QuriDynamicGrid wbsgrid{ get; set; }
   CommonCode srtype { get; set; }
   CommonCode compstat { get; set; }
 
@@ -65,6 +69,17 @@
      { "prj_rid", cc.Code },
      { "compstat", compstat?.Code },
     });
+  }
+
+  
+  protected async Task OnSaveWrk() {
+    await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+     { "prj_rid", srtype.Code },
+     { "compstat", compstat?.Code },
+    }, Data);
+    await wbsgrid.Reload();
+    
+    StateHasChanged();
   }
 
 

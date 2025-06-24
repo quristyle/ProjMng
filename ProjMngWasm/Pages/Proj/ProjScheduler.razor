@@ -19,7 +19,7 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
       <QuriDropDown CodeId="projlist" @bind-Value=srtype />
-      <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" />
+      <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" IsAll=true />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
@@ -88,7 +88,8 @@
 
   void OnSlotRender(SchedulerSlotRenderEventArgs args) {
     // Highlight today in month view
-    if (args.View.Text == "Month" && args.Start.Date == DateTime.Today) {
+    //if (args.View.Text == "Month" && args.Start.Date == DateTime.Today) {
+    if (args.Start.Date == DateTime.Today) {
       args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
     }
 
@@ -128,10 +129,23 @@
 
   void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<WbsInfo> args) {
     // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+    
 
-    if (args.Data.proc_nm == "Birthday") {
-      args.Attributes["style"] = "background: red";
+    switch(args.Data.wbs_state){
+      case "READY" : 
+      args.Attributes["style"] = "background: var( --rz-warning );";
+      break;
+      case "RUNNING" : 
+      args.Attributes["style"] = "background: var( --rz-info );";
+      break;
+      case "OVER" : 
+      args.Attributes["style"] = "background: var( --rz-danger );";
+      break;
+      case "COMP" : 
+      args.Attributes["style"] = "background: var( --rz-secondary );";
+      break;
     }
+
   }
 
 

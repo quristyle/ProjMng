@@ -15,7 +15,7 @@
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="End" Style="width: 4rem;" />
-      <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt" ShowTime="true" Style="width: 12rem;" />
+      <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt" ShowTime="true" Style="width: 12rem;" DateFormat="yyyy-MM-dd" />
       <RadzenRequiredValidator Component="End" Text="End is required" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">

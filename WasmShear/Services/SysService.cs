@@ -8,23 +8,12 @@ public class SysService : BaseService {
 
   public SysService(IHttpClientFactory httpClientFactory) : base(httpClientFactory.CreateClient("jsini")) { }
   public async Task<ResultInfo<T>> GetList<T>(string proc_name, IDictionary<string, string> dic, string proc_type = "srch", bool isFast = false) {
+    var dict = new Dictionary<string, string>(dic);
+    RequestDto rd = new RequestDto() { ProcType= proc_type, ProcName=proc_name, IsFast=isFast, MainParam= dict };
 
-    if (string.IsNullOrEmpty(proc_name) || proc_name.Length < 3) {
-      // 규칙위반
-    }
-    string calltype = proc_name.Substring(0, 2).ToLower();
     string targetUrl = "api/Sys";
 
-    Dictionary<string, string> req = new Dictionary<string, string>() {
-      { "req_cname", proc_name }
-      , { "req_type", proc_type }
-      , { "req_sdt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
-      , { "req_isFast", isFast.ToString() }
-    };
-
-    var reqDic = WasmUtil.JoinDictionaries(dic, req);
-
-    return await GetData<T>(proc_name, reqDic, targetUrl);
+    return await GetData<T>(rd, targetUrl);
   }
 
 }

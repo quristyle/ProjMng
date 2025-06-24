@@ -26,6 +26,8 @@ public class WbsInfo : BaseModel {
   public string qc_chk { get; set; }
   public string qc_chk_dt { get; set; }
   public string comm { get; set; }
+  public string wbs_state { get; set; }
+  public bool isComplatge { get; set; }
 
 }
 

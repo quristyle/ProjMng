@@ -63,7 +63,14 @@ public class CommonComponent : ComponentBase {
       };
     }
 
-    var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
+    RequestDto rd = new RequestDto() { 
+    ProcName = proc_name
+    , ProcType = proc_type
+    , IsFast = isFast
+    , MainParam = dic
+    };
+
+    var data = await jsiniService.GetList<T>(rd);
 
     if (data.Code < 0) {
       //Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -91,7 +98,15 @@ public class CommonComponent : ComponentBase {
       return null;
     }
 
-    var data = await jsiniService.GetList<T>(md_name, dic, proc_type, isFast);
+    RequestDto rd = new RequestDto() {
+      ProcName = md_name
+    ,      ProcType = proc_type
+    ,      IsFast = isFast
+    ,      MainParam = dic
+    };
+
+
+    var data = await jsiniService.GetList<T>(rd);
 
     if (data.Code < 0) {
       //Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -130,7 +145,14 @@ public class CommonComponent : ComponentBase {
 
     if (dic == null) dic = new Dictionary<string, string>() { };
 
-    var data = await devService.GetList<T>(action_name, dic);
+
+    RequestDto rd = new RequestDto() {
+      ProcName = action_name
+    ,      MainParam = dic
+    };
+
+
+    var data = await devService.GetList<T>(rd);
 
     if (data.Code < 0) {
       //Notify(NotificationSeverity.Error, "Error Message", data.Message, 10000, true);
@@ -218,10 +240,19 @@ protected void Notify(NotificationSeverity severity, string summary, string deta
 
   protected async Task<List<CommonCode>> GetCommon(string _codeId, string _key) {
 
-    var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon", new Dictionary<string, string>() {
+
+    RequestDto rd = new RequestDto() {
+      ProcName = "sp_projCommon"
+    ,
+      MainParam = new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", _key }
-            });
+            }
+    };
+
+
+
+    var data = await jsiniService.GetList<Dictionary<string, string>>(rd);
 
 
     List<CommonCode> dic = new List<CommonCode>();

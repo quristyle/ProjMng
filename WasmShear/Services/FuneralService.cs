@@ -1,4 +1,5 @@
 ﻿
+using ProjModel;
 using System.Web;
 using WasmShear.Commons;
 
@@ -21,7 +22,21 @@ public class FuneralService : BaseService {
     string url = $"fr3.jsp?{queryString}";
 
     var dicc = WasmUtil.JoinConvert(dic);
-    var res = await GetData<IDictionary<string, object>>(path, dicc, url, HttpCallType.Get);
+
+
+
+
+
+    RequestDto rd = new RequestDto() {
+      ProcName = path
+    ,      MainParam = dicc
+    };
+
+
+
+
+
+    var res = await GetData<IDictionary<string, object>>(rd, url, HttpCallType.Get);
 
     return res.Data;
   }

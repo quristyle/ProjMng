@@ -10,8 +10,36 @@ public class BaseService {
 
   protected IConfiguration _configuration;
 
+
+  /// <summary>
+  /// 포로시저의 파라미터정보를 리턴
+  /// </summary>
+  /// <param name="db"></param>
+  /// <param name="schema_name"></param>
+  /// <param name="procedureName"></param>
+  /// <returns></returns>
+  protected IEnumerable<dynamic> ProcParams(IDbConnection db, string schema_name, string procedureName) {
+    string getProcParamsQuery = $@"
+                SELECT
+                    p.parameter_name,
+                    p.data_type,
+                    p.specific_name,
+                    p.parameter_mode
+                FROM
+                    information_schema.parameters p
+                WHERE 1=1
+                    -- p.specific_schema = '{schema_name}' 
+                    and p.specific_name ~ ('^{procedureName.ToLower()}(_[0-9]+)?$')
+                ORDER BY
+                    p.ordinal_position;
+            ";
+
+    return db.Query(getProcParamsQuery);
+  }
+
+
   /// <summary> 되돌려줄 response dictionary </summary>
-  protected void GetRes<T>(ref ResultInfo<T> ri, Dictionary<string, string> param
+  protected void GetRes<T>(ref ResultInfo<T> ri, IDictionary<string, string> param
     , DateTime sdt, DateTime spdt, DateTime epdt
     ) {
 

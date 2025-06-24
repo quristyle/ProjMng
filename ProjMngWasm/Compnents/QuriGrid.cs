@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using ProjModel;
 using Radzen.Blazor;
 using WasmShear.Services;
 
@@ -27,7 +28,12 @@ namespace ProjMngWasm.Compnents {
       IsLoading = true;
       await InvokeAsync(StateHasChanged);
 
-      var ri = await devService.GetList<TItem>(procName, dic);
+      RequestDto rd = new RequestDto() { 
+      ProcName=procName, MainParam = dic
+      };
+
+
+      var ri = await devService.GetList<TItem>(rd);
       Data = ri.Data.ToList();
 
       IsLoading = false;

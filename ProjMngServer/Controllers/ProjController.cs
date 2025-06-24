@@ -15,12 +15,37 @@ public class ProjController : ControllerBase {
   }
 
 
+  //[HttpPost]
+  //public ActionResult<ResultInfo<Dictionary<string, object>>> PostBody([FromBody] Dictionary<string, string> param) {
+  //  string req_cname = param.TryGetValue("req_cname", out var stpValue) && stpValue != null ? stpValue.ToString().ToLower() : string.Empty;
+  //  var data = _projService.GetData(req_cname,param);
+  //  return Ok(data);
+  //}
+
   [HttpPost]
-  public ActionResult<ResultInfo<Dictionary<string, object>>> PostBody([FromBody] Dictionary<string, string> param) {
-    string req_cname = param.TryGetValue("req_cname", out var stpValue) && stpValue != null ? stpValue.ToString().ToLower() : string.Empty;
-    var data = _projService.GetData(req_cname,param);
+  public ActionResult<ResultInfo<Dictionary<string, object>>> PostBody([FromBody] RequestDto dto) {
+    ResultInfo<dynamic> data = null;
+    if (
+      dto.MultyData == null || dto.MultyData.Count <= 0) {
+      data = _projService.GetData(dto); 
+    }
+    else { 
+      
+      data = _projService.ExcuteMultyData(dto); 
+    
+    }
     return Ok(data);
   }
+
+
+  //[HttpPost]
+  //[Route("multydata")]
+  //public ActionResult<ResultInfo<Dictionary<string, object>>> PostBodyMulty([FromBody] Dictionary<string, string> param) {
+  //  string req_cname = param.TryGetValue("req_cname", out var stpValue) && stpValue != null ? stpValue.ToString().ToLower() : string.Empty;
+  //  object req_multydata = param.TryGetValue("req_multydata", out var stpValue2) ;
+  //  var data = _projService.GetData(req_cname, param);
+  //  return Ok(data);
+  //}
   //[HttpPost]
   //[Route("fast")]
   //public ActionResult<Dictionary<string, object>> Fast([FromBody] Dictionary<string, string> param) {

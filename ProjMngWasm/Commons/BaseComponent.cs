@@ -30,9 +30,18 @@ public class BaseComponent : CommonComponent {
       };
     }
 
-    var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
+    RequestDto rd = new RequestDto() {
+      ProcName = proc_name
+      , ProcType = proc_type
+      , IsFast = isFast
+      , MainParam = dic
+      , Start = DateTime.Now
+    };
 
-    if(data == null) {
+    //var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
+    var data = await jsiniService.GetList<T>(rd);
+
+    if (data == null) {
       Notify(NotificationSeverity.Warning, "Warning Message", $"{proc_name} Data is null", 50000, true);
     }
     else if (data.Code < 0) {
@@ -41,6 +50,33 @@ public class BaseComponent : CommonComponent {
 
     return data;
   }
+
+
+  private async Task<ResultInfo<T>> DbCont<T>(RequestDto rd) {
+    if (string.IsNullOrWhiteSpace(rd.ProcName) || !rd.ProcName.StartsWith("sp_") || rd.ProcName.Length < 6) {
+      Notify(NotificationSeverity.Warning, "Error Message", "규칙 위반", 5000);
+      return new ResultInfo<T> {
+        Code = -1,
+        Message = "Invalid procedure name"
+      };
+    }
+
+    rd.Start = DateTime.Now;
+
+    //var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
+    var data = await jsiniService.GetList<T>(rd);
+
+    if (data == null) {
+      Notify(NotificationSeverity.Warning, "Warning Message", $"{rd.ProcName} Data is null", 50000, true);
+    }
+    else if (data.Code < 0) {
+      Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
+    }
+
+    return data;
+  }
+
+
 
 
   public async Task<ResultInfo<T>> SysCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type = "srch", bool isFast = false) {
@@ -61,7 +97,9 @@ public class BaseComponent : CommonComponent {
       return null;
     }
 
-    var data = await jsiniService.GetList<T>(md_name, dic, proc_type, isFast);
+    RequestDto rd = new RequestDto() { ProcName= md_name , MainParam = dic, ProcType=proc_type, IsFast=isFast};
+
+    var data = await jsiniService.GetList<T>(rd);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -75,13 +113,78 @@ public class BaseComponent : CommonComponent {
 
     var req = WasmUtil.JoinConvert(dic);
 
-    return await DbSave<T>( proc_name, req, isFast);
+    return await DbSave<T>(proc_name, req, isFast);
+  }
+  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, IDictionary<string, object> dic, ResultInfo<Dictionary<string, object>> data, bool isFast = false) {
+    //var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {  });
+
+    var req = WasmUtil.JoinConvert(dic);
+
+    return await DbSave<T>(proc_name, req, isFast);
   }
   protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
     var data = await DbCont<T>( proc_name, dic, "save", isFast);
     Notify(data);
     return data;
   }
+
+
+  protected List<Dictionary<string, object>> GetChangeData(ResultInfo<Dictionary<string, object>> ri) {
+    var data = ri.Data;
+    List<Dictionary<string, object>> result = new();
+    if (data != null) {
+      foreach (var dic in data) {
+        if (dic.TryGetValue("quri_ischange", out var isChangeObj)) {
+          bool isChange = false;
+          if (isChangeObj is bool b)
+            isChange = b;
+          else if (isChangeObj is string s)
+            isChange = s.Equals("true", StringComparison.OrdinalIgnoreCase);
+
+          if (isChange) {
+            // 복사본 생성 후 quri_ischange 제거
+            var newDic = new Dictionary<string, object>(dic);
+            newDic.Remove("quri_ischange");
+            result.Add(newDic);
+
+            // 원본의 quri_ischange 제거
+            dic.Remove("quri_ischange");
+            // 원본의 quri_ischange도 false로 변경(필요시)
+            // dic["quri_ischange"] = false;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+
+  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, Dictionary<string, string> dic, ResultInfo<Dictionary<string, object>> data, bool isFast = false) {
+
+    List<Dictionary<string, object>> mlist = GetChangeData(data);
+    if (mlist == null || mlist.Count <= 0) {
+      NotificationService.Notify(new NotificationMessage {
+        Severity = NotificationSeverity.Warning,
+        Summary = "알림",
+        Detail = "수정대상이 존재하지 않습니다.",
+       // Duration = duration,
+        ShowProgress = true,
+        Payload = DateTime.Now
+      });
+      return new ResultInfo<T>() { Code=-77, Message="수정대상이 존재하지 않습니다." } ;
+    }
+    else {
+      RequestDto rd = new RequestDto() { ProcName = proc_name, MainParam = dic, ProcType = "save", IsFast = isFast, MultyData = mlist };
+
+      var res = await DbCont<T>(rd);
+      Notify(res);
+      return res;
+    }
+  }
+
+
+  
+
 
 
   protected async Task<ResultInfo<T>> DbDelete<T>(string proc_name, IDictionary<string, object> dic, bool isFast = false) {
@@ -100,7 +203,8 @@ public class BaseComponent : CommonComponent {
 
     if (dic == null) dic = new Dictionary<string, string>() { };
 
-    var data = await devService.GetList<T>(action_name, dic);
+    RequestDto rd = new RequestDto() { ProcName = action_name, MainParam = dic };
+    var data = await devService.GetList<T>(rd);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", data.Message, 10000, true);
@@ -170,10 +274,16 @@ public class BaseComponent : CommonComponent {
 
   protected async Task<List<CommonCode>> GetCommon(string _codeId, string _key) {
 
-    var data = await jsiniService.GetList<Dictionary<string, string>>("sp_projCommon", new Dictionary<string, string>() {
+
+    RequestDto rd = new RequestDto() { ProcName = "sp_projCommon", MainParam = new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", _key }
-            });
+            }
+    };
+
+
+
+    var data = await jsiniService.GetList<Dictionary<string, string>>(rd);
 
 
     List<CommonCode> dic = new List<CommonCode>();
