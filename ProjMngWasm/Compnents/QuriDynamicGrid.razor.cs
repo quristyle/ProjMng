@@ -136,9 +136,9 @@ public class QuriDynamicGridBase : BaseComponent {
   protected async Task EditRow(IDictionary<string, object> order) {
     if (!ordersGrid.IsValid) return;
 
-    if (editMode == DataGridEditMode.Single) {
-      Reset();
-    }
+    //if (editMode == DataGridEditMode.Single) {
+    //  Reset();
+    //}
     order["quri_ischange"] = true;
     ordersToUpdate.Add(order);
     await ordersGrid.EditRow(order);
@@ -215,8 +215,12 @@ public class QuriDynamicGridBase : BaseComponent {
   }
 
   public async Task Reload() {
+
+    for (int i = ordersToUpdate.Count - 1; i >= 0; i--) {
+      ordersGrid.CancelEditRow(ordersToUpdate[i]);
+    }
     Reset();
-    await ordersGrid.Reload();
+    //await ordersGrid.Reload();
     StateHasChanged();
   }
 
@@ -236,9 +240,9 @@ public class QuriDynamicGridBase : BaseComponent {
   protected async Task InsertAfterRow(IDictionary<string, object> row) {
     if (!ordersGrid.IsValid) return;
 
-    if (editMode == DataGridEditMode.Single) {
-      Reset();
-    }
+    //if (editMode == DataGridEditMode.Single) {
+    //  Reset();
+    //}
 
     int findIndex = 0;
     var firstItem = SItems?.FirstOrDefault();

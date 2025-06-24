@@ -5,17 +5,25 @@
   <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Title" Style="width: 4rem;" />
-      <RadzenTextBox @bind-Value="@model.proc_nm" Name="Text" Style="width: 12rem;" />
+      <RadzenTextBox @bind-Value="@model.proc_nm" Name="Text" Style="width: 20rem;" />
       <RadzenRequiredValidator Component="Text" Text="Title is required" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Start" Style="width: 4rem;" />
-      <RadzenDatePicker @bind-Value="@model.plan_sdt" Name="Start" ShowTime="true" Style="width: 12rem;" />
+      <RadzenDatePicker @bind-Value="@model.plan_sdt" Name="Start" ShowTime="true" Style="width: 12rem;"  DateFormat="yyyy-MM-dd" >
+        <FooterTemplate>
+            <RadzenButton Click=@(args => model.plan_sdt = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
+        </FooterTemplate>
+    </RadzenDatePicker>
       <RadzenRequiredValidator Component="Start" Text="Start is required" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="End" Style="width: 4rem;" />
-      <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt" ShowTime="true" Style="width: 12rem;" DateFormat="yyyy-MM-dd" />
+      <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt" ShowTime="true" Style="width: 12rem;" DateFormat="yyyy-MM-dd"  >
+        <FooterTemplate>
+            <RadzenButton Click=@(args => model.plan_edt = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
+        </FooterTemplate>
+    </RadzenDatePicker>
       <RadzenRequiredValidator Component="End" Text="End is required" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">

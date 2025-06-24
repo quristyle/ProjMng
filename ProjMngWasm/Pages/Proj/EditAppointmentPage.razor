@@ -6,23 +6,32 @@
   <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Title" Style="width: 6rem;" />
-      <RadzenTextBox @bind-Value="@model.proc_nm" Name="Text" Style="width: 12rem;" />
+      <RadzenTextBox @bind-Value="@model.proc_nm" Name="Text" Style="width: 20rem;" />
       <RadzenRequiredValidator Component="Text" Text="Title is required" />
       <RadzenLabel Text="완료여부" Style="width: 6rem;" />
       <RadzenCheckBox  @bind-Value="@model.isComplatge" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Start" Style="width: 6rem;" />
-      <RadzenDatePicker @bind-Value="@model.plan_sdt" Name="Start"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" />
+      <RadzenDatePicker @bind-Value="@model.plan_sdt" Name="Start"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" >
+        <FooterTemplate>
+            <RadzenButton Click=@(args => model.plan_sdt = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
+        </FooterTemplate>
+    </RadzenDatePicker>
       <RadzenRequiredValidator Component="Start" Text="Start is required" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="End" Style="width: 6rem;" />
-      <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" />
+      <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" >
+        <FooterTemplate>
+            <RadzenButton Click=@(args => model.plan_edt = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
+        </FooterTemplate>
+    </RadzenDatePicker>
       <RadzenRequiredValidator Component="End" Text="End is required" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
       <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+      <RadzenButton  Text="MoveToday" Click=OnTodayAndSave />
     </RadzenStack>
   </RadzenStack>
 </RadzenTemplateForm>
@@ -34,6 +43,19 @@
   protected override void OnParametersSet() {
     model = Appointment;
   }
+
+
+  
+  async Task OnTodayAndSave() {
+    model.plan_sdt = DateTime.Now;
+    model.plan_edt = DateTime.Now;
+
+   await OnSubmit(model);
+  }
+
+
+
+
 
   async Task OnSubmit(WbsInfo model) {
     if(model.isComplatge){

@@ -32,6 +32,7 @@
   /*  --rz-body-font-size: 0.825rem !important;*/
   --rz-tabs-padding: 0.25rem !important;
   --rz-root-font-size: 12px !important;
+  --rz-scheduler-event-font-size: 1rem !important;
 }
 
 * {
