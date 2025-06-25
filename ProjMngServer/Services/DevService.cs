@@ -122,7 +122,59 @@ public class DevService : BaseService {
   }
 
 
-  public ResultInfo<dynamic> DevExecuteQuery(string dbNick, string stp, Dictionary<string, string> param) {
+  public ResultInfo<dynamic> GetData(RequestDto dto) {
+
+    var param = dto.MainParam;
+
+    DateTime sdt = DateTime.Now;
+    string dbtype = param.TryGetValue("db", out var dbValue) && dbValue != null ? dbValue.ToString() : string.Empty;
+    //string stp = param.TryGetValue("stp", out var stpValue) && stpValue != null ? stpValue.ToString() : string.Empty;
+    string sta = param.TryGetValue("sta", out var staValue) && staValue != null ? staValue.ToString() : string.Empty;
+    string sob = param.TryGetValue("sob", out var sobValue) && sobValue != null ? sobValue.ToString() : string.Empty;
+    string proj = param.TryGetValue("proj", out var projValue) && projValue != null ? projValue.ToString() : string.Empty;
+    string dbNick = param.TryGetValue("dbnick", out var dbNickValue) && dbNickValue != null ? dbNickValue.ToString() : string.Empty;
+    string sva = param.TryGetValue("sva", out var svaValue) && svaValue != null ? svaValue.ToString() : string.Empty;
+
+    DateTime spdt = DateTime.Now;
+    DateTime epdt = DateTime.Now;
+
+    //ResultInfo<dynamic> ri = DevExecuteQuery(dbNick, stp, param);
+    ResultInfo<dynamic> ri = DevExecuteQuery(dbNick, dto.ProcName, param);
+    epdt = DateTime.Now;
+    GetRes(ref ri, param, sdt, spdt, epdt);
+
+    return ri;
+  }
+
+
+  public ResultInfo<dynamic> ExcuteMultyData(RequestDto dto) {
+
+    var param = dto.MainParam;
+
+    DateTime sdt = DateTime.Now;
+    string dbtype = param.TryGetValue("db", out var dbValue) && dbValue != null ? dbValue.ToString() : string.Empty;
+    string stp = param.TryGetValue("stp", out var stpValue) && stpValue != null ? stpValue.ToString() : string.Empty;
+    string sta = param.TryGetValue("sta", out var staValue) && staValue != null ? staValue.ToString() : string.Empty;
+    string sob = param.TryGetValue("sob", out var sobValue) && sobValue != null ? sobValue.ToString() : string.Empty;
+    string proj = param.TryGetValue("proj", out var projValue) && projValue != null ? projValue.ToString() : string.Empty;
+    string dbNick = param.TryGetValue("dbnick", out var dbNickValue) && dbNickValue != null ? dbNickValue.ToString() : string.Empty;
+    string sva = param.TryGetValue("sva", out var svaValue) && svaValue != null ? svaValue.ToString() : string.Empty;
+
+    DateTime spdt = DateTime.Now;
+    DateTime epdt = DateTime.Now;
+
+    ResultInfo<dynamic> ri = DevExecuteQuery(dbNick, stp, param);
+    epdt = DateTime.Now;
+    GetRes(ref ri, param, sdt, spdt, epdt);
+
+    return ri;
+  }
+
+
+
+
+
+  public ResultInfo<dynamic> DevExecuteQuery(string dbNick, string stp, IDictionary<string, string> param) {
 
     ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
 
@@ -153,8 +205,15 @@ public class DevService : BaseService {
       }
 
       param["schema"] = di.Db_schema;
+      param["db_id"] = di.Db_id;
+
+
+      //Console.WriteLine($"Dsl_query : {dsr.Dsl_query}");
+
 
       string directString = ChangeQueryDirectQuery(dsr.Dsl_query, param);
+
+      Console.WriteLine($"directString : {directString}");
 
       DynamicParameters parameters = GetParams(directString, param);
 
@@ -218,7 +277,8 @@ public class DevService : BaseService {
     if (result == null) {
       result = GetDevsqlresp(di.Db_type, dsrKey);
       if (result != null) {
-        AppData.DsrInfos.Add(result);
+        // db 정보에서 db_nick 또는 dbseq 와 같은 unique key 값으로 관리 필요.. 당분간 주석
+        // AppData.DsrInfos.Add(result);
       }
     }
 
@@ -273,7 +333,7 @@ public class DevService : BaseService {
   /// <param name="dsl_query"></param>
   /// <param name="param"></param>
   /// <returns></returns>
-  string ChangeQueryDirectQuery(string dsl_query, Dictionary<string, string> param) {
+  string ChangeQueryDirectQuery(string dsl_query, IDictionary<string, string> param) {
     String result = dsl_query;
     // $key 값은 문자열을 바꾼다. 다이렉트 쿼리 문자열 $
     var _dd_matches = Regex.Matches(dsl_query, @"\$\w+");
@@ -294,7 +354,7 @@ public class DevService : BaseService {
 
 
 
-  DynamicParameters GetParams(string directString, Dictionary<string, string> param) {
+  DynamicParameters GetParams(string directString, IDictionary<string, string> param) {
 
 
     DynamicParameters parameters = new DynamicParameters();

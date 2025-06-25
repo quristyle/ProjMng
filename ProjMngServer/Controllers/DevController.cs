@@ -13,11 +13,36 @@ public class DevController : ControllerBase {
     _devService = devService;
   }
 
+  //[HttpPost]
+  //public ActionResult<Dictionary<string, object>> PostBody([FromBody] Dictionary<string, string> parameters) {
+  //  var data = _devService.GetData(parameters);
+  //  return Ok(data);
+  //}
+
+
+
   [HttpPost]
-  public ActionResult<Dictionary<string, object>> PostBody([FromBody] Dictionary<string, string> parameters) {
-    var data = _devService.GetData(parameters);
+  public ActionResult<ResultInfo<Dictionary<string, object>>> PostBody([FromBody] RequestDto dto) {
+    ResultInfo<dynamic> data = null;
+    if (
+      dto.MultyData == null || dto.MultyData.Count <= 0) {
+      data = _devService.GetData(dto);
+    }
+    else {
+
+      data = _devService.ExcuteMultyData(dto);
+
+    }
     return Ok(data);
   }
+
+
+
+
+
+
+
+
   [HttpPost]
   [Route("sql")]
   public ActionResult<Dictionary<string, object>> PostSql([FromBody] Dictionary<string, string> param) {

@@ -769,6 +769,8 @@ a[class^=action]:hover {
   height: calc(100vh - 6.4rem);
 }
 
+
+
 .context-body-row {
     height: calc(100vh - 8rem) !important;
 }
@@ -776,6 +778,15 @@ a[class^=action]:hover {
 .main-page-context .context-body-row {
   height: calc(100vh - 11rem) !important;
 }
+/*
+.overheight {
+  height: calc(100vh - 12rem) !important;
+}*/
+
+/*
+.main-page-context .overheight {
+  height: calc(100vh - 19rem) !important;
+}*/
 
 
 .rz-tabview-panel {

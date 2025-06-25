@@ -27,17 +27,26 @@
   </RadzenStack>
 </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-  <RadzenColumn Size="3" >
 
-    <QuriDynamicGrid ReqData=Data @bind-SItems=SelectedItems HiddenCols="dsl_id,dsl_type,dsl_query"  />
 
-  </RadzenColumn>  
+
+
+        
+<RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" >
+
   
-  <RadzenColumn Size="9">
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="20%" Min="10%" Max="90%">
+    <QuriDynamicGrid ReqData=Data @bind-SItems=SelectedItems HiddenCols="dsl_id,dsl_type,dsl_query"  />
+  </RadzenSplitterPane>
+  <!-- 오른쪽 -->
+  <RadzenSplitterPane  Size="80%" Min="10%" Max="90%">
       <QuriCodeEditor @ref="_editor" />
-  </RadzenColumn>
-</RadzenRow>
+  </RadzenSplitterPane>
+</RadzenSplitter>
+
+
+
 
 @code {
   CommonCode? dbType { get; set; }

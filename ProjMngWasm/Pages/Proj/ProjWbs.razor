@@ -1,4 +1,4 @@
-﻿@page "/proj-schedule";
+﻿@page "/proj-wbs";
 @{
   /* description : 업무 WBS
   * title : WBS
@@ -15,10 +15,12 @@
       <RadzenCard >
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-            <QuriDropDown CodeId="projlist" @bind-Value=srtype Change=OnProjChange />
-            <QuriDropDown CodeId="compstat" @bind-Value=compstat IsAll=true />
-          </RadzenStack>
+            <QuriSearchs AllLoadComplete=OnLoadWrk >
+                <QuriDropDown  CodeId="projlist" @bind-Value=srtype Change=OnProjChange />
+                <QuriDropDown CodeId="compstat" @bind-Value=compstat IsAll=true />
+            </QuriSearchs>
+
+
 
           <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
             <RadzenButton Click="@OnLoadWrk" Text="Search" />
@@ -49,6 +51,7 @@
         QuriDynamicGrid wbsgrid{ get; set; }
   CommonCode srtype { get; set; }
   CommonCode compstat { get; set; }
+  
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
@@ -60,6 +63,7 @@
 
 
   protected async Task OnLoadWrk() {
+      Console.WriteLine($"OnLoadWrk srtype: xxxxxxxxxxxxxxxxxxxxxxxxxx{srtype} ");
     await OnLoadWrk(srtype);
   }
 
@@ -69,6 +73,7 @@
      { "prj_rid", cc.Code },
      { "compstat", compstat?.Code },
     });
+    StateHasChanged();
   }
 
   

@@ -17,10 +17,15 @@
 <RadzenCard >
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+
+            <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown CodeId="projlist" @bind-Value=srtype />
       <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" IsAll=true />
-    </RadzenStack>
+            </QuriSearchs>
+
+
+
+
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />
@@ -32,7 +37,7 @@
 <RadzenScheduler 
   @ref=@scheduler 
   SlotRender=@OnSlotRender 
-  class="context-body-row" 
+  class="@schedulerClass" 
   TItem="WbsInfo" 
   Data=@Data 
   StartProperty="plan_sdt" 
@@ -82,7 +87,39 @@
      { "compstat", compstat?.Code },
     });
     Data = data.Data;
+        await scheduler.Reload();
+    StateHasChanged();
   }
+
+
+  
+
+    string schedulerClass = "context-body-row";
+    /*
+    protected async Task OnLoadWrk() {
+
+      
+        // overheight 클래스 추가
+        schedulerClass = "context-body-row overheight";
+        //await scheduler.Reload();
+        StateHasChanged();
+
+
+        var data = await DbCont<WbsInfo>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+            { "prj_rid", srtype?.Code },
+            { "compstat", compstat?.Code },
+        });
+        Data = data.Data;
+
+
+        // 1초 후 overheight 클래스 제거
+        await Task.Delay(1000);
+        schedulerClass = "context-body-row";
+        //await scheduler.Reload();
+        StateHasChanged();
+    }
+
+    */
 
 
 
@@ -144,6 +181,12 @@
       case "COMP" : 
       args.Attributes["style"] = "background: var( --rz-secondary );";
       break;
+      case "DELETE" : 
+      args.Attributes["style"] = "background: red;";
+      break;
+
+
+
     }
 
   }
@@ -178,3 +221,11 @@
 
 
 }
+
+
+<style>
+  
+/* .main-page-context .context-body-row.overheight {
+  height: calc(100vh - 20rem) !important;
+} */
+  </style>

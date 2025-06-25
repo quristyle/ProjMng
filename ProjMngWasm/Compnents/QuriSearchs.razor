@@ -1,0 +1,55 @@
+﻿@* @typeparam TChildContent *@
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+<CascadingValue Value="(Action<string>)RegisterDropDown" Name="RegisterDropDown">
+    <CascadingValue Value="(Action<string>)OnDropDownLoaded" Name="OnDropDownLoaded">
+        @ChildContent
+    </CascadingValue>
+</CascadingValue>
+</RadzenStack>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback AllLoadComplete { get; set; }
+
+    private HashSet<string> loadedDropDowns = new();
+    private HashSet<string> registeredDropDowns = new();
+    private bool allLoaded = false;
+
+    private bool registrationComplete = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)    {
+        if (!registrationComplete && registeredDropDowns.Count > 0)        {
+            registrationComplete = true;
+            CheckAllLoaded();
+        }
+    }
+    
+    private async void CheckAllLoaded()    {
+        if (loadedDropDowns.Count == registeredDropDowns.Count && registeredDropDowns.Count > 0 && !allLoaded)        {
+            allLoaded = true;
+            await AllLoadComplete.InvokeAsync();
+        }
+    }
+
+    public void RegisterDropDown(string codeId)    {
+      Console.WriteLine($"RegisterDropDown : {codeId} --------------------");
+       
+        registeredDropDowns.Add(codeId);
+        registrationComplete = false; // 새로 등록되면 다시 체크
+    }
+
+    public async void OnDropDownLoaded(string codeId)    {
+      Console.WriteLine($"OnDropDownLoaded : {codeId} =================");
+        
+        loadedDropDowns.Add(codeId);
+        CheckAllLoaded();
+    }
+
+    protected override void OnParametersSet()    {
+      Console.WriteLine($"OnParametersSet : zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+        //loadedDropDowns.Clear();
+        //registeredDropDowns.Clear();
+        //allLoaded = false;
+    }
+}

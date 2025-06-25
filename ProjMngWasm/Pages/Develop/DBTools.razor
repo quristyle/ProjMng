@@ -15,12 +15,13 @@
 
 <RadzenCard >
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
-    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+
+    <QuriSearchs>
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
-    </RadzenStack>
-    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true  />
-    </RadzenStack>
+      </QuriSearchs>
+
+
     <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
     </RadzenStack>
@@ -29,6 +30,7 @@
 
 <RadzenTabs TabPosition="TabPosition.Top" 
 RenderMode="TabRenderMode.Client"
+class="context-body-row"
 
 @bind-SelectedIndex="@tabIndex"
  >
@@ -37,7 +39,7 @@ RenderMode="TabRenderMode.Client"
 
 
         
-<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:calc(100vh - 250px);">
+<RadzenSplitter Orientation="Orientation.Horizontal" >
 
 
   <!-- 왼쪽 -->
@@ -150,7 +152,7 @@ RenderMode="TabRenderMode.Client"
 
 
         
-<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); height:calc(100vh - 250px);">
+<RadzenSplitter Orientation="Orientation.Horizontal"style=" border: 1px solid rgba(0,0,0,.08); ">
 
 
   <!-- 왼쪽 -->
@@ -288,7 +290,7 @@ RenderMode="TabRenderMode.Client"
 
 
 
-      <div style=" height:calc(100vh - 250px);">
+      <div class="h-100">
 
 
                 <QuriCodeEditor @ref="_editProc" />
@@ -374,21 +376,12 @@ RenderMode="TabRenderMode.Client"
       return;
     }
 
-    if (tabIndex == 0)    {
-      //  isLoading = true;
-    }
-    else if (tabIndex == 1) {
-    }
-    else if (tabIndex == 2) {
-      //isLoading2 = true;
-    }
-
 
     var dbLogicItem = await DbCont<Dictionary<string, string>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
       { "db_rid", dbType.Code },
       { "db_pkey", "sp_fmt" }
     });
-    if (dbLogicItem.Data.Count == 0) {
+    if (dbLogicItem.Data == null || dbLogicItem.Data.Count == 0) {
       string dbtype = dbType?.Others["db_type"];
 
       switch (dbtype) {

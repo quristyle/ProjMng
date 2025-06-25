@@ -29,6 +29,28 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   string? _etc0;
   [Parameter] public string? Etc0 { get; set; }
 
+  [CascadingParameter(Name = "RegisterDropDown")] public Action<string>? RegisterDropDown { get; set; }
+  [CascadingParameter(Name = "OnDropDownLoaded")] public Action<string>? OnParentDropDownLoaded { get; set; }
+
+
+  
+
+
+  protected override void OnInitialized() {
+    base.OnInitialized();
+    if (RegisterDropDown != null && !string.IsNullOrEmpty(CodeId))
+      RegisterDropDown(CodeId);
+  }
+
+  // 데이터 로딩이 끝나는 시점에 호출
+  private void NotifyParentLoaded() {
+    if (OnParentDropDownLoaded != null && !string.IsNullOrEmpty(CodeId))
+      OnParentDropDownLoaded(CodeId);
+  }
+
+
+
+
   protected override async void OnParametersSet() {
     base.OnParametersSet();
     if (_codeId != CodeId) {
@@ -47,6 +69,8 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   async Task LoadItems() {
 
     if (IsEtcFix && string.IsNullOrEmpty(Etc0)) {
+      // 데이터 로딩 완료 후 부모에 알림
+      NotifyParentLoaded();
       return;
     }
 
@@ -151,6 +175,11 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     //  await ValueChanged.InvokeAsync((TValue)obj); // 바인딩된 변수에 반영
     //}
     StateHasChanged(); // 다시 렌더링
+
+
+    // 데이터 로딩 완료 후 부모에 알림
+    NotifyParentLoaded();
+
   }
 
 

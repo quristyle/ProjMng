@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using ProjModel;
+using Radzen;
 using Radzen.Blazor;
 using WasmShear.Services;
 
@@ -34,7 +35,12 @@ namespace ProjMngWasm.Compnents {
 
 
       var ri = await devService.GetList<TItem>(rd);
-      Data = ri.Data.ToList();
+      if(ri.Code < 0) {
+        Console.WriteLine($" Grd Load Error : {ri.Message}");
+      }
+      else {
+        Data = ri.Data.ToList();
+      }
 
       IsLoading = false;
       //await Reload();

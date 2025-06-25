@@ -32,6 +32,7 @@
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
       <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
       <RadzenButton  Text="MoveToday" Click=OnTodayAndSave />
+      <RadzenButton  Text="Delete" Click=OnDelete />
     </RadzenStack>
   </RadzenStack>
 </RadzenTemplateForm>
@@ -42,6 +43,17 @@
 
   protected override void OnParametersSet() {
     model = Appointment;
+  }
+  
+
+  
+  async Task OnDelete() {
+    
+    model.wbs_state = "DELETE";
+    Dictionary<string, string> dic = model.ToDictionary();
+    await DbDelete<Dictionary<string, object>>("sp_proj_wbs_exec", dic);
+
+    DialogService.Close(model);
   }
 
 
