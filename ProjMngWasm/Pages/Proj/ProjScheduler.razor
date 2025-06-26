@@ -159,10 +159,48 @@
   async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<WbsInfo> args) {
 
 
-    await DialogService.OpenAsync<EditAppointmentPage>("Edit WbsInfo", new Dictionary<string, object> { { "Appointment", args.Data } });
+    var result = await DialogService.OpenAsync<EditAppointmentPage>("Edit WbsInfo", new Dictionary<string, object> { { "Appointment", args.Data } });
+
+    
+if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")
+{
+    // 여기서 EditAppointment 호출 가능
+    //await EditAppointment(deleted);
+
+    
+        // Data에서 삭제
+        var item = Data.FirstOrDefault(x => x.wbs_id == deleted.wbs_id);
+        if (item != null)
+        {
+            Data.Remove(item);
+            StateHasChanged();
+        }
+
+
+}
 
     await scheduler.Reload();
   }
+
+  async Task EditAppointment(WbsInfo appointment)
+{
+    var result = await DialogService.OpenAsync<EditAppointmentPage>(
+        "Edit Appointment",
+        new Dictionary<string, object>() { { "Appointment", appointment } }
+    );
+
+    if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")
+    {
+        // Data에서 삭제
+        var item = Data.FirstOrDefault(x => x.wbs_id == deleted.wbs_id);
+        if (item != null)
+        {
+            Data.Remove(item);
+            StateHasChanged();
+        }
+    }
+}
+
 
   void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<WbsInfo> args) {
     // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
