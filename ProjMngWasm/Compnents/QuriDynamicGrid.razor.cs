@@ -110,17 +110,24 @@ public class QuriDynamicGridBase : BaseComponent {
 
     if (!string.IsNullOrEmpty(DropDownCols)) {
       _dropDownColArr = DropDownCols.Split(',');
+      foreach (var item in _dropDownColArr) {
+        var parts = item.Split('|');
+        if (parts.Length > 0 && !dropDownValues.ContainsKey(parts[0])) {
+          dropDownValues[parts[0]] = null;
+        }
+      }
     }
 
 
-    
+
 
   }
-
+  // 컬럼명별로 선택된 CommonCode를 저장
+  protected Dictionary<string, CommonCode?> dropDownValues = new();
 
   protected string DropDownColCode(string colname) {
 
-    Console.WriteLine($"DropDownColCode : {colname}");
+    //Console.WriteLine($"DropDownColCode : {colname}");
     string result = string.Empty;
     foreach (string a in _dropDownColArr) {
       string[] cols = a.Split("|");

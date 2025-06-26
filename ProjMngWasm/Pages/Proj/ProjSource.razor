@@ -14,7 +14,8 @@
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true InitialCode="7" />
+      <QuriDropDown TValue="@CommonCode" CodeId="projlist" InitialCode="7"  />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">

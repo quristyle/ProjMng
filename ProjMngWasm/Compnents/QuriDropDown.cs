@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json.Linq;
 using ProjMngWasm.Commons;
 using ProjModel;
 using Radzen.Blazor;
@@ -19,6 +20,9 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   public string? _codeId;
   //private string? _previousCodeId;
   [Parameter] public string? CodeId { get; set; }
+
+
+
 
   /// <summary> 전체 표기 여부 </summary>
   [Parameter] public bool IsAll { get; set; } = false;
@@ -44,6 +48,13 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
   // 데이터 로딩이 끝나는 시점에 호출
   private void NotifyParentLoaded() {
+
+    //if (!string.IsNullOrEmpty(GrdValue)) {
+    //  Value = FindCode(GrdValue);
+    //  await ValueChanged.InvokeAsync(Value);
+    //  StateHasChanged();
+    //}
+
     if (OnParentDropDownLoaded != null && !string.IsNullOrEmpty(CodeId))
       OnParentDropDownLoaded(CodeId);
   }
@@ -65,6 +76,22 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
   }
 
+  //public async Task<TValue> FindCode(string key) {
+  //  CommonCode result = null; 
+  //  foreach ( var cc in tmp ) {
+  //    if( cc.Code == key ) {
+  //      result = cc;
+  //      Console.WriteLine($"FindCode : {cc.Code}"); 
+  //      break;
+  //    }
+  //  }
+
+  //  await ValueChanged.InvokeAsync((TValue)(object)result);
+
+  //  return (TValue)(object)result;
+  //}
+
+  List<CommonCode> tmp = new List<CommonCode>();
   //bool isFrist = true;
   async Task LoadItems() {
 
@@ -74,7 +101,8 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
       return;
     }
 
-    List<CommonCode> tmp = new List<CommonCode>();
+    tmp.Clear();
+
 
     if (!string.IsNullOrEmpty(_codeId)) {
       // isRelod
@@ -103,9 +131,9 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         RequestDto rd = new RequestDto() {
           ProcName = "sp_projCommon",
           MainParam = new Dictionary<string, string>() {
-                { "code_id", _codeId },
-                { "etc0", Etc0 }
-            }
+            { "code_id", _codeId },
+            { "etc0", Etc0 }
+          }
         };
 
 
@@ -147,6 +175,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     Data = tmp.AsEnumerable();
 
 
+    StateHasChanged();
     if (!string.IsNullOrEmpty(InitialCode)) {
       var match = tmp.FirstOrDefault(x => x.Code == InitialCode);
       if (match != null) {
@@ -169,6 +198,9 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
     }
 
 
+    //if (!string.IsNullOrEmpty(GrdValue)) {
+    //  await FindCode(GrdValue);
+    //}
 
     //if (!IsAll && tmp.Count > 0) {
     //  object obj = tmp[0];
