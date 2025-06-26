@@ -399,14 +399,16 @@
 
   
 
-  public void AddCallTab(MenuInfo p) {
+  public void AddCallTab((MenuInfo p, bool isOtherTab) args) {
 
+    var p = args.p;
+    _main.AddItem(p, args.isOtherTab);
 
-      _main.AddItem(p.pgm_id,
-                    p.mnu_nm,
-                    p.mnu_nm,
-                    p.mnu_url,
-                    p.mnu_cd);
+      // _main.AddItem(p.pgm_id,
+      //               p.mnu_nm,
+      //               p.mnu_nm,
+      //               p.mnu_url,
+      //               p.mnu_cd);
    
     
   }

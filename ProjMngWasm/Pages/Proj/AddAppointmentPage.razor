@@ -48,10 +48,14 @@
 async Task OnSubmit(WbsInfo model) {
 
   model.prj_rid = PrjRid;
+  model.wbs_state = "READY";
 
     Dictionary<string, string> dic = model.ToDictionary();
 
-    await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);
+    var rst = await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);
+    if( rst.Data.Count > 0){
+      model.wbs_id = rst.Data[0]["wbs_id"].ToString();
+    }
     DialogService.Close(model);
   }
 }

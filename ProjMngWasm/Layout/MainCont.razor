@@ -112,6 +112,45 @@
 
   }
 
+  /*
+   * 
+      _main.AddItem(p.pgm_id,
+                    p.mnu_nm,
+                    p.mnu_nm,
+                    p.mnu_url,
+                    p.mnu_cd);
+   */
+  
+  public void AddItem(MenuInfo p, bool isOtherTab) {
+
+    bool isExsit = false;
+    if( !isOtherTab ){
+      for(int i = 0; i < ProjItems.Count; i++){
+
+        if( ProjItems[i].ProjPath == p.pgm_id ){
+          selectedIndex = i;
+          isExsit = true;
+          break;
+        }
+
+      }
+    }
+
+    if ( !isExsit ){
+      ProgramInfo ppp = new ProgramInfo(p.pgm_id, p.pgm_id) {
+          ProjName = p.mnu_nm,
+          ProjId = p.mnu_nm,
+          Url=p.mnu_url,
+          ProjPath = p.pgm_id
+        };
+
+      ProjItems.Add(ppp);
+      selectedIndex = ProjItems.Count - 1;
+
+    }
+    //ProjTabs?.Reload();
+
+  }
 
 
   public async void RemoveItem() {

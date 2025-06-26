@@ -53,6 +53,12 @@ public class QuriDynamicGridBase : BaseComponent {
 
 
 
+  [Parameter] public string DropDownCols { get; set; }
+  private string[] _dropDownColArr = { };
+
+
+
+
   bool _isLoading { get; set; }
   [Parameter]  public bool IsLoading { get; set; }
 
@@ -102,10 +108,26 @@ public class QuriDynamicGridBase : BaseComponent {
       _hiddenColArr = HiddenCols.Split(',');
     }
 
+    if (!string.IsNullOrEmpty(DropDownCols)) {
+      _dropDownColArr = DropDownCols.Split(',');
+    }
+
+
+    
 
   }
 
 
+  protected string DropDownColCode(string colname) {
+
+    Console.WriteLine($"DropDownColCode : {colname}");
+    string result = string.Empty;
+    foreach (string a in _dropDownColArr) {
+      string[] cols = a.Split("|");
+      if (colname == cols[0]) { result = cols[1]; break; }
+    }
+    return result;
+  }
 
 
 

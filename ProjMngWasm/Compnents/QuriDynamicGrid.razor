@@ -29,6 +29,9 @@
 
       @* 
 
+      
+    AllowAlternatingRows="false"
+
 
                         PagerHorizontalAlign="HorizontalAlign.Left"
                         ShowPagingSummary="true"
@@ -86,82 +89,124 @@
           </EditTemplate>
         </RadzenDataGridColumn>
       }
+      
+      @* adsfasd 
 
-      @if (cols != null) {
-    @foreach (var col in cols)        {
+      
+                Type=@WasmUtil.GetType(col.Value)
+                Property="@PropertyAccess.GetDynamicPropertyExpression( col.Key, WasmUtil.GetType(col.Value) )"
 
-      if (isHiddenCol(col.Key)){ continue; }
 
-      <RadzenDataGridColumn 
-        @key=@col.Key
-        Width="@GetWidth(col.Value)"
-        TextAlign="TextAlign.Center"
-        Title="@col.Key"                               
-        Type=@WasmUtil.GetType(col.Value)
-        Property="@PropertyAccess.GetDynamicPropertyExpression( col.Key, WasmUtil.GetType(col.Value) )"
-      >
+      *@
 
-        <EditTemplate Context="order">
-          @if (col.Value == "System.DateTime") {
 
-            @* @bind-Value=@order[col.Key] *@
+      @{
+        @if (cols != null) {
+          @foreach (var col in cols)        {
 
-            <RadzenDatePicker  DateFormat="yyyy-MM-dd" 
-            
-             TValue="DateTime?" 
-          Value="@(order[col.Key] as DateTime?)" 
-          ValueChanged="@(v => order[col.Key] = v)" 
-            
-            />
-          } 
-          else if (col.Value == "System.Int32") {
-          <RadzenNumeric TValue="int?" 
-          Value="@(order[col.Key] as int?)" 
-          ValueChanged="@(v => order[col.Key] = v)" 
-          />
-          }
-          else if (col.Value == "System.Boolean") {
-            <RadzenCheckBox @bind-Value=@order[col.Key] />
-          }
-          else {
-          <RadzenTextBox Change="@(args => order[@col.Key] = args)"
-                          Value=@(order.TryGetValue(@col.Key, out object k)?k?.ToString():"")
-                          Name="@col.Key" aria-label="Enter {col.Key}" />
-          }
-        </EditTemplate>
+            if (isHiddenCol(col.Key)){ continue; }
+
+            string codesss = DropDownColCode(@col.Key);
+            if( !string.IsNullOrEmpty( codesss ) ){
               
-        <Template>
+              <RadzenDataGridColumn 
+                @key=@col.Key
+                Width="@GetWidth(col.Value)"
+                TextAlign="TextAlign.Center"
+                Title="@col.Key"                               
+              >
 
-          @if (col.Value == "System.DateTime") {
-            if (context[@col.Key] != null && !string.IsNullOrWhiteSpace(context[@col.Key].ToString()) && context[@col.Key].GetType() == typeof(DateTime)
-        ){
-              //@vrst.ToString("yyyy-MM-dd");
- 
-            @(((DateTime)context[@col.Key]).ToString("yyyy-MM-dd"))
-
+                <EditTemplate Context="order">
+                  <QuriDropDown CodeId=@codesss 
+                    @bind-Value=@(order[col.Key])
+                    />
+                </EditTemplate>
+              
+                <Template>                    
+                  @context[@col.Key]                    
+                </Template>
+              </RadzenDataGridColumn>
+        
             }
             else{
-                  
-            @context[@col.Key] 
+              
+              <RadzenDataGridColumn 
+                @key=@col.Key
+                Width="@GetWidth(col.Value)"
+                TextAlign="TextAlign.Center"
+                Title="@col.Key"                               
+                Type=@WasmUtil.GetType(col.Value)
+                Property="@PropertyAccess.GetDynamicPropertyExpression( col.Key, WasmUtil.GetType(col.Value) )"
+              >
 
-            }
+                <EditTemplate Context="order">
+                  @{
+                    if (col.Value == "System.DateTime") {
 
-          }
-          else if (col.Value == "System.Boolean") {
-            @if((bool)context[@col.Key]){
-              <RadzenIcon Icon="done" />
-            }
-            else {
+                      <RadzenDatePicker  DateFormat="yyyy-MM-dd"             
+                        TValue="DateTime?" 
+                        Value="@(order[col.Key] as DateTime?)" 
+                        ValueChanged="@(v => order[col.Key] = v)" 
+            
+                      />
+                    } 
+                    else if (col.Value == "System.Int32") {
+                      <RadzenNumeric TValue="int?" 
+                      Value="@(order[col.Key] as int?)" 
+                      ValueChanged="@(v => order[col.Key] = v)" 
+                      />
+                    }
+                    else if (col.Value == "System.Boolean") {
+                      <RadzenCheckBox @bind-Value=@order[col.Key] />
+                    }
+                    else {
+                      <RadzenTextBox Change="@(args => order[@col.Key] = args)"
+                                    Value=@(order.TryGetValue(@col.Key, out object k)?k?.ToString():"")
+                                    Name="@col.Key" aria-label="Enter {col.Key}" />
+                    }
+                  }
+                </EditTemplate>
+              
+                <Template>
+
+                  @if (col.Value == "System.DateTime") {
+                    if (context[@col.Key] != null && !string.IsNullOrWhiteSpace(context[@col.Key].ToString()) && context[@col.Key].GetType() == typeof(DateTime)
+                ){
+                      //@vrst.ToString("yyyy-MM-dd");
+ 
+                    @(((DateTime)context[@col.Key]).ToString("yyyy-MM-dd"))
+
+                    }
+                    else{
                   
+                    @context[@col.Key] 
+
+                    }
+
+                  }
+                  else if (col.Value == "System.Boolean") {
+                    @if((bool)context[@col.Key]){
+                      <RadzenIcon Icon="done" />
+                    }
+                    else {
+                  
+                    }
+                  }
+                  else {
+                  @context[@col.Key]
+                  }
+                </Template>
+              </RadzenDataGridColumn>
+        
             }
+          
+
+
+        
+        
           }
-          else {
-          @context[@col.Key]
-          }
-        </Template>
-      </RadzenDataGridColumn>
-    }
-    }
+        }
+      }
 
 
 
@@ -189,9 +234,6 @@
 }
 
 @code{
-
-
-
 
 
   protected string GetWidth(string typeStr, string unit = "px"){

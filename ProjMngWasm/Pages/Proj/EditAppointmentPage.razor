@@ -76,8 +76,13 @@
       model.wbs_state = "COMP";
     }
     else{
-      model.dev_edt = null;
-      model.wbs_state = "RUNNING";
+      if( model.dev_sdt == null && model.dev_edt == null ){
+        model.wbs_state = "READY";
+      }
+      else{
+        model.dev_edt = null;
+        model.wbs_state = "RUNNING";
+      }
     }
     Dictionary<string, string> dic = model.ToDictionary();
 

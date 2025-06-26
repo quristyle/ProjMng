@@ -232,16 +232,19 @@ void OnMenuExpand(MenuInfo menu){
     }StateHasChanged();
   }
 
-  [Parameter]
-    public EventCallback<MenuInfo> OnCallTab { get; set; }
+  [Parameter]    public EventCallback<(MenuInfo, bool)> OnCallTab { get; set; }
 
     void AddCallTab(MenuInfo p)    {
-
+      
+      AddCallTab(p, false);
+    }
+    
+    void AddCallTab(MenuInfo p, bool isOtherTab)    {
       
       Console.WriteLine("sidebarmenu AddCallTab call.");
 
         if (OnCallTab.HasDelegate)        {
-            OnCallTab.InvokeAsync(p);
+            OnCallTab.InvokeAsync((p, isOtherTab));
         }
     }
 
@@ -260,11 +263,11 @@ void OnMenuExpand(MenuInfo menu){
 
     <RadzenMenuItem Text=@("Open "+item.mnu_url) Value="1"></RadzenMenuItem>
     <RadzenMenuItem Text=@( item.pgm_id) Value="2"></RadzenMenuItem>
+    <RadzenMenuItem Text="OtherTab" Value="5"></RadzenMenuItem>
 
 
     <RadzenMenuItem Text="More items" Value="3">
       <RadzenMenuItem Text="More sub items" Value="4">
-        <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
         <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
       </RadzenMenuItem>
     </RadzenMenuItem>
@@ -293,6 +296,9 @@ void OnMenuExpand(MenuInfo menu){
     }
     else if (args.Value.Equals(4)) {
       // Do something else
+    }
+    else if (args.Value.Equals(5)) {
+      AddCallTab(item, true);
     }
     if (!args.Value.Equals(3) && !args.Value.Equals(4)) {
     ContextMenuService.Close();

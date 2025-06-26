@@ -26,19 +26,16 @@
 
 
 
-
-
 <RadzenSplitter Orientation="Orientation.Vertical" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08); ">
             
-<!-- up -->
-<RadzenSplitterPane Size="30%" Min="10%" Max="90%">
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent RowClickEvent=OnLoadWrk_dtl ReqData=Data  />
-
-</RadzenSplitterPane>
-<!-- down -->
-<RadzenSplitterPane Size="70%" Min="10%" Max="90%">
+  <!-- up -->
+  <RadzenSplitterPane Size="30%" Min="10%" Max="90%">
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent RowClickEvent=OnLoadWrk_dtl ReqData=Data DropDownCols="src_comm|SOURCE_GB"  />
+  </RadzenSplitterPane>
+  <!-- down -->
+  <RadzenSplitterPane Size="70%" Min="10%" Max="90%">
     <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent_dtl DeleteBtnEvent=DeleteBtnEvent_dtl ReqData=Data_dtl />
-</RadzenSplitterPane>
+  </RadzenSplitterPane>
 </RadzenSplitter>
 
 
