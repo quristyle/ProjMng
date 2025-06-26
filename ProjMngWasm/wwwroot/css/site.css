@@ -42,7 +42,8 @@
 
 
 #app {
-  background-color: #2e2e2e;
+  /*  background-color: #2e2e2e;*/
+  background-color: var(--rz-header-background-color);
 }
 
 a.ui-button:hover {

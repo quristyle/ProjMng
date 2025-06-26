@@ -76,8 +76,9 @@ public class Member {
   public string SessionId { get; set; }
   public string User_photo { get; set; }
   public string Remark { get; set; }
+  public string Theme { get; set; } = "standard-dark";
 
-  
+
 
 
 }

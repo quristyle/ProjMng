@@ -3,7 +3,7 @@
 @using Radzen.Blazor
 @using static ProjMngWasm.Layout.MainCont
 @inherits LayoutComponentBase
-@inject ThemeService ThemeService
+@inject ThemeService themeService
 @inject QueryStringThemeService QueryStringThemeService
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
@@ -16,8 +16,7 @@
 @inject ContextMenuService ContextMenuService
 
 <HeadContent>
-  <RadzenTheme Theme="standard-dark" />
-  @* software-dark *@
+  <RadzenTheme />
 </HeadContent>
 
 <RadzenComponents />
@@ -98,9 +97,7 @@
 
 @code {
 
-  
   [Inject] protected IJSRuntime? jsRuntime { get; set; }
-
 
   RadzenButton? wcagColorsInfo;
   RadzenButton? freeThemesInfo;
@@ -109,51 +106,50 @@
   bool rendered;
 
 
-  
   void OnMainContChanged()    {
     StateHasChanged();
   }
-  
+
 
   protected override void OnInitialized() {
     System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ko");
   }
 
 
-  
+
   bool IsBodyUrl{get;set;} = false;
   bool IsBodyUrl2{get;set;} = false;
 
   void BodyVisible(){    
-    
+
     // Console.WriteLine($"BodyVisible00000000000000000000000: {_relativeUrl}   { _main == null}      { _main?.PageCount} ");
-    
-      if( !IsBodyUrl && _main != null && _main?.PageCount > 0){
-        IsBodyUrl = true;
-        StateHasChanged();
-      }
-      else if( IsBodyUrl  && ( _main == null || _main?.PageCount <= 0 ) ){
-        IsBodyUrl = false;
-        StateHasChanged();
-      }
+
+    if( !IsBodyUrl && _main != null && _main?.PageCount > 0){
+      IsBodyUrl = true;
+      StateHasChanged();
+    }
+    else if( IsBodyUrl  && ( _main == null || _main?.PageCount <= 0 ) ){
+      IsBodyUrl = false;
+      StateHasChanged();
+    }
   }
 
-  
+
   void BodyVisible2(){    
-    
+
     // Console.WriteLine($"BodyVisible: {_relativeUrl}");
 
-      if( _relativeUrl.Length > 0 ){        
-        IsBodyUrl2 = true;
-      }
-      else{         
-        IsBodyUrl2 = false;
-      }
+    if( _relativeUrl.Length > 0 ){        
+      IsBodyUrl2 = true;
+    }
+    else{         
+      IsBodyUrl2 = false;
+    }
     // Console.WriteLine($"IsBodyUrl: {IsBodyUrl}         {IsBodyUrl2} ");
-      StateHasChanged();
+    StateHasChanged();
   }
 
-  
+
   string _relativeUrl {get;set;} = "";
   string relativeUrl {
     get{return _relativeUrl;}
@@ -174,6 +170,14 @@
     }
     var currentUrl = UriHelper.Uri;
     var baseUri = UriHelper.BaseUri;
+
+
+    Console.WriteLine($"currentUrl: {currentUrl}    baseUri     {baseUri} ");
+    if (currentUrl.IndexOf("?theme=") >= 0) {
+      Console.WriteLine($"Move to root");
+      NavigationManager.NavigateTo("/");
+      return;
+    }
     var calcUrl = currentUrl.Replace(baseUri, string.Empty);
 
     if( calcUrl.StartsWith('?')){
@@ -182,34 +186,34 @@
     else{
       relativeUrl = calcUrl;
     }
-    
+
     // Console.WriteLine($"OnAfterRenderAsync Call: {IsBodyUrl}         {IsBodyUrl2} ");
     BodyVisible();
     return;
     // Console.WriteLine($"Relative URL: {relativeUrl}");
-    
+
     // Console.WriteLine($"Current URL: {currentUrl}");
     // Console.WriteLine($"_openPageUrl URL: {_openPageUrl}");
 
     //projItems
 
-    
-      // if( projItems.Count <= 0){
-      // IsBodyUrl = false;
-      // }
-      
-      if( projItems.Count <= 0){
+
+    // if( projItems.Count <= 0){
+    // IsBodyUrl = false;
+    // }
+
+    if( projItems.Count <= 0){
       IsBodyUrl = false;
-      }
-      else {
+    }
+    else {
       IsBodyUrl = true;
-      }
+    }
 
 
     if ((_openPageUrl != relativeUrl) && !string.IsNullOrEmpty(relativeUrl) && !relativeUrl.StartsWith('?')) {
       _openPageUrl = relativeUrl;
 
-      
+
       IsBodyUrl2 = true;
       // if( projItems.Count <= 0){
       // IsBodyUrl = false;
@@ -217,8 +221,8 @@
       // else {
       // IsBodyUrl = true;
       // }
-      
-    // Console.WriteLine($"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: {IsBodyUrl}");
+
+      // Console.WriteLine($"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: {IsBodyUrl}");
 
 
       StateHasChanged();
@@ -228,7 +232,7 @@
       _openPageUrl = relativeUrl;
       IsBodyUrl = true;
       IsBodyUrl2 = false;
-    // Console.WriteLine($"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: {IsBodyUrl}");
+      // Console.WriteLine($"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: {IsBodyUrl}");
       StateHasChanged();
     }
     // Console.WriteLine($"IsBodyUrl : {IsBodyUrl}      {IsBodyUrl2}");
@@ -237,13 +241,13 @@
   }
 
   string _openPageUrl = null;
- 
+
   public List<ProgramInfo> projItems = new List<ProgramInfo>();// { "Customers", "Orders", "Order Details" };
 
   MainCont? _main{get;set;}
 
 
-  
+
   // [Inject] AppProjData appData { get; set; }
   [Inject] AppData appData { get; set; }
 
@@ -263,20 +267,23 @@
     // 인증체크
     if (appData.User == null) {
 
+      Console.WriteLine($"LoadInfo AuthCheck start: ");
 
-      try {
-        string json = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
-        if (!string.IsNullOrEmpty(json)) {
-          Member user = JsonConvert.DeserializeObject<Member>(json);
-          appData.User = user;
-        }
-      }
-      catch (Exception eee) {
-      }
+      await LoadInfo();
+      // try {
+      //     string json = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
+      //     if (!string.IsNullOrEmpty(json)) {
+      //         Member user = JsonConvert.DeserializeObject<Member>(json);
+      //         appData.User = user;
+      //     }
+      // }
+      // catch (Exception eee) {
+      // }
 
       return (appData.User != null);
     }
     else {
+      await LoadInfo();
       return true;
       // 인증된 사용자
       // appData.User = user;
@@ -287,6 +294,22 @@
   }
 
 
+  protected async Task LoadInfo() {
+    Console.WriteLine($"LoadInfo start: ");
+    try {
+      string json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
+      if (!string.IsNullOrEmpty(json)) {
+        Console.WriteLine($"LoadInfo try : {json}");
+        Member user = JsonConvert.DeserializeObject<Member>(json);
+        appData.User = user;
+        themeService.SetTheme(user.Theme ?? "software-dark");
+        //sysTheme = appData.User.Theme ?? "software-dark";
+      }
+    }
+    catch (Exception eee) {
+      Console.WriteLine($"Error loading user info: {eee.Message}");
+    }
+  }
   
 
   public void AddCallTab((MenuInfo p, bool isOtherTab) args) {

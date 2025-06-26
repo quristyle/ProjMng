@@ -189,6 +189,38 @@ public class CommonComponent : ComponentBase {
   }
 
 
+  protected async Task LoadInfo() {
+    try {
+      string json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
+      if (!string.IsNullOrEmpty(json)) {
+        Member user = JsonConvert.DeserializeObject<Member>(json);
+        appData.User = user;
+      }
+    }
+    catch (Exception eee) {
+      Console.WriteLine($"Error loading user info: {eee.Message}");
+    }
+  }
+
+  protected async Task SaveUserInfo() {
+    var user = appData.User;
+
+    string json = JsonConvert.SerializeObject(user);
+
+    await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);
+
+  }
+
+
+  protected async Task Logout() {
+    appData.User = null;
+    appData.IsLogin = false;
+
+    await jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userInfo");
+    navigationManager.NavigateTo("/");
+  }
+
+
   protected object GetDicValue(IDictionary<string, object> args, string key) {
     var value = args.FirstOrDefault(kvp => kvp.Key.Equals(key, StringComparison.OrdinalIgnoreCase)).Value;
     return value;

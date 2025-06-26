@@ -74,29 +74,33 @@
 
 
 @code {
-  
-protected async Task OnLoadWrk() {
-  // Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
-  // { "user_name", "" },{ "prj_rid", srtype?.Code }
-  // });
-}
 
-  
-protected async Task OnSaveWrk() {
-  var Data = await DbSave<Dictionary<string, object>>("sp_dev_user_exec", new Dictionary<string, string>() {
+  [Inject] AppData appData { get; set; }
+
+  protected async Task OnLoadWrk() {
+    // Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
+    // { "user_name", "" },{ "prj_rid", srtype?.Code }
+    // });
+  }
+
+
+  protected async Task OnSaveWrk() {
+    var Data = await DbSave<Dictionary<string, object>>("sp_dev_user_exec", new Dictionary<string, string>() {
   { "user_name_eng", appData.User.FirstName },
   { "user_name", appData.User.LastName },
   { "email", appData.User.Email },
   { "user_id", appData.User.UserId },
   { "phone_num", appData.User.Phone_num },
   });
-}
+  }
 
 
 
-async Task ChangeTheme(object value) {
-  ThemeService.SetTheme($"{value}");
-  await DbSave<Dictionary<string, object>>("sp_dev_user_prop_exec", new Dictionary<string, string>() {
+  async Task ChangeTheme(object value) {
+    ThemeService.SetTheme($"{value}");
+    appData.User.Theme = value?.ToString() ?? "standard-dark";
+  await SaveUserInfo();
+    await DbSave<Dictionary<string, object>>("sp_dev_user_prop_exec", new Dictionary<string, string>() {
   { "prop_type", "THEME" },
   { "user_id", appData.User.UserId },
   { "prop_val", value?.ToString() },
