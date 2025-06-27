@@ -243,7 +243,7 @@ window.loadDiagramFromObjectJson = (containerId, jsonStr) => {
     for (let entity of json.entities) {
       const label = entity.name + '\n' + entity.desc;// + '\n' + entity.fields.join('\n');
       //var ww = entity.w || 150;
-      var ww = getLabelWidthByCharCount(label);
+      var ww = entity.w ||getLabelWidthByCharCount(label);
       var hh = entity.h || 40;
       const node = iniObj.graph.insertVertex(parent, entity.id, label, entity.x, entity.y, ww, hh);
       nodes[entity.id] = node;
