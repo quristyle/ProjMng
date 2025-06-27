@@ -60,7 +60,7 @@ public class AppData {
 
 
 }
-public class Member {
+public class Member : UserProp {
   public string FirstName { get; set; }
   public string LastName { get; set; }
   public string Password { get; set; }
@@ -76,9 +76,16 @@ public class Member {
   public string SessionId { get; set; }
   public string User_photo { get; set; }
   public string Remark { get; set; }
+
+
+}
+
+
+public class UserProp {
   public string Theme { get; set; } = "standard-dark";
-
-
-
-
+  public string Last_page { get; set; }
+  public string Last_page_nm { get; set; }
+  public string Last_login_tm { get; set; }
+  public bool Last_page_yn { get; set; }
+  public bool SideBarAutoClose { get; set; }
 }

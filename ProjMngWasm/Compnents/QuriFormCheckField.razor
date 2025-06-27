@@ -2,13 +2,19 @@
 @using Radzen.Blazor  
 @using System.Linq.Expressions  
 
-<RadzenFormField Text="@Text" Variant=Variant.Outlined AllowFloatingLabel="false">  
-    <RadzenCheckBox TValue="bool" Value="@Value" Placeholder="@Placeholder" Style="@InputStyle"  
+<div class="rz-p-1 rz-text-align-center"> 
+    <RadzenCheckBox 
+        TValue="bool" 
+        Value="@Value" 
+        Placeholder="@Placeholder" 
+        Style="@InputStyle"  
         ValueChanged="@OnValueChanged"  
         ValueExpression="ValueExpression"  
         Disabled=Disable  
+        Name="CheckBox1"
     />  
-</RadzenFormField>  
+    <RadzenLabel Text="@Text" Component="CheckBox1" class="rz-ms-2" />
+</div>
 
 @code {  
     [Parameter] public string Text { get; set; }  

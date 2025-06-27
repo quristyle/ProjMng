@@ -766,18 +766,41 @@ a[class^=action]:hover {
 /*    max-height: 100% !important;*/
 }
 
-.main-page-context {
-  height: calc(100vh - 6.4rem);
-}
-
 
 
 .context-body-row {
     height: calc(100vh - 8rem) !important;
 }
 
+/* 특정 theme 별로 context 의 길이가 각각 다르다.. 어떻게 해결할수 있나*/
+
+
+
+:root {
+  --main-context-body-offset: 6.4rem;
+  --context-body-offset: 11rem;
+}
+
+div[theme="material-dark"] .main-page-context {
+  --main-context-body-offset: 7.4rem;
+  --context-body-offset: 12rem;
+}
+
+
 .main-page-context .context-body-row {
-  height: calc(100vh - 11rem) !important;
+  height: calc(100vh - var(--context-body-offset)) !important;
+}
+
+
+.main-page-context {
+  height: calc(100vh - var(--main-context-body-offset));
+  /*  height: calc(100vh - 7.4rem);*/
+}
+
+
+.main-page-context .context-body-row {
+/*  height: calc(100vh - 12rem) !important;*/
+/*  height: calc(100vh - 11rem) !important;*/
 }
 /*
 .overheight {

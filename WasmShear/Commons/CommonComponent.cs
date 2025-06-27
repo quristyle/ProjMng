@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ProjModel;
 using WasmShear;
 using WasmShear.Commons;
@@ -204,6 +205,21 @@ public class CommonComponent : ComponentBase {
 
   protected async Task SaveUserInfo() {
     var user = appData.User;
+
+    await DbSave<Dictionary<string, object>>("sp_dev_user_exec_all", new Dictionary<string, string>() {
+      { "prop_type", "LASTPAGE" },
+      { "user_id", user.UserId },
+      { "page", user.Last_page },
+      { "page_nm", user.Last_page_nm },
+      { "theme", user.Theme },
+      { "page_yn", user.Last_page_yn.ToString() },
+      { "sideauto_close", user.SideBarAutoClose.ToString() },
+
+
+      
+
+
+    });
 
     string json = JsonConvert.SerializeObject(user);
 

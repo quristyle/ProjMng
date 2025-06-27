@@ -28,6 +28,7 @@
     private async void CheckAllLoaded()    {
         if (loadedDropDowns.Count == registeredDropDowns.Count && registeredDropDowns.Count > 0 && !allLoaded)        {
             allLoaded = true;
+            await Task.Delay(500); // 0.5초 대기
             await AllLoadComplete.InvokeAsync();
         }
     }

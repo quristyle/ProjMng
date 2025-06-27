@@ -60,6 +60,9 @@ OnKeyDown=OnKeyDown
   private async Task CopyTextToClipboard() {
     var str = await _editor.GetValue();
     await jsRuntime.InvokeVoidAsync("copyClipboard", str);
+
+    Notify(NotificationSeverity.Success, "알림", "Copyed !!", 2*1000, false);
+
   }
 
 

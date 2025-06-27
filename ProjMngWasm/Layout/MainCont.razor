@@ -1,7 +1,10 @@
 ﻿@inherits BaseComponent
 
 @if (ready) {
-    <RadzenTabs @bind-SelectedIndex="@selectedIndex" class="rz-h-100" RenderMode="TabRenderMode.Client" @ref="@ProjTabs">
+
+  @* @bind-SelectedIndex="@selectedIndex" *@
+
+    <RadzenTabs SelectedIndex="@selectedIndex" class="rz-h-100" RenderMode="TabRenderMode.Client" @ref="@ProjTabs" SelectedIndexChanged=OnSelectedChange  >
         <Tabs>
       @if ( ProjItems != null && ProjItems?.Count > 0 ) {
       @foreach (var item in ProjItems) {
@@ -83,7 +86,7 @@
 
   int selectedIndex = 0;
 
-  public void AddItem(string fullname, string title, string name, string url, string dir) {
+  public async Task AddItem(string fullname, string title, string name, string url, string dir, bool isSave = false) {
 
     bool isExsit = false;
     for(int i = 0; i < ProjItems.Count; i++){
@@ -108,20 +111,19 @@
       selectedIndex = ProjItems.Count - 1;
 
     }
+
+    if( isSave ){   
+      appData.User.Last_page = fullname;
+      appData.User.Last_page_nm = title;
+      await SaveUserInfo();
+    }
+
     //ProjTabs?.Reload();
 
   }
 
-  /*
-   * 
-      _main.AddItem(p.pgm_id,
-                    p.mnu_nm,
-                    p.mnu_nm,
-                    p.mnu_url,
-                    p.mnu_cd);
-   */
   
-  public void AddItem(MenuInfo p, bool isOtherTab) {
+  public async Task AddItem(MenuInfo p, bool isOtherTab) {
 
     bool isExsit = false;
     if( !isOtherTab ){
@@ -148,6 +150,11 @@
       selectedIndex = ProjItems.Count - 1;
 
     }
+
+    // 화면이 선택이 되고 나면 last_page 기록을 남긴다.
+    appData.User.Last_page = p.pgm_id;
+    appData.User.Last_page_nm = p.mnu_nm;
+    await SaveUserInfo();
     //ProjTabs?.Reload();
 
   }
@@ -175,7 +182,8 @@
         <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
       </RadzenMenuItem>
     </RadzenMenuItem>
-  </RadzenMenu>);
+  </RadzenMenu>
+  );
 
   void OnMenuItemClick(MenuItemEventArgs args, ProgramInfo item) {
 
@@ -206,7 +214,21 @@
 
 
 
+  private void OnSelectedChange(int args)  {
+    //throw new NotImplementedException();
 
+    Console.WriteLine($"OnSelectedChange : {args}");
+
+    selectedIndex = args;
+
+    ProgramInfo p = ProjItems[selectedIndex];
+
+   
+    appData.User.Last_page = p.ProjPath;
+    appData.User.Last_page_nm = p.ProjName;
+    SaveUserInfo();
+
+  }
 }
 
 <style>

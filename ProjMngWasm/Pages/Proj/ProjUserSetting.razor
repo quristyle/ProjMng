@@ -27,49 +27,67 @@
 </RadzenCard>
 
 
-<RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
-  <RadzenRow Gap="1rem">
-    <RadzenColumn Size="6" SizeSM="6">
-      <RadzenStack>
-        <QuriFormTextField @bind-Value=@appData.User.UserId Text="UserId" Disable=true />
-        <QuriFormTextField @bind-Value=@appData.User.FirstName Text="FirstName"  />
-        <QuriFormTextField @bind-Value=@appData.User.LastName Text="LastName"  />
-        <QuriFormTextField @bind-Value=@appData.User.Email Text="Email"  />
-        <QuriFormTextField @bind-Value=@appData.User.Phone_num Text="Phone_num"  />
+  <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row" >
+    <RadzenColumn Size="12" SizeSM="12">
 
-        <RadzenImage 
-          Path=@appData.User.User_photo class="rz-border-radius-10" 
-          Style="width: 80px; height: 80px;" AlternateText="@(appData.User.FirstName + " " + appData.User.LastName)" />
-                            
 
-        <QuriFormTextField @bind-Value=@appData.User.User_photo Text="User_photo"  />
-        @* <QuriFormTextField @bind-Value=@appData.User.Password Text="Password"  /> *@
-        <QuriFormTextField @bind-Value=@appData.User.Remark Text="Remark"  />
-      </RadzenStack>
-    </RadzenColumn>
+      <RadzenCard Variant="Variant.Outlined" class="rz-mt-4 ">
+        <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal"  >
+          <RadzenColumn Size="6" SizeSM="6">
+            <RadzenStack>
+              <QuriFormTextField @bind-Value=@appData.User.UserId Text="UserId" Disable=true />
+              <QuriFormTextField @bind-Value=@appData.User.FirstName Text="FirstName"  />
+              <QuriFormTextField @bind-Value=@appData.User.LastName Text="LastName"  />
+              <QuriFormTextField @bind-Value=@appData.User.Email Text="Email"  />
+              <QuriFormTextField @bind-Value=@appData.User.Phone_num Text="Phone_num"  />
+
+        
+         
+              <RadzenRow AlignItems=AlignItems.Center >
+                <RadzenColumn Size="2" class="rz-text-align-center" >
+                  <RadzenImage 
+                    Path=@appData.User.User_photo 
+                    Style="width: 80px; height: 80px;border-radius:50%" AlternateText="@(appData.User.FirstName + " " + appData.User.LastName)" />
+                </RadzenColumn>
+                <RadzenColumn>
+                  <RadzenStack >
+                    <QuriFormTextField @bind-Value=@appData.User.User_photo Text="User_photo" InputStyle="width:calc(100% - 100px);"  />
+                  </RadzenStack>
+                </RadzenColumn>
+              </RadzenRow>
+
+
+              @* <QuriFormTextField @bind-Value=@appData.User.Password Text="Password"  /> *@
+              <QuriFormCheckField  @bind-Value=@appData.User.Last_page_yn Text="마지막 활성화면 다시 접근시 자동열기" />
+              <QuriFormCheckField  @bind-Value=@appData.User.SideBarAutoClose Text="메뉴 클릭시 메뉴창 닫기" />
+              <QuriFormTextField @bind-Value=@appData.User.Remark Text="Remark"  />
+            </RadzenStack>
+          </RadzenColumn>
     
-    <RadzenColumn Size="6" SizeSM="6">
+          <RadzenColumn Size="6" SizeSM="6">
       
-      <RadzenListBox 
-        class="thema_listbox"
-        TValue="string" 
-        TextProperty="Text" 
-        ValueProperty="Value" 
-        Data="@Themes.Free" 
-        Value="@ThemeService.Theme" 
-        Change="@ChangeTheme" 
-      >
-        <Template>
-          <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
-            @RenderTheme(context)
-          </RadzenStack>
-        </Template>
-      </RadzenListBox>
+            <RadzenListBox 
+              class="thema_listbox"
+              TValue="string" 
+              TextProperty="Text" 
+              ValueProperty="Value" 
+              Data="@Themes.Free" 
+              Value="@ThemeService.Theme" 
+              Change="@ChangeTheme" 
+            >
+              <Template>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
+                  @RenderTheme(context)
+                </RadzenStack>
+              </Template>
+            </RadzenListBox>
+
+          </RadzenColumn>
+        </RadzenRow>
+      </RadzenCard>
 
     </RadzenColumn>
   </RadzenRow>
-</RadzenCard>
-
 
 
 
@@ -86,26 +104,25 @@
 
   protected async Task OnSaveWrk() {
     var Data = await DbSave<Dictionary<string, object>>("sp_dev_user_exec", new Dictionary<string, string>() {
-  { "user_name_eng", appData.User.FirstName },
-  { "user_name", appData.User.LastName },
-  { "email", appData.User.Email },
-  { "user_id", appData.User.UserId },
-  { "phone_num", appData.User.Phone_num },
-  });
+      { "user_name_eng", appData.User.FirstName },
+      { "user_name", appData.User.LastName },
+      { "email", appData.User.Email },
+      { "user_id", appData.User.UserId },
+      { "phone_num", appData.User.Phone_num },
+     // { "last_page_yn", appData.User.Last_page_yn.ToString() },
+    });
+    await SaveUserInfo();
   }
 
-
-
   async Task ChangeTheme(object value) {
+    
+    Console.WriteLine($"ChangeTheme themeService  : {value} ");
+
     ThemeService.SetTheme($"{value}");
     appData.User.Theme = value?.ToString() ?? "standard-dark";
-  await SaveUserInfo();
-    await DbSave<Dictionary<string, object>>("sp_dev_user_prop_exec", new Dictionary<string, string>() {
-  { "prop_type", "THEME" },
-  { "user_id", appData.User.UserId },
-  { "prop_val", value?.ToString() },
-  });
-}
+    await SaveUserInfo();
+    StateHasChanged();
+  }
 
 
 internal static RenderFragment RenderTheme(Theme theme, bool showTitle = true) {
@@ -114,7 +131,7 @@ internal static RenderFragment RenderTheme(Theme theme, bool showTitle = true) {
         @if (showTitle) {
           @theme.Text
         }
-        <svg width="100%" height="72" viewBox="0 0 100% 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
+        <svg width="100%" height="72" viewBox="0 0 288 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
           <rect width="100%" height="72" fill="@theme.Base" />
           <g filter="url(#dropShadow1)"><rect x="196" y="12" width="80" height="48" rx="@theme.CardRadius" fill="@theme.Content" /></g>
           <g filter="url(#dropShadow0)"><rect x="104" y="12" width="80" height="48" rx="@theme.CardRadius" fill="@theme.Content" /></g>
