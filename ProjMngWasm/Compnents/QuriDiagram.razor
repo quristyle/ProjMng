@@ -29,15 +29,15 @@
 *@
 
 </div>
-<div  style="float:left;height:100%;width:calc(100% - 25px);overflow:auto;">
-  <div id="@ContainerId"></div>
+<div  style="float:left;height:50%;width:calc(100% - 25px);overflow:auto;">
+  <div id="@ContainerId" tabindex="0"></div>
 </div>
 
 </div>
 
-<textarea id="diagramData"
-          style="width:100%; height:150px; margin-top:10px;display:none;"
-          @bind="_diagramXml"></textarea>
+<textarea id="@_copyPasteId"
+          style="width:100%; height:150px; margin-top:10px;display:novne;"
+          ></textarea>
 
 
 
@@ -45,6 +45,7 @@
 
   private DotNetObjectReference<QuriDiagram>? _dotNetRef;
   private string ContainerId = $"graph-container-{Guid.NewGuid()}";
+  private string _copyPasteId = $"graph-copypaste-{Guid.NewGuid()}";
 
   private string _selectedNode = "없음"; //선택한 노드
   private string SelectERD = "";

@@ -79,27 +79,264 @@ Actions.prototype.init = function()
 	// Edit actions
 	this.addAction('undo', function() { ui.undo(); }, null, 'sprite-undo', Editor.ctrlKey + '+Z');
 	this.addAction('redo', function() { ui.redo(); }, null, 'sprite-redo', (!mxClient.IS_WIN) ? Editor.ctrlKey + '+Shift+Z' : Editor.ctrlKey + '+Y');
-	this.addAction('cut', function() { mxClipboard.cut(graph); }, null, 'sprite-cut', Editor.ctrlKey + '+X');
+	this.addAction('cut', function () { mxClipboard.cut(graph); }, null, 'sprite-cut', Editor.ctrlKey + '+X');
+
+
+
+	mxClipboard.cellsToString = function (cells) {
+		var codec = new mxCodec();
+		var model = new mxGraphModel();
+		var parent = model.getChildAt(model.getRoot(), 0);
+
+		for (var i = 0; i < cells.length; i++) {
+			model.add(parent, cells[i]);
+		}
+
+		return mxUtils.getXml(codec.encode(model));
+	};
+
+
+	// Inserts the XML for the given cells into the text input for copy
+	var copyCells = function (graph, cells) {
+		if (cells.length > 0) {
+			var clones = graph.cloneCells(cells);
+
+			// Checks for orphaned relative children and makes absolute
+			for (var i = 0; i < clones.length; i++) {
+				var state = graph.view.getState(cells[i]);
+
+				if (state != null) {
+					var geo = graph.getCellGeometry(clones[i]);
+
+					if (geo != null && geo.relative) {
+						geo.relative = false;
+						geo.x = state.x / state.view.scale - state.view.translate.x;
+						geo.y = state.y / state.view.scale - state.view.translate.y;
+					}
+				}
+			}
+
+
+			var copyStr = mxClipboard.cellsToString(clones);
+			//textInput.value = copyStr;//  mxClipboard.cellsToString(clones);
+
+
+			navigator.clipboard.writeText(copyStr).then(function () {
+				console.log('Text copied to clipboard');
+			}).catch(function (error) {
+				console.error('Could not copy text: ', error);
+			});
+
+		}
+
+		//textInput.select();
+		lastPaste = copyStr;// textInput.value;
+	};
+
+
+
+
+
 	this.addAction('copy', function()
 	{
 		try
 		{
+			console.log('xxxxxxxxxxxxxxxxxxxxxxxxxx copy', graph);
 			mxClipboard.copy(graph);
+
+
+
+			if (graph.isEnabled() && !graph.isSelectionEmpty()) {
+				copyCells(graph, mxUtils.sortCells(graph.model.getTopmostCells(graph.getSelectionCells())));
+				dx = 0;
+				dy = 0;
+			}
+			console.log('copy', 'xxxxxxxxx');
+
+
+
 		}
 		catch (e)
 		{
 			ui.handleError(e);
 		}
 	}, null, 'sprite-copy', Editor.ctrlKey + '+C');
-	this.addAction('paste', function()
-	{
-		if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
+
+
+
+
+
+
+
+	// Merges XML into existing graph and layers
+	var importXml = function (xml, dx, dy) {
+		dx = (dx != null) ? dx : 0;
+		dy = (dy != null) ? dy : 0;
+		var cells = []
+
+		try {
+			var doc = mxUtils.parseXml(xml);
+			var node = doc.documentElement;
+
+			if (node != null) {
+				var model = new mxGraphModel();
+				var codec = new mxCodec(node.ownerDocument);
+				codec.decode(node, model);
+
+				var childCount = model.getChildCount(model.getRoot());
+				var targetChildCount = graph.model.getChildCount(graph.model.getRoot());
+
+				// Merges existing layers and adds new layers
+				graph.model.beginUpdate();
+				try {
+					for (var i = 0; i < childCount; i++) {
+						var parent = model.getChildAt(model.getRoot(), i);
+
+						// Adds cells to existing layers if not locked
+						if (targetChildCount > i) {
+							// Inserts into active layer if only one layer is being pasted
+							var target = (childCount == 1) ? graph.getDefaultParent() : graph.model.getChildAt(graph.model.getRoot(), i);
+
+							if (!graph.isCellLocked(target)) {
+								var children = model.getChildren(parent);
+								cells = cells.concat(graph.importCells(children, dx, dy, target));
+							}
+						}
+						else {
+							// Delta is non cascading, needs separate move for layers
+							parent = graph.importCells([parent], 0, 0, graph.model.getRoot())[0];
+							var children = graph.model.getChildren(parent);
+							graph.moveCells(children, dx, dy);
+							cells = cells.concat(children);
+						}
+					}
+				}
+				finally {
+					graph.model.endUpdate();
+				}
+			}
+		}
+		catch (e) {
+			alert(e);
+			throw e;
+		}
+
+		return cells;
+	};
+
+	var gs = graph.gridSize;
+	var lastPaste = null;
+	var dx = 0;
+	var dy = 0;
+	// Parses and inserts XML into graph
+	var pasteText = function (text) {
+
+		console.log('pasteText', text);
+		var xml = mxUtils.trim(text);
+		var x = graph.container.scrollLeft / graph.view.scale - graph.view.translate.x;
+		var y = graph.container.scrollTop / graph.view.scale - graph.view.translate.y;
+
+		if (xml.length > 0) {
+			if (lastPaste != xml) {
+				lastPaste = xml;
+				dx = 0;
+				dy = 0;
+			}
+			else {
+				dx += gs;
+				dy += gs;
+			}
+
+			// Standard paste via control-v
+			if (xml.substring(0, 14) == '<mxGraphModel>') {
+				graph.setSelectionCells(importXml(xml, dx, dy));
+				graph.scrollCellToVisible(graph.getSelectionCell());
+			}
+		}
+	};
+
+
+
+	// Cross-browser function to fetch text from paste events
+	var extractGraphModelFromEvent = function (evt) {
+		var data = null;
+
+		if (evt != null) {
+			var provider = (evt.dataTransfer != null) ? evt.dataTransfer : evt.clipboardData;
+
+			if (provider != null) {
+				if (document.documentMode == 10 || document.documentMode == 11) {
+					data = provider.getData('Text');
+				}
+				else {
+					data = (mxUtils.indexOf(provider.types, 'text/html') >= 0) ? provider.getData('text/html') : null;
+
+					if (mxUtils.indexOf(provider.types, 'text/plain' && (data == null || data.length == 0))) {
+						data = provider.getData('text/plain');
+					}
+				}
+			}
+		}
+		else {
+			navigator.clipboard.readText().then(function (text) {
+
+				if (text != null && text.length > 0) {
+					pasteText(text);
+				}
+
+
+			});
+		}
+
+		return data;
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	this.addAction('paste', function (evt)	{
+		console.log('paste event');
+		if (graph.isEnabled()) {
+			var xml = extractGraphModelFromEvent(evt);
+
+			if (xml != null && xml.length > 0) {
+				pasteText(xml);
+			}
+			else {
+				// Timeout for new value to appear
+				window.setTimeout(mxUtils.bind(this, function () {
+					//pasteText(textInput.value);
+					console.log('Timeout for new value to appear');
+				}), 0);
+			}
+		}
+		else if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 		{
 			mxClipboard.paste(graph);
 		}
 	}, false, 'sprite-paste', Editor.ctrlKey + '+V');
+
+
+
+
+
 	this.addAction('pasteHere', function(evt)
 	{
+
+		console.log('pasteHere');
+
 		if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 		{
 			graph.getModel().beginUpdate();
