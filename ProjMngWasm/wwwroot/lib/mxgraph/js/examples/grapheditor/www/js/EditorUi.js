@@ -1589,12 +1589,12 @@ EditorUi.prototype.createMenus = function()
 EditorUi.prototype.updatePasteActionStates = function()
 {
 	var graph = this.editor.graph;
-	var paste = this.actions.get('paste');
-	var pasteHere = this.actions.get('pasteHere');
+	//var paste = this.actions.get('paste');
+	//var pasteHere = this.actions.get('pasteHere');
 	
-	paste.setEnabled(this.editor.graph.cellEditor.isContentEditing() || (!mxClipboard.isEmpty() &&
-		graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent())));
-	pasteHere.setEnabled(paste.isEnabled());
+	//paste.setEnabled(this.editor.graph.cellEditor.isContentEditing() || (!mxClipboard.isEmpty() &&
+	//	graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent())));
+	//pasteHere.setEnabled(paste.isEnabled());
 };
 
 /**

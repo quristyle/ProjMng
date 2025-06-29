@@ -326,7 +326,7 @@ Actions.prototype.init = function()
 		{
 			mxClipboard.paste(graph);
 		}
-	}, false, 'sprite-paste', Editor.ctrlKey + '+V');
+	}, true, 'sprite-paste', Editor.ctrlKey + '+V');
 
 
 
