@@ -718,6 +718,7 @@ const test = {
   ]
 }
 
+//mxBasePath = '/lib/mxgraph/js/src/js';
 
 window.initMxGraphEditor = (containerId) => {
   mxBasePath = 'mxgraph'; // mxClient.js 기준 경로
