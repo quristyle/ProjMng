@@ -209,6 +209,14 @@ class="context-body-row"
 
 
     <RadzenTabsItem Text="Data">
+
+
+      
+    <QuriDynamicGrid ReqData=@PrevData />
+
+
+
+
     </RadzenTabsItem>
 
 
@@ -366,6 +374,11 @@ class="context-body-row"
   //bool isLoading3 = false;
 
 
+  
+  public ResultInfo<Dictionary<string, object>> PrevData { get; set; }
+
+
+
   string DBSpMakeString;
 
 
@@ -409,6 +422,13 @@ class="context-body-row"
     else if (tabIndex == 2) {
       await LoadTable();
     }
+    else if (tabIndex == 3) {
+      await LoadPrevData();
+    }
+
+    
+
+
   }
 
   Dictionary<string, string> getParams(){
@@ -457,6 +477,21 @@ class="context-body-row"
     // var ri = await devService.GetList<TableInfo>("tablelist", dic);
     // dataTb = ri.Data;
     // isLoading2 = false;
+  }
+  
+  protected async Task LoadPrevData() {
+
+    if( selectedTable != null && selectedTable.Count > 0 ){
+
+    string query = $"select * from {selectedTable[0].TableName} where rownum < 10";
+
+    PrevData = await JsContQuery<Dictionary<string, object>>(dbType?.Others["db_nick"], query);
+
+    }
+    else{
+      Notify(NotificationSeverity.Error, "", "need to selected Table", 1000);
+    }
+
   }
 
 

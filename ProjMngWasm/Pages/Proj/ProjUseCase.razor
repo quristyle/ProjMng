@@ -19,7 +19,7 @@
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
-      <QuriDropDown @bind-Value="wbsType" CodeId="wbsflowlist" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
+      <QuriDropDown @bind-Value="wbsType" CodeId="wbsflowlist" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad Style="width: 20rem;" />
 
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">

@@ -161,16 +161,16 @@ public class CommonComponent : ComponentBase {
    
     return data;
   }
-  protected async Task<ResultInfo<T>> JsContQuery<T>(CommonCode db, string query) {
+  //protected async Task<ResultInfo<T>> JsContQuery<T>(CommonCode db, string query) {
 
-    var data = await devService.GetListQuery<T>(db.Others["db_nick"], query);
+  //  var data = await devService.GetListQuery<T>(db.Others["db_nick"], query);
 
-    if (data.Code < 0) {
-      //Notify(NotificationSeverity.Error, "Error Message", $"다이렉트 쿼리 준비:{data.Message}", 50000, true);
-    }
+  //  if (data.Code < 0) {
+  //    Notify(NotificationSeverity.Error, "Error Message", $"다이렉트 쿼리 준비:{data.Message}", 50000, true);
+  //  }
 
-    return data;
-  }
+  //  return data;
+  //}
 
 
   public async Task Login(string id, string pw) {

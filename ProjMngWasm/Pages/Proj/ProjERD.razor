@@ -72,8 +72,9 @@
     else{
       SelectERD = "";
     }
-    
+    if( !string.IsNullOrEmpty(db_pvalue)){
     await diagram.LoadDiagramFromObjectJson(db_pvalue);
+    }
     return db_pvalue;
 
   }

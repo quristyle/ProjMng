@@ -17,6 +17,8 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
   [Parameter] public string? InitialCode { get; set; }
 
+
+
   public string? _codeId;
   //private string? _previousCodeId;
   [Parameter] public string? CodeId { get; set; }
@@ -37,7 +39,6 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
   [CascadingParameter(Name = "OnDropDownLoaded")] public Action<string>? OnParentDropDownLoaded { get; set; }
 
 
-  
 
 
   protected override void OnInitialized() {
@@ -177,6 +178,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
     StateHasChanged();
     if (!string.IsNullOrEmpty(InitialCode)) {
+      Console.WriteLine($"기본 선택자 선택000 : {_codeId} InitialCode : {InitialCode}");
       var match = tmp.FirstOrDefault(x => x.Code == InitialCode);
       if (match != null) {
         await ValueChanged.InvokeAsync((TValue)(object)match);
@@ -185,12 +187,14 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
       Console.WriteLine($"기본 선택자 선택 : {_codeId} InitialCode : {InitialCode}");
     }
     else if (!IsAll && tmp.Count > 0) {
+      Console.WriteLine($"첫번째 코드 선택000 : {_codeId} etc0 : {_etc0}");
       object obj = tmp[0];
       await ValueChanged.InvokeAsync((TValue)obj);
       //Value = (TValue)obj;
       Console.WriteLine($"첫번째 코드 선택 : {_codeId} etc0 : {_etc0}");
     }
     else if (IsAll) {
+      Console.WriteLine($"All 선택000 : {_codeId} etc0 : {_etc0}");
       object obj = tmp[0];
       await ValueChanged.InvokeAsync((TValue)obj);
       //Value = (TValue)obj;

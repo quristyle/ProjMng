@@ -40,7 +40,8 @@
           AddBtnEvent=NewRowCreate
           CopyBtnEvent=CopyRowEvent
           ReqData=Data 
-          HiddenCols="prj_rid,wbs_id,proc_lvl,build_user,build_status,dev_chk,build_chk,build_chk_dt,qc_user,qc_chk,qc_chk_dt,cre_user,cre_dt,mod_user,mod_dt,comm" />
+          DropDownCols="schedule_type|schedule_type"
+          HiddenCols="prj_rid,proc_lvl,build_user,build_status,build_chk_dt,qc_chk_dt,cre_user,cre_dt,mod_user,mod_dt" />
 
         </RadzenColumn>
       </RadzenRow>
@@ -72,6 +73,7 @@
     Data = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
      { "prj_rid", cc.Code },
      { "compstat", compstat?.Code },
+     { "schedule_type", "WBS" },
     });
     StateHasChanged();
   }
@@ -81,6 +83,7 @@
     await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
      { "prj_rid", srtype.Code },
      { "compstat", compstat?.Code },
+     { "schedule_type", "WBS" },
     }, Data);
     await wbsgrid.Reload();
     

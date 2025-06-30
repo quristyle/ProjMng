@@ -11,6 +11,18 @@
       <RadzenLabel Text="완료여부" Style="width: 6rem;" />
       <RadzenCheckBox  @bind-Value="@model.isComplatge" />
     </RadzenStack>
+
+
+    
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+      <RadzenLabel Text="종류" Style="width: 6rem;" />
+      <QuriDropDown CodeId="schedule_type" @bind-Value=@_schedule_type Name="schedule_type"  Style="width: 12rem;" />
+      <RadzenRequiredValidator Component="schedule_type" Text="Start is required" />
+    </RadzenStack>
+
+
+
+
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Start" Style="width: 6rem;" />
       <RadzenDatePicker @bind-Value="@model.plan_sdt" Name="Start"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" >
@@ -19,8 +31,8 @@
         </FooterTemplate>
     </RadzenDatePicker>
       <RadzenRequiredValidator Component="Start" Text="Start is required" />
-    </RadzenStack>
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+
+      
       <RadzenLabel Text="End" Style="width: 6rem;" />
       <RadzenDatePicker Name="End" @bind-Value="@model.plan_edt"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" >
         <FooterTemplate>
@@ -28,7 +40,30 @@
         </FooterTemplate>
     </RadzenDatePicker>
       <RadzenRequiredValidator Component="End" Text="End is required" />
+
+
     </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+      
+      <RadzenLabel Text="Run Start" Style="width: 6rem;" />
+      <RadzenDatePicker @bind-Value="@model.dev_sdt" Name="RunStart"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" >
+        <FooterTemplate>
+            <RadzenButton Click=@(args => model.dev_sdt = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
+        </FooterTemplate>
+    </RadzenDatePicker>
+
+      
+      <RadzenLabel Text="Run End" Style="width: 6rem;" />
+      <RadzenDatePicker Name="RunEnd" @bind-Value="@model.dev_edt"  Style="width: 12rem;" DateFormat="yyyy-MM-dd" >
+        <FooterTemplate>
+            <RadzenButton Click=@(args => model.dev_edt = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
+        </FooterTemplate>
+    </RadzenDatePicker>
+
+
+    </RadzenStack>
+
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
       <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
       <RadzenButton  Text="MoveToday" Click=OnTodayAndSave />
@@ -40,9 +75,25 @@
   [Parameter]  public WbsInfo Appointment { get; set; }
 
   WbsInfo model = new WbsInfo();
+  CommonCode _schedule_type {get;set;}
+  
+  [Parameter]  public DateTime? Start { get; set; }
+
+  [Parameter]  public DateTime? End { get; set; }
+
+  [Parameter]  public string PrjRid { get; set; }
+
 
   protected override void OnParametersSet() {
-    model = Appointment;
+    if( Appointment == null){
+      model.plan_sdt = Start;
+      model.plan_edt = End;
+      model.prj_rid = PrjRid;
+      model.wbs_state = "READY";
+    }
+    else{
+      model = Appointment;
+    }
   }
   
 
@@ -84,6 +135,10 @@
         model.wbs_state = "RUNNING";
       }
     }
+    if( _schedule_type != null){
+      model.schedule_type =   _schedule_type.Code;
+    }
+
     Dictionary<string, string> dic = model.ToDictionary();
 
     await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);

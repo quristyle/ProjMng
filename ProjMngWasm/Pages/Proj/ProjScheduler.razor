@@ -21,6 +21,7 @@
     <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown CodeId="projlist" @bind-Value=srtype />
       <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" IsAll=true />
+      <QuriDropDown CodeId="schedule_type" @bind-Value=_schedule_type InitialCode="Public" IsAll=true />
     </QuriSearchs>
 
 
@@ -63,6 +64,10 @@
 
   CommonCode srtype { get; set; }
   CommonCode compstat { get; set; } 
+  CommonCode _schedule_type { get; set; } 
+
+  
+
 
   RadzenScheduler<WbsInfo> scheduler;
 
@@ -85,6 +90,7 @@
     var data = await DbCont<WbsInfo>("sp_proj_wbs_exec", new Dictionary<string, string>() {
      { "prj_rid", srtype?.Code },
      { "compstat", compstat?.Code },
+     { "schedule_type", _schedule_type?.Code },
     });
     Data = data.Data;
         await scheduler.Reload();
@@ -140,7 +146,7 @@
 
 
     if (args.View.Text != "Year") {
-      WbsInfo data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+      WbsInfo data = await DialogService.OpenAsync<EditAppointmentPage>("Add Schedule",
           new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End }, {"PrjRid", srtype?.Code} });
 
       if (data != null) {
@@ -159,19 +165,17 @@
   async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<WbsInfo> args) {
 
 
-    var result = await DialogService.OpenAsync<EditAppointmentPage>("Edit WbsInfo", new Dictionary<string, object> { { "Appointment", args.Data } });
+    var result = await DialogService.OpenAsync<EditAppointmentPage>("Edit Schedule", new Dictionary<string, object> { { "Appointment", args.Data } });
 
     
-if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")
-{
+if (result is WbsInfo deleted && deleted.wbs_state == "DELETE"){
     // 여기서 EditAppointment 호출 가능
     //await EditAppointment(deleted);
 
     
         // Data에서 삭제
         var item = Data.FirstOrDefault(x => x.wbs_id == deleted.wbs_id);
-        if (item != null)
-        {
+        if (item != null)        {
             Data.Remove(item);
             StateHasChanged();
         }
@@ -182,15 +186,13 @@ if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")
     await scheduler.Reload();
   }
 
-  async Task EditAppointment(WbsInfo appointment)
-{
+  async Task EditAppointment(WbsInfo appointment){
     var result = await DialogService.OpenAsync<EditAppointmentPage>(
         "Edit Appointment",
         new Dictionary<string, object>() { { "Appointment", appointment } }
     );
 
-    if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")
-    {
+    if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")    {
         // Data에서 삭제
         var item = Data.FirstOrDefault(x => x.wbs_id == deleted.wbs_id);
         if (item != null)
