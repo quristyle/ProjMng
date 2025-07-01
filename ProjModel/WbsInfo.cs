@@ -10,6 +10,7 @@ public class WbsInfo : BaseModel {
   public string gb1 { get; set; }
   public string gb2 { get; set; }
   public string proc_nm { get; set; }
+  public string proc_full_nm { get { if (string.IsNullOrEmpty(proc_id)) { return proc_nm; } else {  return $"{proc_id} : {proc_nm}"; } } }
   public string proc_tp { get; set; }
   public string proc_lvl { get; set; }
   public string build_user { get; set; }

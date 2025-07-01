@@ -21,7 +21,7 @@
     <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown CodeId="projlist" @bind-Value=srtype />
       <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" IsAll=true />
-      <QuriDropDown CodeId="schedule_type" @bind-Value=_schedule_type InitialCode="Public" IsAll=true />
+      <QuriDropDown CodeId="schedule_type" @bind-Value=_schedule_type IsAll=true />
     </QuriSearchs>
 
 
@@ -43,7 +43,7 @@
   Data=@Data 
   StartProperty="plan_sdt" 
   EndProperty="plan_edt"
-  TextProperty="proc_nm" 
+  TextProperty="proc_full_nm" 
   SelectedIndex="0"
   SlotSelect=@OnSlotSelect 
   AppointmentSelect=@OnAppointmentSelect 

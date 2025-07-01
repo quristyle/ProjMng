@@ -1,0 +1,56 @@
+﻿@page "/glue";
+@{ 
+  /* description : 글루 process 추적기
+   * title : 글루 추적기
+  * sort : 1
+  * credt : 2025-07-01
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard >
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <RadzenTextBox @bind-Value="srtype" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
+  <RadzenColumn Size="12" >
+
+    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent ReqData=@Data />
+
+  </RadzenColumn>
+</RadzenRow>
+
+@code {
+
+  public string srtype { get; set; } = "";
+
+  protected override async Task OnAfterRenderAsync(bool firstRender) {
+    if (firstRender) {
+      OnLoadWrk();
+    }
+  }
+
+  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>("sp_dev_proj_exec", new Dictionary<string, string>() { });
+  StateHasChanged();
+  }
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_proj_exec", dic);
+  }
+
+}

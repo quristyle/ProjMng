@@ -398,4 +398,67 @@ public class ProjService : BaseService {
     return ri;
   }
 
+
+
+  public ResultInfo<Dictionary<string, string>> GetMdData(RequestDto dto) {
+
+
+    string action_name = dto.ProcName;
+    IDictionary<string, string> param = dto.MainParam;
+
+
+    param["req_type"] = "srch";
+
+    ResultInfo<dynamic> srcInfo = GetData("sp_dev_srcinfo_exec", param);
+
+    List<Dictionary<string, object>> srcInfoData = ConvertToListOfDictionaries(srcInfo.Data.AsEnumerable());
+
+
+    ResultInfo<Dictionary<string, string>> ri = new ResultInfo<Dictionary<string, string>>();
+    if (srcInfoData.Count > 0) {
+      string basePath = srcInfoData[0]["src_path"].ToString();
+      string projNamespace = srcInfoData[0]["prj_namespace"].ToString();  // @"ProjMngWasm";
+      string pageRoot = srcInfoData[0]["src_ui_root"].ToString();         // @"Pages";
+      string pagePattern = srcInfoData[0]["url_pattern"].ToString();      // "@page\\s+\"(?<url>[^\"]+)\"";
+
+      List<Dictionary<string, string>> aaa = null;
+
+      aaa = BlazorUtil.GetBlazorMenuList(basePath, projNamespace, pageRoot, pagePattern);
+
+      if (aaa == null || aaa.Count <= 0) {
+        // subdir 찾아서 가져오기
+        string src_rid = srcInfoData[0]["src_rid"].ToString();
+        param.Add("src_rid", src_rid);
+
+        ResultInfo<dynamic> srcInfo_dtl = GetData("sp_dev_srcinfo_dtl_exec", param);
+
+        List<Dictionary<string, object>> srcInfoDtlData = ConvertToListOfDictionaries(srcInfo_dtl.Data.AsEnumerable());
+
+        List<Dictionary<string, object>> srcPathList = srcInfoDtlData.Where(dict => dict.ContainsKey("src_pattern_grp") && dict["src_pattern_grp"]?.ToString() == "src_path").ToList();
+
+        if (srcPathList.Count > 0) {
+
+          basePath = srcPathList[0]["url_pattern"].ToString();
+
+          aaa = BlazorUtil.GetBlazorMenuList(basePath, projNamespace, pageRoot, pagePattern);
+        }
+      }
+
+      Dictionary<string, string> col = new Dictionary<string, string>();
+      foreach (var ad in aaa) {
+        foreach (var a in ad) {
+          col.Add(a.Key, "System.String");
+        }
+        break;
+      }
+      ri.Cols = col;
+      ri.Data = aaa;
+    }
+
+    GetRes<Dictionary<string, string>>(ref ri, param, DateTime.Now, DateTime.Now, DateTime.Now);
+    return ri;
+  }
+
+
+
 }

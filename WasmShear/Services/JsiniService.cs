@@ -41,13 +41,14 @@ public class JsiniService : BaseService {
 
     string calltype = rd.ProcName.ToLower();
     string targetUrl = TargetUrl;
-    if (calltype == "sp") {
-      targetUrl = TargetUrl;
-      if (rd.IsFast) {
-        targetUrl = TargetUrlFast;
-      }
-    }
-    else if (calltype == "md") { targetUrl = TargetUrlMedia; }
+    //if (calltype == "sp") {
+    //  targetUrl = TargetUrl;
+    //  if (rd.IsFast) {
+    //    targetUrl = TargetUrlFast;
+    //  }
+    //}
+    //else 
+    if (calltype.IndexOf("md_") == 0) { targetUrl = TargetUrlMedia; }
 
     //Dictionary<string, string> req = new Dictionary<string, string>() {
     //  { "req_cname", proc_name }
