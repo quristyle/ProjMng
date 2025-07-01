@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Glue:GlueDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Glue="http://www.glueframework.com/activitydiagram/" id="0" location="0,0" size="-1,-1">
+  <child xsi:type="Glue:Activity" id="0" location="105,72" size="885,-1" input="//@wire.0" output="//@wire.1 //@wire.5 //@wire.3" name="Router">
+    <property key="class" value="com.poscoict.glueframework.biz.activity.GlueDefaultRouter"/>{0}
+  </child>
+  <child xsi:type="Glue:InitialState" id="1" location="532,25" size="-1,-1" output="//@wire.0"/>
+  <child xsi:type="Glue:FinalState" id="2" location="532,502" size="-1,-1" input="//@wire.2 //@wire.4 //@wire.6"/>
+  <child xsi:type="Glue:Activity" id="53624" location="145,217" size="217,-1" input="//@wire.1" output="//@wire.2" name="Search">
+    <property key="class" value="com.poscoict.gluewing.activity.edb.GlueWingEdbCursor"/>
+    <property key="dao" value="{0}dao"/>
+    <property key="procedure-name" value="p_{2}.p_search"/>
+    <property key="result-key" value="RK_{2}"/>
+    <property key="description" value="{1} {3}"/>
+  </child>
+  <child xsi:type="Glue:Activity" id="53736" location="460,216" size="182,-1" input="//@wire.3" output="//@wire.4" name="Save">
+    <property key="class" value="com.poscoict.gluewing.activity.edb.GlueWingEdbProcedure"/>
+    <property key="dao" value="{0}dao"/>
+    <property key="json-keylist" value="G_{4}"/>
+    <property key="procedure-name" value="p_{2}.p_save"/>
+    <property key="result-key" value="rowCnt"/>
+  </child>
+  <child xsi:type="Glue:Activity" id="54207" location="739,214" size="182,-1" input="//@wire.5" output="//@wire.6" name="Delete">
+    <property key="class" value="com.poscoict.gluewing.activity.edb.GlueWingEdbProcedure"/>
+    <property key="dao" value="{0}dao"/>
+    <property key="json-keylist" value="G_{4}"/>
+    <property key="procedure-name" value="p_{2}.p_delete"/>
+    <property key="result-key" value="rowCnt"/>
+  </child>
+  <property key="tx0" value="true"/>
+  <property key="description" value=""/>
+  <wire id="0" guardcondition="success" firstRelativePoint="542,44" lastRelativePoint="542,72"/>
+  <wire id="5420" guardcondition="search" firstRelativePoint="829,244" lastRelativePoint="548,455"/>
+  <wire id="5423" guardcondition="success" firstRelativePoint="259,247" lastRelativePoint="530,455">
+    <bendpoint weight="0.5" firstDimension="6,135" secondDimension="-281,-92"/>
+  </wire>
+  <wire id="5491" guardcondition="save" firstRelativePoint="353,102" lastRelativePoint="353,217"/>
+  <wire id="5492" guardcondition="success" firstRelativePoint="536,246" lastRelativePoint="536,448">
+    <bendpoint weight="0.5" firstDimension="-15,116" secondDimension="-4,-112"/>
+  </wire>
+  <wire id="5506" guardcondition="delete" firstRelativePoint="539,102" lastRelativePoint="539,216"/>
+  <wire id="5507" guardcondition="success" firstRelativePoint="829,244" lastRelativePoint="548,455">
+    <bendpoint weight="0.5" firstDimension="-1,121" secondDimension="289,-109"/>
+  </wire>
+</Glue:GlueDiagram>

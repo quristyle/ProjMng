@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service name="SG9802-service" initial="Router" xmlns="http://www.poscoict.com/glueframework/service">smg
+    <transaction-manager id="tx0" commit="true"/>
+    <activity name="Router" class="com.poscoict.glueframework.biz.activity.GlueDefaultRouter">
+        <transition name="searchmg_so_test2" value="Search mg_so_test2"/>
+        <transition name="deletemg_so_test2" value="Delete mg_so_test2"/>
+        <transition name="savemg_so_test2" value="Save mg_so_test2"/>
+    </activity>
+    <activity name="Search mg_so_test2" class="com.poscoict.gluewing.activity.edb.GlueWingEdbCursor">
+        <transition name="success" value="end"/>
+        <property name="result-key" value="RK_mg_so_test2"/>
+        <property name="dao" value="smgdao"/>
+        <property name="procedure-name" value="p_mg_so_test2.p_search"/>
+    </activity>
+    <activity name="Save mg_so_test2" class="com.poscoict.gluewing.activity.edb.GlueWingEdbProcedure">
+        <transition name="success" value="end"/>
+        <property name="result-key" value="rowCnt"/>
+        <property name="dao" value="smgdao"/>
+        <property name="json-keylist" value="G_SG9802"/>
+        <property name="procedure-name" value="p_mg_so_test2.p_save"/>
+    </activity>
+    <activity name="Delete mg_so_test2" class="com.poscoict.gluewing.activity.edb.GlueWingEdbProcedure">
+        <transition name="success" value="end"/>
+        <property name="result-key" value="rowCnt"/>
+        <property name="dao" value="smgdao"/>
+        <property name="json-keylist" value="G_SG9802"/>
+        <property name="procedure-name" value="p_mg_so_test2.p_delete"/>
+    </activity>
+</service>

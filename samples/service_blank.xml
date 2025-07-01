@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service name="{4}-service" initial="Router" xmlns="http://www.poscoict.com/glueframework/service">{0}
+    <transaction-manager id="tx0" commit="true"/>
+    <activity name="Router" class="com.poscoict.glueframework.biz.activity.GlueDefaultRouter">
+        <transition name="search" value="Search"/>
+        <transition name="delete" value="Delete"/>
+        <transition name="save" value="Save"/>
+    </activity>
+    <activity name="Search" class="com.poscoict.gluewing.activity.edb.GlueWingEdbCursor">
+        <transition name="success" value="end"/>
+        <property name="result-key" value="RK_{2}"/>
+        <property name="dao" value="smgdao"/>
+        <property name="procedure-name" value="p_{2}.p_search"/>
+    </activity>
+    <activity name="Save" class="com.poscoict.gluewing.activity.edb.GlueWingEdbProcedure">
+        <transition name="success" value="end"/>
+        <property name="result-key" value="rowCnt"/>
+        <property name="dao" value="smgdao"/>
+        <property name="json-keylist" value="G_{4}"/>
+        <property name="procedure-name" value="p_{2}.p_save"/>
+    </activity>
+    <activity name="Delete" class="com.poscoict.gluewing.activity.edb.GlueWingEdbProcedure">
+        <transition name="success" value="end"/>
+        <property name="result-key" value="rowCnt"/>
+        <property name="dao" value="smgdao"/>
+        <property name="json-keylist" value="G_{4}"/>
+        <property name="procedure-name" value="p_{2}.p_delete"/>
+    </activity>
+</service>

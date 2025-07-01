@@ -27,7 +27,7 @@
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
   <RadzenColumn Size="12" >
 
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent ReqData=@Data />
+    <QuriDynamicGrid  ReqData=@Data />
 
   </RadzenColumn>
 </RadzenRow>
@@ -45,12 +45,12 @@
   public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
-    Data = await DbCont<Dictionary<string, object>>("sp_dev_proj_exec", new Dictionary<string, string>() { });
+    Data = await MdCont<Dictionary<string, object>>("md_glue_service", new Dictionary<string, string>(){{"prj_rid","3"}});
+
+
+
   StateHasChanged();
   }
 
-  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
-    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_proj_exec", dic);
-  }
 
 }
