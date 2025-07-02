@@ -22,6 +22,17 @@ select d.*
    and dsl_cd = @dsl_cd 
 ";
 
+
+  public const string ProcDbQuery = @"
+ select a.* 
+      , a.db_pvalue as Dsl_query
+      , a.db_pkey as Dsl_cd
+   from projmng.dev_db_prop a
+  where db_pkey = @db_pkey
+    and db_rid = @db_rid ::bigint
+";
+
+
   public const string NullStr = null;
 
 

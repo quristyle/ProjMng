@@ -7,7 +7,6 @@
       * author : quristyle
       */
 }
-
 @inherits PageBaseComponent
 
 <RadzenCard >
@@ -17,7 +16,7 @@
     <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown @bind-Value="srtype" CodeId="projlist" />
       <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@srtype?.Code IsEtcFix=true  />
-      </QuriSearchs>
+    </QuriSearchs>
 
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
@@ -29,49 +28,27 @@
 
 
 
-<RadzenSplitter Orientation="Orientation.Vertical" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
+<RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
 
     
   <!-- 위쪽 -->
   <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
 
-        <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent
-                         DeleteBtnEvent=DeleteBtnEvent ReqData=Data SItemsChanged=OnDbInfoChange />
+    <QuriDynamicGrid 
+      ReqData=Data 
+      SItemsChanged=OnDbInfoChange />
 
 
-    </RadzenSplitterPane>
+  </RadzenSplitterPane>
     <!-- 아래쪽 -->
-    <RadzenSplitterPane Size="60%" Min="10%" Max="90%">
+  <RadzenSplitterPane Size="60%" Min="10%" Max="90%">
 
-        
-    <RadzenSplitter Orientation="Orientation.Horizontal">
-        
-        <!-- 왼쪽 -->
-        <RadzenSplitterPane Size="40%" Min="20%" Max="80%">
+    <QuriDynamicGrid 
+      ReqData=DbPropData  />
 
-                <QuriDynamicGrid ReqData=DbPropData SaveBtnEvent=SaveDBPropEvent SItemsChanged=OnDbPropChange />
-        </RadzenSplitterPane>
-        <!-- 오른쪽 -->
-        <RadzenSplitterPane Size="60%" Min="20%" Max="80%">
+  </RadzenSplitterPane>
 
-                <QuriCodeEditor @ref="_editProc" />
-
-        </RadzenSplitterPane>
-
-
-
-
-
-        </RadzenSplitter>
-
-
-
-
-
-
-    </RadzenSplitterPane>
-
-    </RadzenSplitter>
+</RadzenSplitter>
 
 
 
@@ -96,64 +73,29 @@
 
 
 
-  private QuriCodeEditor? _editProc;
 
 
   protected async Task OnLoadWrk() {
-    Data = await DbCont<Dictionary<string, object>>("sp_projdblist", new Dictionary<string, string>() {
-    { "proj_rid",  srtype?.Code ?? string.Empty }
-    });
-  }
+    // 선택한 db의 codeMaster 를 구하여 해당 관리 쿼리들 동작한 결과를 리턴한다.
 
-  protected async Task OnSaveWrk() {
-    var sp_fmt = await _editProc.GetValue();
-    await DbSave<Dictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
-    { "db_rid",  SelDbProp.FirstOrDefault()["db_rid"].ToString() },
-    { "db_prid",  SelDbProp.FirstOrDefault()["db_prid"].ToString() },
-    { "db_pkey",  SelDbProp.FirstOrDefault()["db_pkey"].ToString() },
-    { "db_pvalue",  sp_fmt },
-    });
-  }
+    Data = await JsProcDbReturn<Dictionary<string, object>>("code_master", dbType);
 
-
-  
-
-  private async Task SaveBtnEvent(IDictionary<string, object> dic) {
-    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { { "stp", "sp_projdbsave" } });
-
-    var saveobj = await DbSave<IDictionary<string, object>>("sp_projdbsave", req);
-  }
-
-
-
-  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
-    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
-
-    var saveobj = await DbDelete<IDictionary<string, object>>("sp_projdbdel", req);
-  }
-
-
-  private async Task OnDbInfoChange(IList<IDictionary<string, object>> args) {
-    DbPropData = await DbCont<Dictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
-    { "db_rid",  args.FirstOrDefault()["db_rid"].ToString() }
-    });
-  }
-
-
-  private async Task OnDbPropChange(IList<IDictionary<string, object>> args) {
-    SelDbProp = args;
-    _editProc.SetValue(args.FirstOrDefault()["db_pvalue"].ToString());
-
+    //Data = await DbCont<Dictionary<string, object>>("sp_projdblist", new Dictionary<string, string>() {
+    //{ "proj_rid",  srtype?.Code ?? string.Empty }
+    //});
   }
 
   
 
+  private async Task OnDbInfoChange(IList<IDictionary<string, object>> args) {    
+    DbPropData = await JsProcDbReturn<Dictionary<string, object>>("code_detail", dbType, new Dictionary<string, string>() {
+    { "parameter1",  args.FirstOrDefault()["cm_cd"].ToString() }
+    });
 
-  private async Task SaveDBPropEvent(IDictionary<string, object> dic) {
-    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {  });
-
-    await DbSave<IDictionary<string, object>>("sp_dev_db_prop_exec", req);
   }
+
+
+  
 
 
 }

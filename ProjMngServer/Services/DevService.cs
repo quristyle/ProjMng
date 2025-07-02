@@ -1,20 +1,21 @@
-﻿using System.Data;
-using System.Collections.Generic;
-using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
-using System.Collections;
-using ProjModel;
-using System.Security.Cryptography;
-using Npgsql;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
+﻿using Dapper;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using System.Dynamic;
-using System.Runtime.Intrinsics.Arm;
-using System.Reflection.Metadata;
-using static System.Net.WebRequestMethods;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using Npgsql;
+using ProjModel;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Dynamic;
+using System.Reflection.Metadata;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjMngServer.Services;
 public class DevService : BaseService {
@@ -139,7 +140,26 @@ public class DevService : BaseService {
     DateTime epdt = DateTime.Now;
 
     //ResultInfo<dynamic> ri = DevExecuteQuery(dbNick, stp, param);
-    ResultInfo<dynamic> ri = DevExecuteQuery(dbNick, dto.ProcName, param);
+    ResultInfo<dynamic> ri = null; // DevExecuteQuery(dbNick, dto.ProcName, param);
+
+
+
+    if (dto.IsProjDb) {
+
+      //string parameter1 = param["parameter1"]?.ToString(); // "parameter1";
+      string parameter1 = param.TryGetValue("parameter1", out var parameter1Value) ? parameter1Value : string.Empty;
+      var dq = GetProcDbDevsqlresp(dto.ProcName, param["db_rid"].ToString());
+      string query = dq.Dsl_query;// "select now()"; // 여기서 projdb 에 보관된 key의 쿼리를 가져온다.
+      if(!string.IsNullOrEmpty(parameter1)) {
+        query = query.Replace("$parameter1", parameter1);
+      }
+      ri = GetDataQuery(dbNick, query);
+    }
+    else {
+      ri = DevExecuteQuery(dbNick, dto.ProcName, param);
+    }
+
+
     epdt = DateTime.Now;
     GetRes(ref ri, param, sdt, spdt, epdt);
 
@@ -327,6 +347,25 @@ public class DevService : BaseService {
 
 
 
+  Devsqlresp GetProcDbDevsqlresp(string db_pkey, string db_rid) {
+    var connectionString = _configuration.GetConnectionString("jsini");
+
+    var parameters = new DynamicParameters();
+    parameters.Add("@db_pkey", db_pkey);
+    parameters.Add("@db_rid", db_rid);
+
+    Devsqlresp dsr = null;
+    using (IDbConnection db = new NpgsqlConnection(connectionString)) {
+      dsr = db.Query<Devsqlresp>(sql: ConstInfo.ProcDbQuery, parameters).ToList().FirstOrDefault();
+    }
+
+    return dsr;
+  }
+
+
+
+
+
   /// <summary>
   /// $key 값은 문자열을 바꾼다. 다이렉트 쿼리 문자열 $ 를 바꾼다.
   /// </summary>
@@ -334,7 +373,7 @@ public class DevService : BaseService {
   /// <param name="param"></param>
   /// <returns></returns>
   string ChangeQueryDirectQuery(string dsl_query, IDictionary<string, string> param) {
-    String result = dsl_query;
+    string result = dsl_query;
     // $key 값은 문자열을 바꾼다. 다이렉트 쿼리 문자열 $
     var _dd_matches = Regex.Matches(dsl_query, @"\$\w+");
     string[] _dd_kkk = _dd_matches.Select(m => m.Value).Distinct().ToArray();

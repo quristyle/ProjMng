@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using ProjMngWasm.Commons;
-using WasmShear.Services;
 using ProjModel;
 using Radzen;
+using System.Data;
 using WasmShear;
 using WasmShear.Commons;
+using WasmShear.Services;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjMngWasm;
@@ -16,6 +17,19 @@ public class BaseComponent : CommonComponent {
   [Inject] protected AppProjData? appProjData { get; set; }
   [Inject] protected DialogService DialogService { get; set; }
   [Inject] protected ContextMenuService ContextMenuService { get; set; }
+
+
+
+  protected Dictionary<string, string> GetProjDbParams(CommonCode dbType) {
+
+    return new Dictionary<string, string>() {
+  {"db",dbType?.Others["db_type"]??string.Empty},
+  {"dbnick",dbType?.Others["db_nick"]??string.Empty},
+  {"schema",dbType?.Others["db_schema"]??string.Empty},
+  {"db_rid",dbType?.Code??string.Empty},
+
+  };
+  }
 
 
   protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
@@ -212,6 +226,37 @@ public class BaseComponent : CommonComponent {
    
     return data;
   }
+
+
+
+  protected async Task<ResultInfo<T>> JsProcDbReturn<T>(string action_name, CommonCode dbType, Dictionary<string, string> dic = null) {
+
+    var param = GetProjDbParams(dbType);
+
+    if (dic == null) dic = new Dictionary<string, string>() { };
+
+    var dic_a = WasmUtil.JoinDictionaries(param, dic);
+
+    RequestDto rd = new RequestDto() { ProcName = action_name, IsProjDb = true, MainParam = dic_a };
+
+    var data = await devService.GetList<T>(rd);
+
+    if (data.Code < 0) {
+      Notify(NotificationSeverity.Error, "Error Message", data.Message, 10000, true);
+    }
+
+    return data;
+  }
+
+
+
+
+
+
+
+
+
+
   protected async Task<ResultInfo<T>> JsContQuery<T>(CommonCode db, string query) {
 
     var data = await devService.GetListQuery<T>(db.Others["db_nick"], query);

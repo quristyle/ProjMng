@@ -33,8 +33,11 @@
   <!-- 위쪽 -->
   <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
 
-        <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent
-                         DeleteBtnEvent=DeleteBtnEvent ReqData=Data SItemsChanged=OnDbInfoChange />
+        <QuriDynamicGrid 
+          SaveBtnEvent=SaveBtnEvent
+          DeleteBtnEvent=DeleteBtnEvent 
+          ReqData=Data 
+          SItemsChanged=OnDbInfoChange />
 
 
     </RadzenSplitterPane>
@@ -47,7 +50,12 @@
         <!-- 왼쪽 -->
         <RadzenSplitterPane Size="40%" Min="20%" Max="80%">
 
-                <QuriDynamicGrid ReqData=DbPropData SaveBtnEvent=SaveDBPropEvent SItemsChanged=OnDbPropChange />
+                <QuriDynamicGrid 
+                  ReqData=DbPropData 
+                  SaveBtnEvent=SaveDBPropEvent 
+                  SItemsChanged=OnDbPropChange
+                  AddBtnEvent=OnAddPropEvent
+                  />
         </RadzenSplitterPane>
         <!-- 오른쪽 -->
         <RadzenSplitterPane Size="60%" Min="20%" Max="80%">
@@ -121,6 +129,15 @@
     var saveobj = await DbSave<IDictionary<string, object>>("sp_projdbsave", req);
   }
 
+  
+  private async Task OnAddPropEvent(IDictionary<string, object> dic) {
+    dic["db_rid"] =   Convert.ToInt64( selectedDB["db_rid"].ToString());
+  }
+
+
+
+
+  
 
 
   private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
@@ -130,7 +147,11 @@
   }
 
 
+  IDictionary<string, object> selectedDB{get;set;}
   private async Task OnDbInfoChange(IList<IDictionary<string, object>> args) {
+
+    selectedDB = args.FirstOrDefault();
+
     DbPropData = await DbCont<Dictionary<string, object>>("sp_dev_db_prop_exec", new Dictionary<string, string>() {
     { "db_rid",  args.FirstOrDefault()["db_rid"].ToString() }
     });
