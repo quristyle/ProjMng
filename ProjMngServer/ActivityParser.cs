@@ -12,23 +12,23 @@ using System.Xml.Linq;
 public class ActivityParser {
   public static List<ActivityInfo> ParseActivityFiles(string rootPath) {
     var activityList = new List<ActivityInfo>();
-
-    var xmlFiles = Directory.GetFiles(rootPath, "*.xml", SearchOption.AllDirectories);
+    var xmlFiles = Directory.GetFiles(rootPath, "*-service.xml", SearchOption.AllDirectories);
 
     foreach (var file in xmlFiles) {
       try {
         XDocument doc = XDocument.Load(file);
-
-        XNamespace ns = "http://www.poscoict.com/glueframework/service";
         var serviceElement = doc.Root;
-        if (serviceElement == null) continue;
 
+        // <service> 루트 확인
+        if (serviceElement == null || serviceElement.Name.LocalName != "service")
+          continue;
+
+        XNamespace ns = serviceElement.Name.Namespace;
         string serviceName = serviceElement.Attribute("name")?.Value ?? "";
 
-        // Router 안에 있는 transition 들 가져오기
+        // Router activity 찾기
         var router = serviceElement.Elements(ns + "activity")
                                    .FirstOrDefault(e => e.Attribute("name")?.Value == "Router");
-
         if (router == null) continue;
 
         var transitions = router.Elements(ns + "transition");
@@ -37,31 +37,59 @@ public class ActivityParser {
           string transitionName = transition.Attribute("name")?.Value ?? "";
           string transitionValue = transition.Attribute("value")?.Value ?? "";
 
-          // transition value 와 일치하는 activity 찾기
-          var activity = serviceElement.Elements(ns + "activity")
-                                       .FirstOrDefault(e => e.Attribute("name")?.Value == transitionValue);
-          if (activity == null) continue;
+          var procedureNames = new List<string>();
+          var resultKeys = new List<string>();
 
-          string activityClass = activity.Attribute("class")?.Value ?? "";
-          string dao = activity.Elements(ns + "property")
-                               .FirstOrDefault(p => p.Attribute("name")?.Value == "dao")
-                               ?.Attribute("value")?.Value ?? "";
+          string dao = "";
+          //string resultKey = "";
+          string activityClass = "";
 
-          string procedureName = activity.Elements(ns + "property")
-                                         .FirstOrDefault(p => p.Attribute("name")?.Value == "procedure-name")
-                                         ?.Attribute("value")?.Value ?? "";
+          string currentActivityName = transitionValue;
 
-          string resultKey = activity.Elements(ns + "property")
-                                     .FirstOrDefault(p => p.Attribute("name")?.Value == "result-key")
-                                     ?.Attribute("value")?.Value ?? "";
+          // 다음 activity를 따라가며 프로시저 체인 및 result-key 체인 구성
+          while (!string.Equals(currentActivityName, "end", StringComparison.OrdinalIgnoreCase)) {
+            var activity = serviceElement.Elements(ns + "activity")
+                                         .FirstOrDefault(e => e.Attribute("name")?.Value == currentActivityName);
+            if (activity == null)
+              break;
+
+            string procName = activity.Elements(ns + "property")
+                                      .FirstOrDefault(p => p.Attribute("name")?.Value == "procedure-name")
+                                      ?.Attribute("value")?.Value ?? "";
+
+            if (!string.IsNullOrWhiteSpace(procName))
+              procedureNames.Add(procName);
+
+            string resKey = activity.Elements(ns + "property")
+                                    .FirstOrDefault(p => p.Attribute("name")?.Value == "result-key")
+                                    ?.Attribute("value")?.Value ?? "";
+
+            if (!string.IsNullOrWhiteSpace(resKey))
+              resultKeys.Add(resKey);
+
+            // dao, activityClass는 첫 활동 기준
+            if (string.IsNullOrEmpty(dao)) {
+              dao = activity.Elements(ns + "property")
+                            .FirstOrDefault(p => p.Attribute("name")?.Value == "dao")
+                            ?.Attribute("value")?.Value ?? "";
+            }
+
+            if (string.IsNullOrEmpty(activityClass)) {
+              activityClass = activity.Attribute("class")?.Value ?? "";
+            }
+
+            // 다음 activity 이름 탐색
+            var nextTransition = activity.Elements(ns + "transition").FirstOrDefault();
+            currentActivityName = nextTransition?.Attribute("value")?.Value ?? "end";
+          }
 
           activityList.Add(new ActivityInfo {
             ServiceName = serviceName,
             TransitionName = transitionName,
             TransitionValue = transitionValue,
             Dao = dao,
-            ProcedureName = procedureName,
-            ResultKey = resultKey,
+            ProcedureName = string.Join(" -> ", procedureNames),
+            ResultKey = string.Join(" -> ", resultKeys),
             Activity = activityClass
           });
         }

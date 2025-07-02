@@ -132,17 +132,17 @@ public static class BaseModelExtensions {
       // DateTime 또는 DateTime? 처리
       if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?)) {
         var dt = value as DateTime?;
-        dict[prop.Name] = dt.HasValue ? dt.Value.ToString("yyyy-MM-dd HH:mm:ss") : "";
+        dict[prop.Name.ToLower()] = dt.HasValue ? dt.Value.ToString("yyyy-MM-dd HH:mm:ss") : "";
       }
       //else if (prop.PropertyType == typeof(DateOnly) || prop.PropertyType == typeof(DateOnly?)) {
       //  var dt = value as DateOnly?;
       //  dict[prop.Name] = dt.HasValue ? dt.Value.ToString("yyyy-MM-dd") : "";
       //}
       else if (value != null) {
-        dict[prop.Name] = value.ToString();
+        dict[prop.Name.ToLower()] = value.ToString();
       }
       else {
-        dict[prop.Name] = "";
+        dict[prop.Name.ToLower()] = "";
 
 
       }

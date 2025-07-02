@@ -13,12 +13,17 @@
 <RadzenCard >
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-      <RadzenTextBox @bind-Value="srtype" />
-    </RadzenStack>
+    
+    
+    <QuriSearchs>
+      <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
+      <QuriDropDown @bind-Value="SrouceName" CodeId="sourcelist" Etc0=@projectName?.Code />
+    </QuriSearchs>
+
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />
+      <RadzenButton Click="@OnSaveWrk" Text="Save" />
     </RadzenStack>
 
   </RadzenStack>
@@ -27,14 +32,15 @@
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
   <RadzenColumn Size="12" >
 
-    <QuriDynamicGrid  ReqData=@Data />
+    <QuriDynamicGrid  ReqData=@Data AllowPaging=true />
 
   </RadzenColumn>
 </RadzenRow>
 
 @code {
-
-  public string srtype { get; set; } = "";
+  
+  CommonCode? projectName { get; set; }
+  CommonCode? SrouceName { get; set; }
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
@@ -45,12 +51,18 @@
   public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
-    Data = await MdCont<Dictionary<string, object>>("md_glue_service", new Dictionary<string, string>(){{"prj_rid","3"}});
-
-
+    Data = await DbCont<Dictionary<string, object>>("sp_dev_activityinfo_exec", new Dictionary<string, string>(){{"prj_rid",projectName?.Code}, {"src_rid",SrouceName?.Code}});
 
   StateHasChanged();
   }
+
+  
+  protected async Task OnSaveWrk() {
+    MdCont<Dictionary<string, object>>("md_glue_service", new Dictionary<string, string>(){{"prj_rid",projectName?.Code}, {"src_rid",SrouceName?.Code}});
+    Notify(NotificationSeverity.Info, "정보", "back ground 동작함 알아서 도니깐 이제 신경 끄셔도 됩니다.", 5000);
+  }
+
+
 
 
 }

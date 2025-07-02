@@ -62,7 +62,12 @@ public class QuriDynamicGridBase : BaseComponent {
   bool _isLoading { get; set; }
   [Parameter]  public bool IsLoading { get; set; }
 
+  [Parameter] public bool AllowPaging { get; set; } = false;
 
+
+
+  [Parameter] public int PageSize { get; set; } = 20;
+  
   [Parameter] public EventCallback<bool> IsLoadingChanged { get; set; }
 
 

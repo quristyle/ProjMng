@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using ProjModel;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Data;
 using System.Dynamic;
@@ -211,7 +212,40 @@ public class ProjService : BaseService {
     param["req_type"] = dto.ProcType;
     return ExcuteMultyData(procedureName, param, rowdata);
   }
+
+
   public ResultInfo<dynamic> ExcuteMultyData(string procedureName, IDictionary<string, string> param, List<Dictionary<string, object>> rowdata) {
+
+    var rowdata2 = ConvertToListOfStringDictionaries(rowdata);
+
+    return ExcuteMultyData( procedureName,  param,  rowdata2);
+  }
+
+
+  public List<Dictionary<string, string>> ConvertToListOfStringDictionaries(List<Dictionary<string, object>> source) {
+    var result = new List<Dictionary<string, string>>(source.Count);
+    foreach (var dict in source) {
+      var newDict = new Dictionary<string, string>(dict.Count);
+      foreach (var kv in dict) {
+        if (kv.Value == null) {
+          newDict[kv.Key] = null;
+        }
+        else if (kv.Value is DateTime dt) {
+          newDict[kv.Key] = dt.ToString("yyyyMMdd"); // 필요에 따라 포맷 변경
+        }
+        else {
+          newDict[kv.Key] = kv.Value.ToString();
+        }
+      }
+      result.Add(newDict);
+    }
+    return result;
+  }
+
+
+
+  //public ResultInfo<dynamic> ExcuteMultyData(string procedureName, IDictionary<string, string> param, List<Dictionary<string, object>> rowdata) {
+  public ResultInfo<dynamic> ExcuteMultyData(string procedureName, IDictionary<string, string> param, List<Dictionary<string, string>> rowdata) {
 
     ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
 
@@ -278,8 +312,16 @@ public class ProjService : BaseService {
             using (var tran = db.BeginTransaction()) {
 
 
-              foreach (Dictionary<string, object> itm in rowdata) { 
+              foreach (Dictionary<string, string> itm in rowdata) {
+                //Dictionary<string, object> itm = null;
+                //if ( obj.GetType() is BaseModel) {
+                //  itm = obj.ToDictionary();
+                //}
+                //else {
+                //  itm = obj as Dictionary<string, object>;
+                //}
 
+                //  Dictionary<string, object> itm = obj as Dictionary<string, object>;
 
                 var parameters = new DynamicParameters();
                 // 프로시저 파라미터 구성
@@ -394,7 +436,7 @@ public class ProjService : BaseService {
       ri.Data = aaa;
     }
 
-     GetRes<Dictionary<string, string>>(ref ri, param, DateTime.Now, DateTime.Now, DateTime.Now);
+    GetRes<Dictionary<string, string>>(ref ri, param, DateTime.Now, DateTime.Now, DateTime.Now);
     return ri;
   }
 
@@ -413,17 +455,10 @@ public class ProjService : BaseService {
     }
     else if (action_name == "md_glue_service") {
 
-      string path = @"c:\projects\ProjMng\samples\";
-      var activeList = ActivityParser.ParseActivityFiles(path);
 
+      string src_rid = param["src_rid"]?.ToString();
 
       List<Dictionary<string, string>> aaa = new();
-      foreach (var item in activeList) {
-        Console.WriteLine($"{item.ServiceName} | {item.TransitionName} -> {item.TransitionValue} | {item.ProcedureName} -> {item.ResultKey}");
-        aaa.Add(item.ToDictionary());
-      }
-
-
       Dictionary<string, string> col = new Dictionary<string, string>() {
         { "ServiceName", "System.String"},
         { "TransitionName", "System.String"},
@@ -435,6 +470,47 @@ public class ProjService : BaseService {
       };
 
       ri.Cols = col;
+
+
+      var srcInfo = GetData("sp_dev_srcinfo_dtl_exec", param);
+      //System.Dynamic.ExpandoObject ccc = srcInfo.Data[0];
+      //ccc.
+      var ccc = srcInfo.Data
+    .OfType<IDictionary<string, object>>()
+    .FirstOrDefault(d => d.ContainsKey("src_extend") && d["src_extend"]?.ToString() == "glue");
+
+      string path = ccc["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\";
+      if (string.IsNullOrEmpty(path)) {
+
+      }
+      else {
+
+        List<Dictionary<string, string>> rowdata = new();
+
+        var activeList = ActivityParser.ParseActivityFiles(path);
+
+        foreach (var item in activeList) {
+          Console.WriteLine($"{item.ServiceName} | {item.TransitionName} -> {item.TransitionValue} | {item.ProcedureName} -> {item.ResultKey}");
+          //aaa.Add(item.ToDictionary());
+
+          Dictionary<string, string> sItem = item.ToDictionary();
+          sItem["req_type"] = "save";
+          sItem["src_rid"] = src_rid;
+
+          //var check= GetData("sp_dev_activityinfo_exec", sItem);
+
+          //Console.WriteLine($" .......................... {check.Code}, {check.Message}");
+
+          rowdata.Add(item.ToDictionary());
+
+        }
+
+        ExcuteMultyData("sp_dev_activityinfo_exec"
+          , new Dictionary<string, string> { { "req_type", "save" }, { "src_rid", src_rid } }
+          , rowdata);
+
+
+      }
       ri.Data = aaa;
     }
     GetRes<Dictionary<string, string>>(ref ri, param, DateTime.Now, DateTime.Now, DateTime.Now);
