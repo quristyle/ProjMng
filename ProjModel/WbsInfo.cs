@@ -20,6 +20,16 @@ public class WbsInfo : BaseModel {
   public DateTime? plan_edt { get; set; }
   public DateTime? dev_sdt { get; set; }
   public DateTime? dev_edt { get; set; }
+  public DateTime? display_edt { 
+    get { 
+      if( dev_edt.HasValue) {
+        return dev_edt.Value.AddDays(1);
+      }
+      else {
+        return plan_edt;
+      }
+    } 
+  }
   public string dev_chk { get; set; }
   public string build_chk { get; set; }
   public string build_chk_dt { get; set; }

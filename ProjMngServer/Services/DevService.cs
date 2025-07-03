@@ -147,12 +147,13 @@ public class DevService : BaseService {
     if (dto.IsProjDb) {
 
       //string parameter1 = param["parameter1"]?.ToString(); // "parameter1";
-      string parameter1 = param.TryGetValue("parameter1", out var parameter1Value) ? parameter1Value : string.Empty;
+      //string parameter1 = param.TryGetValue("parameter1", out var parameter1Value) ? parameter1Value : string.Empty;
+      string parameter1 = param.GetValue("parameter1");
       var dq = GetProcDbDevsqlresp(dto.ProcName, param["db_rid"].ToString());
       string query = dq.Dsl_query;// "select now()"; // 여기서 projdb 에 보관된 key의 쿼리를 가져온다.
-      if(!string.IsNullOrEmpty(parameter1)) {
+      //if(!string.IsNullOrEmpty(parameter1)) {
         query = query.Replace("$parameter1", parameter1);
-      }
+      //}
       ri = GetDataQuery(dbNick, query);
     }
     else {

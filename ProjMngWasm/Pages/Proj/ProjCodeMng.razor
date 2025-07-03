@@ -1,4 +1,5 @@
 ﻿@page "/proj-code-mng";
+@using System.Text.RegularExpressions
 @{
   /* description : 프로젝트 master 코드 정보
   * title : 프로젝트 코드 정보
@@ -16,6 +17,7 @@
     <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown @bind-Value="srtype" CodeId="projlist" />
       <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@srtype?.Code IsEtcFix=true  />
+      <RadzenTextBox @bind-Value="srchText" />
     </QuriSearchs>
 
 
@@ -31,20 +33,68 @@
 <RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
 
     
-  <!-- 위쪽 -->
+  <!-- 왼쪽 -->
   <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
 
     <QuriDynamicGrid 
       ReqData=Data 
+      AllowPaging=true
+      PageSize=25
+      HiddenCols="query_text,ctype"
       SItemsChanged=OnDbInfoChange />
 
 
   </RadzenSplitterPane>
-    <!-- 아래쪽 -->
+    <!-- 오른쪽 -->
   <RadzenSplitterPane Size="60%" Min="10%" Max="90%">
 
+
+
+
+
+    
+<RadzenSplitter Orientation="Orientation.Vertical" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
+
+    
+  <!-- 위쪽 -->
+  <RadzenSplitterPane  Size="80%" Min="10%" Max="90%">
+    
     <QuriDynamicGrid 
       ReqData=DbPropData  />
+
+
+  </RadzenSplitterPane>
+    <!-- 아래쪽 -->
+  <RadzenSplitterPane Size="20%" Min="10%" Max="90%">
+    
+    <QuriCodeEditor @ref="_editor"  />
+
+  </RadzenSplitterPane>
+
+</RadzenSplitter>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   </RadzenSplitterPane>
 
@@ -57,8 +107,10 @@
 
 @code {
 
+  string srchText {get;set;}
   public CommonCode? srtype { get; set; }
   CommonCode? dbType { get; set; }
+  QuriCodeEditor? _editor;
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
@@ -77,8 +129,10 @@
 
   protected async Task OnLoadWrk() {
     // 선택한 db의 codeMaster 를 구하여 해당 관리 쿼리들 동작한 결과를 리턴한다.
-
-    Data = await JsProcDbReturn<Dictionary<string, object>>("code_master", dbType);
+    DbPropData = null;
+    Data = await JsProcDbReturn<Dictionary<string, object>>("code_master", dbType, new Dictionary<string, string>() {
+    { "parameter1",  srchText }
+    });
 
     //Data = await DbCont<Dictionary<string, object>>("sp_projdblist", new Dictionary<string, string>() {
     //{ "proj_rid",  srtype?.Code ?? string.Empty }
@@ -87,10 +141,37 @@
 
   
 
-  private async Task OnDbInfoChange(IList<IDictionary<string, object>> args) {    
-    DbPropData = await JsProcDbReturn<Dictionary<string, object>>("code_detail", dbType, new Dictionary<string, string>() {
-    { "parameter1",  args.FirstOrDefault()["cm_cd"].ToString() }
-    });
+  private async Task OnDbInfoChange(IList<IDictionary<string, object>> args) {  
+    DbPropData = null;
+    _editor.SetValue(string.Empty);
+    var dic = args.FirstOrDefault();
+    string master_cd = dic.GetValue("MASTER_CD");  
+    string ctype = dic.GetValue("ctype");
+
+    if( ctype == "Table" ){
+      
+      DbPropData = await JsProcDbReturn<Dictionary<string, object>>("code_detail", dbType, new Dictionary<string, string>() {
+      { "parameter1",  master_cd }
+      });
+
+    }
+    else if( ctype == "Dynamic" ){     
+      string query = dic.GetValue("query_text"); 
+      //_editor.SetValue(query);
+      
+      //Console.WriteLine($"query : {query}");
+
+      //query = Regex.Replace(query, @"(?<!:):\w+", "''"); // :시작되는 단어는 치환 :: 로 시작되는 단어는 치환 되지 않음.
+
+      //Console.WriteLine($"query2 : {query}");
+      
+      _editor.SetValue(query);
+      
+      DbPropData = await JsContQuery<Dictionary<string, object>>(dbType, Regex.Replace(query, @"(?<!:):\w+", "''"));
+
+    }
+    
+
 
   }
 
