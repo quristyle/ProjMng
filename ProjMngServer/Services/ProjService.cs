@@ -589,7 +589,7 @@ public class ProjService : BaseService {
       string basePath = srcInfoData[0]["src_path"].ToString();
       string projNamespace = srcInfoData[0]["prj_namespace"].ToString();  // @"ProjMngWasm";
       string pageRoot = srcInfoData[0]["src_ui_root"].ToString();         // @"Pages";
-      string pagePattern = srcInfoData[0]["url_pattern"].ToString();      // "@page\\s+\"(?<url>[^\"]+)\"";
+      string pagePattern = srcInfoData[0].GetValue("url_pattern");//  ["url_pattern"].ToString();      // "@page\\s+\"(?<url>[^\"]+)\"";
 
       List<Dictionary<string, string>> aaa = null;
 

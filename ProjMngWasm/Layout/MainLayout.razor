@@ -19,6 +19,7 @@
   <RadzenTheme />
 </HeadContent>
 
+<PageTitle> Jsini | @appData.User?.Last_page_nm </PageTitle>
 <RadzenComponents />
 
 <RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
@@ -263,7 +264,7 @@
       Console.WriteLine($"첫 번째 로드 : {appData.User}");
       if( appData.User != null && appData.User.Last_page_yn && !string.IsNullOrEmpty(appData.User?.Last_page) ){
         Console.WriteLine($"첫 화면 열어 주기 : {appData.User.Last_page}");
-        _main.AddItem( appData.User.Last_page, appData.User.Last_page_nm, appData.User.Last_page_nm, appData.User.Last_page_nm, appData.User.Last_page_nm   );
+        _main.AddItem( appData.User.Last_page, appData.User.Last_page_nm, appData.User.Last_page_nm, appData.User.Last_page_nm, appData.User.Last_page_nm, false, false   );
       }
     }
     //StateHasChanged();
@@ -338,7 +339,7 @@
   }
   
   void HandleSettingClick(string title, string path)    {        
-    _main.AddItem(path,title,title,title,title, true);
+    _main.AddItem(path,title,title,title,title, false, false);
   }
 
 

@@ -86,20 +86,24 @@
 
   int selectedIndex = 0;
 
-  public async Task AddItem(string fullname, string title, string name, string url, string dir, bool isSave = false) {
+  public async Task AddItem(string fullname, string title, string name, string url, string dir , bool isOtherTab, bool isSave) {
 
     bool isExsit = false;
-    for(int i = 0; i < ProjItems.Count; i++){
+    if( !isOtherTab ){
+      for(int i = 0; i < ProjItems.Count; i++){
 
-      if( ProjItems[i].ProjPath == fullname ){
-        selectedIndex = i;
-        isExsit = true;
-        break;
+        if( ProjItems[i].ProjPath == fullname ){
+          selectedIndex = i;
+            //appData.ActiveDocument = "Jsini | "+title;
+          isExsit = true;
+          break;
+        }
+
       }
-
     }
 
     if ( !isExsit ){
+      //appData.ActiveDocument = "Jsini | "+title;
       ProgramInfo ppp = new ProgramInfo(fullname, fullname) {
           ProjName = title,
           ProjId = name,
@@ -123,40 +127,8 @@
   }
 
   
-  public async Task AddItem(MenuInfo p, bool isOtherTab) {
-
-    bool isExsit = false;
-    if( !isOtherTab ){
-      for(int i = 0; i < ProjItems.Count; i++){
-
-        if( ProjItems[i].ProjPath == p.pgm_id ){
-          selectedIndex = i;
-          isExsit = true;
-          break;
-        }
-
-      }
-    }
-
-    if ( !isExsit ){
-      ProgramInfo ppp = new ProgramInfo(p.pgm_id, p.pgm_id) {
-          ProjName = p.mnu_nm,
-          ProjId = p.mnu_nm,
-          Url=p.mnu_url,
-          ProjPath = p.pgm_id
-        };
-
-      ProjItems.Add(ppp);
-      selectedIndex = ProjItems.Count - 1;
-
-    }
-
-    // 화면이 선택이 되고 나면 last_page 기록을 남긴다.
-    appData.User.Last_page = p.pgm_id;
-    appData.User.Last_page_nm = p.mnu_nm;
-    await SaveUserInfo();
-    //ProjTabs?.Reload();
-
+  public async Task AddItem(MenuInfo p, bool isOtherTab=false, bool isSave = true) {
+    await AddItem(p.pgm_id, p.mnu_nm, p.mnu_nm, p.mnu_url, "", isOtherTab, isSave);
   }
 
 
@@ -214,7 +186,7 @@
 
 
 
-  private void OnSelectedChange(int args)  {
+  private async Task OnSelectedChange(int args)  {
     //throw new NotImplementedException();
 
     Console.WriteLine($"OnSelectedChange : {args}");
@@ -226,6 +198,9 @@
    
     appData.User.Last_page = p.ProjPath;
     appData.User.Last_page_nm = p.ProjName;
+    
+    await OnChanged.InvokeAsync();
+
     SaveUserInfo();
 
   }

@@ -22,6 +22,8 @@ public class AppData {
     }
   }
 
+  // public string ActiveDocument { get; set; } = "Jsini | Developer";
+
   // session 값 비교를 통해 로그인 여부를 판단
   public bool IsLogin { get; set; }
 
@@ -84,7 +86,7 @@ public class Member : UserProp {
 public class UserProp {
   public string Theme { get; set; } = "standard-dark";
   public string Last_page { get; set; }
-  public string Last_page_nm { get; set; }
+  public string Last_page_nm { get; set; } = "Developer";
   public string Last_login_tm { get; set; }
   public bool Last_page_yn { get; set; }
   public bool SideBarAutoClose { get; set; }

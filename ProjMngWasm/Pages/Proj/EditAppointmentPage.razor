@@ -16,6 +16,7 @@
     
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="종류" Style="width: 6rem;" />
+      <QuriDropDown CodeId="projlist" @bind-Value=@_selectProject Style="width: 12rem;" InitialCode=@model.prj_rid />
       <QuriDropDown CodeId="schedule_type" @bind-Value=@_schedule_type Name="schedule_type"  Style="width: 12rem;" />
       <RadzenRequiredValidator Component="schedule_type" Text="Start is required" />
     </RadzenStack>
@@ -76,6 +77,7 @@
 
   WbsInfo model = new WbsInfo();
   CommonCode _schedule_type {get;set;}
+  CommonCode _selectProject {get;set;}
   
   [Parameter]  public DateTime? Start { get; set; }
 
@@ -139,6 +141,9 @@
     }
     if( _schedule_type != null){
       model.schedule_type =   _schedule_type.Code;
+    }
+    if( _selectProject != null){
+      model.prj_rid =   _selectProject.Code;
     }
 
     Dictionary<string, string> dic = model.ToDictionary();
