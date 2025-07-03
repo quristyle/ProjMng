@@ -6,7 +6,7 @@ namespace WasmShear.Services;
 
 public class UMSService : BaseService {
 
-  public UMSService(HttpClient httpClient) : base(httpClient) {
+  public UMSService(HttpClient httpClient, AppData appData) : base(httpClient,  appData) {
     DataPath = "DataSet.dt0.data";
     FirstDataRow = "$..data[0]";
   }

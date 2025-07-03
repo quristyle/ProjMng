@@ -7,7 +7,7 @@ namespace WasmShear.Services;
 
 public class FuneralService : BaseService {
 
-  public FuneralService(HttpClient httpClient) : base(httpClient) {
+  public FuneralService(HttpClient httpClient, AppData appData) : base(httpClient,  appData) {
     RecPath = "result";
   }
 

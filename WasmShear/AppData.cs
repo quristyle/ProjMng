@@ -22,7 +22,7 @@ public class AppData {
     }
   }
 
-  // public string ActiveDocument { get; set; } = "Jsini | Developer";
+  public string UserServerUrl { get; set; }
 
   // session 값 비교를 통해 로그인 여부를 판단
   public bool IsLogin { get; set; }

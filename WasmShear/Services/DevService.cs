@@ -6,7 +6,8 @@ namespace WasmShear.Services;
 
 public class DevService : BaseService {
 
-  public DevService(IHttpClientFactory httpClientFactory) : base(httpClientFactory.CreateClient("jsini")) { }
+  public DevService(IHttpClientFactory httpClientFactory, AppData appData) 
+    : base(httpClientFactory.CreateClient("jsini"), appData) { }
 
   public async Task<ResultInfo<T>> GetList<T>(RequestDto rd) {
 

@@ -174,11 +174,14 @@ public class CommonComponent : ComponentBase {
 
 
   public async Task Login(string id, string pw) {
+
+
+
    var user =  await jsiniService.Login(id, pw);
     if (user != null) {
       appData.User = user;
       appData.IsLogin = true;
-
+      appData.UserServerUrl = @"http://localhost:15668/";
       string json = JsonConvert.SerializeObject(user);
 
       await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);

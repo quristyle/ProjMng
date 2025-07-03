@@ -6,7 +6,8 @@ namespace WasmShear.Services;
 
 public class JsiniService : BaseService {
 
-  public JsiniService(IHttpClientFactory httpClientFactory) : base(httpClientFactory.CreateClient("jsini")) { }
+  public JsiniService(IHttpClientFactory httpClientFactory, AppData appData)
+    : base(httpClientFactory.CreateClient("jsini"), appData) { }
   
   /*
   public async Task<ResultInfo<T>> GetList<T>(string proc_name, IDictionary<string, string> dic, string proc_type = "srch", bool isFast = false) {
