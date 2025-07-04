@@ -24,15 +24,15 @@
   </RadzenStack>
 </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-  <RadzenColumn Size="6" >
+
+
+
+<RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
 
     
-    @* SaveBtnEvent=SaveBtnEvent 
-    DeleteBtnEvent=DeleteBtnEvent
-    RowClickEvent=RowClickEvent *@
-
-
+  <!-- 쪽 -->
+  <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
+    
 
     <QuriDynamicGrid 
     ReqData=Data 
@@ -45,15 +45,27 @@
 
                       />
 
-  </RadzenColumn>
+  </RadzenSplitterPane>
+  <!-- 쪽 -->
+  <RadzenSplitterPane  Size="60%" Min="10%" Max="90%">
 
-  <RadzenColumn Size="6">
-
+    
     <QuriDynamicGrid SaveBtnEvent=SaveBtnEventProj
                      ReqData=DataProj   />
 
-  </RadzenColumn>
-</RadzenRow>
+
+
+  </RadzenSplitterPane>
+
+  
+
+  </RadzenSplitter>
+
+
+
+
+
+
 
 @code {
 

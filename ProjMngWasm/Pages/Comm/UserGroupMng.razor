@@ -1,0 +1,259 @@
+﻿@page "/user-group-manager"
+@{
+  /* description : user-group-manager
+  * title : user-group-manager
+  * sort : 3
+  * credt : 2025-07-04
+  * author : quristyle
+  */
+}
+
+@inherits PageBaseComponent
+
+<RadzenCard >
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+
+
+    
+    <QuriSearchs AllLoadComplete=OnLoadWrk >
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true />
+    </QuriSearchs>
+
+
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+      <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
+
+  </RadzenStack>
+</RadzenCard>
+
+
+
+
+<RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" style=" border: 1px solid rgba(0,0,0,.08);">
+
+    
+  <!-- 쪽 -->
+  <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
+    
+
+    <QuriDynamicGrid 
+      ReqData=Data 
+      @bind-SItems=_selectedItems
+      HiddenCols="role_id,use_yn,cre_id,cre_dt,mod_id,mod_dt,grp_photo"
+      SaveBtnEvent=SaveBtnEvent 
+      DeleteBtnEvent=DeleteBtnEvent
+      RowClickEvent=RowClickEvent
+
+
+                      />
+
+  </RadzenSplitterPane>
+  <!-- 쪽 -->
+  <RadzenSplitterPane  Size="30%" Min="10%" Max="90%">
+
+
+    <RadzenTree 
+      Data=@MenuData    
+      AllowCheckBoxes="true"
+      CheckedValuesChanged=OnCheckedValuesChanged
+      
+      @bind-Value="SelectMenuObj"
+      Style="height:calc(100% - 37px);width:100%;"                         
+      ItemRender="ItemRender"                          
+    >
+      <RadzenTreeLevel 
+        TextProperty="mnu_nm" 
+        ChildrenProperty="Children"
+        Expanded=@(i => true)
+        HasChildren=@(i => ((MenuInfo)i).Children?.Any() == true)
+                                         
+      />
+
+    </RadzenTree>
+
+
+
+  </RadzenSplitterPane>
+  <!-- 쪽 -->
+  <RadzenSplitterPane  Size="30%" Min="10%" Max="90%">
+
+    <QuriDynamicGrid 
+      SaveBtnEvent=SaveBtnEventProj
+      DropDownCols="user_id|user"
+      AddBtnEvent=OnNewGroupUser
+      ReqData=DataProj   />
+
+  </RadzenSplitterPane>
+
+  </RadzenSplitter>
+
+
+
+@code {
+
+  CommonCode? srtype { get; set; }
+
+  public List<MenuInfo> Source{ get; set; }
+  public List<MenuInfo> MenuData { get; set; } // 메뉴데이터
+
+
+  IEnumerable<object> checkedValues;
+
+  IEnumerable<object> CheckedValues        {
+    get => checkedValues;
+    set{
+      checkedValues = value;
+      if (checkedValues != null)                {
+        Console.WriteLine($"CheckedValues Changed : {value}");
+      }
+    }
+  }
+
+
+  public object _selectMenuObj{get;set;}
+  public object SelectMenuObj{
+    get{
+      return _selectMenuObj;
+    }
+    set{
+      _selectMenuObj = value;
+      SelectMenu = (MenuInfo)value;
+    }}
+  public MenuInfo SelectMenu{get;set;} = new MenuInfo();
+
+
+
+
+
+  void ItemRender(TreeItemRenderEventArgs args)    { 
+    var employee = (MenuInfo)args.Value;
+    args.Attributes.Add("title", "Drag item to reorder");
+    args.Attributes.Add("style", "cursor:grab");     
+    args.Attributes.Add("ondragover", "event.preventDefault()");
+  }
+
+
+
+
+
+
+
+  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+  const string _spName = "sp_dev_user_grp_exec";
+  public IList<IDictionary<string, object>>? _selectedItems { get; set; }
+
+  protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    await OnLoadWrk();
+  }
+
+  protected async Task OnLoadWrk() {
+    Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
+    { "user_name", "" },{ "prj_rid", srtype?.Code }
+    });
+
+
+    var rdata = await DbCont<MenuInfo>("sp_dev_menu_exec", new Dictionary<string, string>() {
+        { "srch_type",  "main" }
+        });
+
+    //rdata.Data.Add(new MenuInfo(){mnu_id="ROOT",mnu_cd="ROOT",mnu_nm="ROOT"});
+    Source = rdata.Data;
+    MenuData = MenuInfo.BuildMenuTree(rdata.Data);
+
+
+
+  }
+
+  private async Task SaveBtnEvent(IDictionary<string, object> dic) {    
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+    await DbSave<Dictionary<string, object>>(_spName, req);
+  }
+
+  private async Task DeleteBtnEvent(IDictionary<string, object> dic) {
+    var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
+    await DbDelete<Dictionary<string, object>>(_spName, req);
+  }
+
+
+  public ResultInfo<Dictionary<string, object>> DataProj { get; set; }
+
+
+  string _spNameProj = "sp_dev_user_grp_map_exec";
+  protected async Task ProjectUser(IDictionary<string, object> args) {
+    Console.WriteLine($" ProjectUser {args}");
+    DataProj = await DbCont<Dictionary<string, object>>("sp_dev_user_grp_map_exec", new Dictionary<string, string>() {
+    { "grp_id", args.GetValue("grp_id") }
+    });
+    //gridProjLoding = false;
+    //Console.WriteLine($" ProjectUser {_selectedItems}");
+    StateHasChanged();
+  }
+
+  private async Task SaveBtnEventProj(IDictionary<string, object> dic) {
+    await DbSave<Dictionary<string, object>>("sp_dev_user_grp_map_exec", dic);
+  }
+  //string user_id { get; set; }
+  private async Task RowClickEvent(IDictionary<string, object> args)  { 
+
+    CheckedValues = null;
+    //return ;
+    //args.Data["user_id"]
+
+    //Console.WriteLine($" RowClickEvent {_selectedItems}");
+
+    //user_id = args.TryGetValue("user_id", out object oojb) ? oojb.ToString() : "";
+
+    //Console.WriteLine($" RowClickEvent {_selectedItems}");
+    ProjectUser(   args   );
+
+    
+    var data = await DbCont<Dictionary<string, object>>("sp_dev_grp_menu_map_exec", null);
+
+    CheckedValues = data.Data;
+
+
+  }
+
+
+
+
+
+
+
+
+  //string user_id { get; set; }
+  private void OnNewGroupUser(IDictionary<string, object> args)  { 
+    args["grp_id"] = _selectedItems.FirstOrDefault().GetValue("grp_id");
+  }
+
+
+
+
+
+
+
+
+
+  private async Task OnCheckedValuesChanged(IEnumerable<object> args)  {
+    
+        Console.WriteLine($"OnCheckedValuesChanged : {args}, {SelectMenu.mnu_nm}");
+        
+    var menuList = args.OfType<MenuInfo>().ToList();
+    bool exsitMenu = menuList.Any(m => m.mnu_id == SelectMenu.mnu_id);
+
+
+    
+    await DbCont<Dictionary<string, object>>("sp_dev_grp_menu_map_exec", new Dictionary<string, string>() {
+    { "grp_id", _selectedItems.FirstOrDefault().GetValue("grp_id") },
+    { "menu_id", SelectMenu.mnu_id }
+    }, (exsitMenu?"save":"deletge"));
+
+    
+        Console.WriteLine($"OnCheckedValuesChanged exsitMenu : {exsitMenu}, {SelectMenu.mnu_nm}");
+
+
+  }
+}

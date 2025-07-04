@@ -35,7 +35,12 @@ public class BaseComponent : CommonComponent {
   protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
     return await DbCont<T>(proc_name, dic, "srch", isFast);
   }
-  private async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type="srch",  bool isFast = false) {
+
+  protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type, bool isFast = false) {
+    return await DbCont_h<T>(proc_name, dic, proc_type, isFast);
+  }
+
+  private async Task<ResultInfo<T>> DbCont_h<T>(string proc_name, Dictionary<string, string> dic, string proc_type="srch",  bool isFast = false) {
     if (string.IsNullOrWhiteSpace(proc_name) || !proc_name.StartsWith("sp_") || proc_name.Length < 6) {
       Notify(NotificationSeverity.Warning, "Error Message", "규칙 위반", 5000);
       return new ResultInfo<T> {
@@ -43,7 +48,7 @@ public class BaseComponent : CommonComponent {
         Message = "Invalid procedure name"
       };
     }
-
+    if ( dic == null ) { dic = new(); }
     RequestDto rd = new RequestDto() {
       ProcName = proc_name
       , ProcType = proc_type

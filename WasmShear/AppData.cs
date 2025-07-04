@@ -22,7 +22,8 @@ public class AppData {
     }
   }
 
-  public string UserServerUrl { get; set; }
+
+  public string ActiveServerUrl { get; set; }
 
   // session 값 비교를 통해 로그인 여부를 판단
   public bool IsLogin { get; set; }
@@ -80,6 +81,7 @@ public class Member : UserProp {
   public string Remark { get; set; }
 
 
+
 }
 
 
@@ -90,4 +92,5 @@ public class UserProp {
   public string Last_login_tm { get; set; }
   public bool Last_page_yn { get; set; }
   public bool SideBarAutoClose { get; set; }
+  public string UserServerUrl { get; set; }
 }

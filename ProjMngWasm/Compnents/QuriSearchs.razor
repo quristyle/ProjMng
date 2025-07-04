@@ -34,21 +34,21 @@
     }
 
     public void RegisterDropDown(string codeId)    {
-      Console.WriteLine($"RegisterDropDown : {codeId} --------------------");
+      //Console.WriteLine($"RegisterDropDown : {codeId} --------------------");
        
         registeredDropDowns.Add(codeId);
         registrationComplete = false; // 새로 등록되면 다시 체크
     }
 
     public async void OnDropDownLoaded(string codeId)    {
-      Console.WriteLine($"OnDropDownLoaded : {codeId} =================");
+     // Console.WriteLine($"OnDropDownLoaded : {codeId} =================");
         
         loadedDropDowns.Add(codeId);
         CheckAllLoaded();
     }
 
     protected override void OnParametersSet()    {
-      Console.WriteLine($"OnParametersSet : zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+      //Console.WriteLine($"OnParametersSet : zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
         //loadedDropDowns.Clear();
         //registeredDropDowns.Clear();
         //allLoaded = false;

@@ -15,7 +15,7 @@ public class BaseService {
   protected string RecPath { get; set; } = "rec";
   protected string FirstDataRow { get; set; } = "data[0]";
 
-  protected readonly HttpClient _httpClient;
+  protected HttpClient _httpClient;
   protected readonly AppData _appData; // AppData 필드 추가
 
   protected const string TargetUrl = "api/Proj";
@@ -25,17 +25,23 @@ public class BaseService {
 
 
   string UserServerUrl { get; set; }
+  Uri AbsoluteUrl { get; set; }
 
   public BaseService(HttpClient httpClient, AppData appData) {
     _httpClient = httpClient;
     _appData = appData;
 
+    //if (string.IsNullOrEmpty(_appData.ActiveServerUrl)) {
+    //  Console.WriteLine($" BaseService init 111111111111111111111 _appData.ActiveServerUrl : {UserServerUrl} : {_appData.ActiveServerUrl}");
+    //  _appData.ActiveServerUrl = _httpClient.BaseAddress.Host;
+    //  Console.WriteLine($" BaseService init 222222222222222222 _appData.ActiveServerUrl : {UserServerUrl} : {_appData.ActiveServerUrl}");
+    //}
 
-    Console.WriteLine($" _appData.UserServerUrl : {_appData.UserServerUrl}");
-    if( !string.IsNullOrWhiteSpace( _appData.UserServerUrl )) {
-      UserServerUrl = _appData.UserServerUrl;
-      Console.WriteLine($" _appData.UserServerUrl in ............. : {_appData.UserServerUrl}");
-    }
+    //Console.WriteLine($" BaseService init _appData.UserServerUrl : {UserServerUrl} : {_appData.User?.UserServerUrl}");
+    //if ( !string.IsNullOrWhiteSpace( _appData.User?.UserServerUrl )) {
+    //  UserServerUrl = _appData.User?.UserServerUrl;
+    //  Console.WriteLine($" BaseService init _appData.UserServerUrl in ............. : {_appData.User?.UserServerUrl}");
+    //}
 
   }
 
@@ -81,21 +87,19 @@ public class BaseService {
 
   protected async Task<ResultInfo<T>> GetData<T>(RequestDto rd, string targetUrl = TargetUrl, HttpCallType hctype = HttpCallType.PostJson) {
 
+    
+    Console.WriteLine($" 시이작. UserServerUrl : {UserServerUrl},  ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
 
 
-    Console.WriteLine($" _appData.UserServerUrl 111111111111111111111 ............. : {_appData.UserServerUrl}    :   {UserServerUrl}");
-
-
-    if (!string.IsNullOrWhiteSpace(_appData.UserServerUrl) && string.IsNullOrWhiteSpace(UserServerUrl)) {
-      UserServerUrl = _appData.UserServerUrl;
-      _httpClient.BaseAddress = new Uri(UserServerUrl);
+    if ( !string.IsNullOrWhiteSpace(_appData.User?.UserServerUrl) && AbsoluteUrl == null  ) {
+      //UserServerUrl = _appData.User?.UserServerUrl;
+      //_httpClient.BaseAddress = new Uri(UserServerUrl);
+     // _httpClient = new HttpClient { BaseAddress = new Uri(UserServerUrl) };
+      AbsoluteUrl = new Uri(_appData.User?.UserServerUrl);
+      _appData.ActiveServerUrl = AbsoluteUrl.Host;
     }
 
-
-    Console.WriteLine($" _appData.UserServerUrl 22222222222222222222 ............. : {_appData.UserServerUrl}    :   {UserServerUrl}");
-
-
-
+    Console.WriteLine($" 끄으엇. UserServerUrl : {UserServerUrl},  ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
 
 
     ResultInfo<T> result = null;
@@ -108,7 +112,14 @@ public class BaseService {
           response = await _httpClient.GetAsync(targetUrl);
           break;
         default:
-          response = await _httpClient.PostAsJsonAsync(targetUrl, rd, System.Text.Json.JsonSerializerOptions.Default);
+
+          if (AbsoluteUrl == null) {
+            response = await _httpClient.PostAsJsonAsync(targetUrl, rd, System.Text.Json.JsonSerializerOptions.Default);
+          }
+          else {
+            response = await _httpClient.PostAsJsonAsync(new Uri(AbsoluteUrl, targetUrl), rd, System.Text.Json.JsonSerializerOptions.Default);
+          }
+
           break;
       }
 
