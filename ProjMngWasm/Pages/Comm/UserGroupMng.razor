@@ -57,8 +57,7 @@
     <RadzenTree 
       Data=@MenuData    
       AllowCheckBoxes="true"
-      CheckedValuesChanged=OnCheckedValuesChanged
-      
+      @bind-CheckedValues=CheckedValues
       @bind-Value="SelectMenuObj"
       Style="height:calc(100% - 37px);width:100%;"                         
       ItemRender="ItemRender"                          
@@ -107,6 +106,8 @@
       checkedValues = value;
       if (checkedValues != null)                {
         Console.WriteLine($"CheckedValues Changed : {value}");
+        OnCheckedValuesChanged(value);
+
       }
     }
   }
@@ -210,15 +211,34 @@
     ProjectUser(   args   );
 
     
-    var data = await DbCont<Dictionary<string, object>>("sp_dev_grp_menu_map_exec", null);
+    var data = await DbCont<MenuInfo>("sp_dev_grp_menu_map_exec", null);
+    //data.Data
 
-    CheckedValues = data.Data;
+ CheckedValues = FlattenMenus(MenuData)
+    .Where(menu => data.Data.Any(d => d.mnu_id == menu.mnu_id))
+    .ToList();
+
+    //CheckedValues = data.Data;
 
 
   }
 
 
+  private IEnumerable<MenuInfo> FlattenMenus(IEnumerable<MenuInfo> menus)
+{
+    foreach (var menu in menus)
+    {
+        yield return menu;
 
+        if (menu.Children != null && menu.Children.Any())
+        {
+            foreach (var child in FlattenMenus(menu.Children))
+            {
+                yield return child;
+            }
+        }
+    }
+}
 
 
 
