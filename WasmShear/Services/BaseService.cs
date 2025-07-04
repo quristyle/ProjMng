@@ -105,6 +105,8 @@ public class BaseService {
     ResultInfo<T> result = null;
 
     try {
+
+
       HttpResponseMessage response = null;
 
       switch (hctype) {

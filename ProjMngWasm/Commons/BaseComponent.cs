@@ -54,6 +54,7 @@ public class BaseComponent : CommonComponent {
       , ProcType = proc_type
       , IsFast = isFast
       , MainParam = dic
+      , SSUserId = appData.User?.UserId
       , Start = DateTime.Now
     };
 

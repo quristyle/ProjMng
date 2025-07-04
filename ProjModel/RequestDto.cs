@@ -5,6 +5,7 @@ namespace ProjModel;
 public class RequestDto {
   public string ProcName { get; set; }
   public string ProcType { get; set; } = "srch";
+  public string SSUserId { get; set; } = "";
   public bool IsFast { get; set; }
   public bool IsProjDb { get; set; } = false;
   public DateTime Start { get; set; }

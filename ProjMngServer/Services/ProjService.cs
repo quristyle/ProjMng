@@ -17,6 +17,7 @@ public class ProjService : BaseService {
     string procedureName = dto.ProcName;
     IDictionary<string, string> param = dto.MainParam;
     param["req_type"] = dto.ProcType;
+    param["req_ss_user_id"] = dto.SSUserId;
     return GetData( procedureName, param);
   }
 
@@ -102,9 +103,15 @@ public class ProjService : BaseService {
                     parameters.Add(paramName, dbType: DbType.Object, direction: ParameterDirection.Output); // Output refcursor
                   }
                   else {
-                    object paramValue = param.TryGetValue(paramKey, out var value) && value != null ? value.ToString() : null;
-                    parameters.Add(paramName, paramValue, DbType.String);
-                    Console.WriteLine($" {paramName} : {paramValue} ");
+
+                    if (paramName == "ss_user_id") {
+                      parameters.Add(paramName, param.GetValue("req_ss_user_id"), DbType.String);
+                    }
+                    else {
+                      object paramValue = param.TryGetValue(paramKey, out var value) && value != null ? value.ToString() : null;
+                      parameters.Add(paramName, paramValue, DbType.String);
+                      Console.WriteLine($" {paramName} : {paramValue} ");
+                    }
 
                   }
                 }
