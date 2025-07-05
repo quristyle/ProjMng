@@ -72,39 +72,14 @@
     </div>
   </RadzenSidebar>
   
-
-
-
 @code {
 
-  
     protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
-      await OnLoadMenu();
-
+      //await OnLoadMenu();
     }
-    /*
-    var currentUrl = UriHelper.Uri;
-    var baseUri = UriHelper.BaseUri;
-    var relativeUrl = currentUrl.Replace(baseUri, string.Empty);
-
-    if ((_openPageUrl != relativeUrl) && !string.IsNullOrEmpty(relativeUrl) && !relativeUrl.StartsWith('?')) {
-      _openPageUrl = relativeUrl;
-      IsBodyUrl = false;
-      StateHasChanged();
-    }
-
-    if ( !IsBodyUrl && (_openPageUrl != relativeUrl)  ) {
-      _openPageUrl = relativeUrl;
-      IsBodyUrl = true;
-      StateHasChanged();
-    }
-    */
 
   }
-
-
-  
 
   void FilterPanelMenu(ChangeEventArgs args) {
     var term = args.Value??string.Empty;
@@ -148,48 +123,36 @@
     */
   }
 
- 
+RenderFragment RenderMenuMarkup(MenuInfo p2) => 
+  @<div>@if( string.IsNullOrEmpty( p2.pgm_id) ){
+    <RadzenPanelMenuItem  
+    Text=@p2.mnu_nm 
+    Icon="" 
 
-  
-                      // Click="@(() => OnMenuExpand(p2))"
-
-    
-    RenderFragment RenderMenuMarkup(MenuInfo p2) => 
-                    @<div>@if( string.IsNullOrEmpty( p2.pgm_id) ){
-                      <RadzenPanelMenuItem  
-                      Text=@p2.mnu_nm 
-                      Icon="" 
-
-                      @bind-Expanded=@p2.Expanded 
-                      class="@((@p2.Children.Count>0)?"menu-fold":"")" >
-                        @if (p2.Children != null && p2.Children.Count > 0)        {
-                            @foreach (var child in p2.Children)            {
-                                @RenderMenuMarkup(child)
-                            }
-                        }
-
-                      </RadzenPanelMenuItem>
-                    }
-                    else{
-                      <div @oncontextmenu="(e => ShowContextMenuWithContent(e, p2))"  @oncontextmenu:preventDefault="true"   >
-                        <RadzenPanelMenuItem 
-                          Click=@(()=>AddCallTab(p2)) 
-                          Text="@p2.mnu_nm"
-                          Icon="" 
-                          aria-label=""
-                          title="@(@p2.pgm_id)"                
-                        >
+    @bind-Expanded=@p2.Expanded 
+    class="@((@p2.Children.Count>0)?"menu-fold":"")" >
+      @if (p2.Children != null && p2.Children.Count > 0)        {
+        @foreach (var child in p2.Children)            {
+          @RenderMenuMarkup(child)
+        }
+      }
+    </RadzenPanelMenuItem>
+  }
+  else{
+    <div @oncontextmenu="(e => ShowContextMenuWithContent(e, p2))"  @oncontextmenu:preventDefault="true"   >
+      <RadzenPanelMenuItem 
+        Click=@(()=>AddCallTab(p2)) 
+        Text="@p2.mnu_nm"
+        Icon="" 
+        aria-label=""
+        title="@(@p2.pgm_id)"                
+      >
           
-                        </RadzenPanelMenuItem>
-                      </div>
-                    }</div>;
+      </RadzenPanelMenuItem>
+    </div>
+  }</div>;
 
-
-
-  public List<MenuInfo> Data { get; set; } = new List<MenuInfo>();
-
-
-
+public List<MenuInfo> Data { get; set; } = new List<MenuInfo>();
 
 void OnMenuExpand(MenuInfo menu){
   return;
@@ -211,52 +174,42 @@ void OnMenuExpand(MenuInfo menu){
 }
 
 
-  protected async Task OnLoadMenu() {
-    if (jsiniService != null) {
-
+public async Task OnLoadMenu() {
+  if (jsiniService != null) {
       
-        var rdata = await DbCont<MenuInfo>("sp_dev_menu_auth", new Dictionary<string, string>() {
+      var rdata = await DbCont<MenuInfo>("sp_dev_menu_auth", new Dictionary<string, string>() {
         { "srch_type",  "main" }
-        });
+      }, false, true);
         
-        if( rdata != null ){
-       //Data = rdata.Data;
-       Data = MenuInfo.BuildMenuTree(rdata.Data);
-
-        }
+      if( rdata != null ){
+        Data = MenuInfo.BuildMenuTree(rdata.Data);
+      }
    
-      
-    }
-    else {
-      Console.WriteLine("JsiniService is null.");
-    }StateHasChanged();
   }
+  else {
+    Console.WriteLine("JsiniService is null.");
+  }
+  StateHasChanged();
+}
 
-  [Parameter]    public EventCallback<(MenuInfo, bool)> OnCallTab { get; set; }
+[Parameter] public EventCallback<(MenuInfo, bool)> OnCallTab { get; set; }
 
-    void AddCallTab(MenuInfo p)    {
+void AddCallTab(MenuInfo p)    {
       
-      AddCallTab(p, false);
-    }
+  AddCallTab(p, false);
+}
     
-    void AddCallTab(MenuInfo p, bool isOtherTab)    {
+void AddCallTab(MenuInfo p, bool isOtherTab)    {
       
-      Console.WriteLine("sidebarmenu AddCallTab call.");
+  Console.WriteLine("sidebarmenu AddCallTab call.");
 
-        if (OnCallTab.HasDelegate)        {
-            OnCallTab.InvokeAsync((p, isOtherTab));
-        }
+    if (OnCallTab.HasDelegate)        {
+        OnCallTab.InvokeAsync((p, isOtherTab));
     }
+}
 
-[Parameter]
-    public bool SidebarExpanded { get; set; }
-    [Parameter]
-    public EventCallback<bool> SidebarExpandedChanged { get; set; }
-
-
-
-
-
+[Parameter]    public bool SidebarExpanded { get; set; }
+[Parameter]    public EventCallback<bool> SidebarExpandedChanged { get; set; }
 
   void ShowContextMenuWithContent(MouseEventArgs args, MenuInfo item) => ContextMenuService.Open(args, ds =>
   @<RadzenMenu Click="@( ( MenuItemEventArgs ee) =>  OnMenuItemClick(ee, item))">
@@ -275,9 +228,7 @@ void OnMenuExpand(MenuInfo menu){
 
   void OnMenuItemClick(MenuItemEventArgs args, MenuInfo item) {
 
-
     Console.WriteLine($"Clicked on {args.Value}");
-
 
     if (args.Value.Equals(1)) {
       // Open URL
@@ -304,10 +255,5 @@ void OnMenuExpand(MenuInfo menu){
     ContextMenuService.Close();
     }
   }
-
-
-
-
-
 
 }

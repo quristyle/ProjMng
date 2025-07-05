@@ -52,10 +52,10 @@ public class CommonComponent : ComponentBase {
 
   }
 
-  protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
-    return await DbCont<T>(proc_name, dic, "srch", isFast);
+  protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false, bool isServerFix = false) {
+    return await DbCont<T>(proc_name, dic, "srch", isFast, isServerFix);
   }
-  private async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type="srch",  bool isFast = false) {
+  private async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type="srch",  bool isFast = false, bool isServerFix = false) {
     if (string.IsNullOrWhiteSpace(proc_name) || !proc_name.StartsWith("sp_") || proc_name.Length < 6) {
       //Notify(NotificationSeverity.Warning, "Error Message", "규칙 위반", 5000);
       return new ResultInfo<T> {
@@ -71,7 +71,19 @@ public class CommonComponent : ComponentBase {
     , MainParam = dic
     };
 
-    var data = await jsiniService.GetList<T>(rd);
+    //var data = await jsiniService.GetList<T>(rd);
+
+
+    ResultInfo<T> data = null;
+    if (isServerFix) {
+      data = await jsiniService.GetList<T>(rd, "api/Proj/sys");
+    }
+    else {
+      data = await jsiniService.GetList<T>(rd);
+    }
+
+
+
 
     if (data.Code < 0) {
       //Notify(NotificationSeverity.Error, "Error Message", data.Message, 50000, true);
@@ -116,15 +128,15 @@ public class CommonComponent : ComponentBase {
     return data;
   }
 
-  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, IDictionary<string, object> dic, bool isFast = false) {
+  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, IDictionary<string, object> dic, bool isFast = false, bool isServerFix = false) {
     //var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() {  });
 
     var req = WasmUtil.JoinConvert(dic);
 
-    return await DbSave<T>( proc_name, req, isFast);
+    return await DbSave<T>( proc_name, req, isFast, isServerFix);
   }
-  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false) {
-    var data = await DbCont<T>( proc_name, dic, "save", isFast);
+  protected async Task<ResultInfo<T>> DbSave<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false, bool isServerFix = false) {
+    var data = await DbCont<T>( proc_name, dic, "save", isFast, isServerFix);
     Notify(data);
     return data;
   }
@@ -218,11 +230,8 @@ public class CommonComponent : ComponentBase {
       { "sideauto_close", user.SideBarAutoClose.ToString() },
       { "serverurl", user.UserServerUrl },
 
-
-
-
-
-    });
+    }, false, true);
+    appData.ActiveServerUrl = user.UserServerUrl;
 
     string json = JsonConvert.SerializeObject(user);
 

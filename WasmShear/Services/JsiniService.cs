@@ -37,11 +37,39 @@ public class JsiniService : BaseService {
     return await GetData<T>(proc_name, reqDic, targetUrl);
   }
   */
+  /*
   public async Task<ResultInfo<T>> GetList<T>(RequestDto rd) {
 
 
     string calltype = rd.ProcName.ToLower();
     string targetUrl = TargetUrl;
+    //if (calltype == "sp") {
+    //  targetUrl = TargetUrl;
+    //  if (rd.IsFast) {
+    //    targetUrl = TargetUrlFast;
+    //  }
+    //}
+    //else 
+    if (calltype.IndexOf("md_") == 0) { targetUrl = TargetUrlMedia; }
+
+    //Dictionary<string, string> req = new Dictionary<string, string>() {
+    //  { "req_cname", proc_name }
+    //  , { "req_type", proc_type }
+    //  , { "req_sdt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }
+    //  , { "req_isFast", isFast.ToString() }
+    //};
+
+    //var reqDic = WasmUtil.JoinDictionaries(dic, req);
+
+    return await GetData<T>(rd, targetUrl);
+  }
+  */
+
+  public async Task<ResultInfo<T>> GetList<T>(RequestDto rd, string targetUrl = TargetUrl) {
+
+
+    string calltype = rd.ProcName.ToLower();
+    //string targetUrl = TargetUrl;
     //if (calltype == "sp") {
     //  targetUrl = TargetUrl;
     //  if (rd.IsFast) {
@@ -75,7 +103,7 @@ public class JsiniService : BaseService {
     //  { "userid", id }
     //  , { "pwd", pw }
     //};
-    var result = await GetList<Member>(rd);
+    var result = await GetData<Member>(rd, "api/Proj/login");
     if (result.Code == 0) {
       return result.Data.FirstOrDefault();
     }

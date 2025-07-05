@@ -76,7 +76,7 @@
     </ChildContent>
   </RadzenBody>
 
-  <SideBarMenu  OnCallTab="AddCallTab" @bind-SidebarExpanded="sidebarExpanded" />
+  <SideBarMenu  @ref="sideBarMenuRef" OnCallTab="AddCallTab" @bind-SidebarExpanded="sidebarExpanded" />
 
   <RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack class="rz-p-4" Gap="0">
@@ -105,6 +105,16 @@
   bool sidebarExpanded = true;
   bool configSidebarExpanded = false;
   bool rendered;
+
+
+  private SideBarMenu? sideBarMenuRef;
+
+    // private void HandleLoginSuccess()
+    // {
+    //     로그인 성공 후 메뉴 갱신
+    //     sideBarMenuRef?.OnLoadMenu();
+    // }
+
 
 
   void OnMainContChanged()    {
@@ -260,7 +270,11 @@
       NavigationManager.NavigateTo("/login");
     }
     else{
-      
+
+      sideBarMenuRef?.OnLoadMenu();
+
+
+      // 로그인 성공시 SideBarMenu 의 OnLoadMenu 를 호출 하고 싶다.
       Console.WriteLine($"첫 번째 로드 : {appData.User}");
       if( appData.User != null && appData.User.Last_page_yn && !string.IsNullOrEmpty(appData.User?.Last_page) ){
         Console.WriteLine($"첫 화면 열어 주기 : {appData.User.Last_page}");

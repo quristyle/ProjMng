@@ -18,6 +18,7 @@ public class BaseService {
   protected HttpClient _httpClient;
   protected readonly AppData _appData; // AppData 필드 추가
 
+  public const string TargetBaseUrl = "api/Proj/sys";
   protected const string TargetUrl = "api/Proj";
   protected const string TargetDevUrl = "api/Dev";
   protected const string TargetUrlFast = "api/Proj/fast";
@@ -115,7 +116,7 @@ public class BaseService {
           break;
         default:
 
-          if (AbsoluteUrl == null) {
+          if (AbsoluteUrl == null || targetUrl == "api/Proj/login" || targetUrl == "api/Proj/sys") {
             response = await _httpClient.PostAsJsonAsync(targetUrl, rd, System.Text.Json.JsonSerializerOptions.Default);
           }
           else {

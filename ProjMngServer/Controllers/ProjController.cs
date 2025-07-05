@@ -38,6 +38,22 @@ public class ProjController : ControllerBase {
   }
 
 
+
+  [HttpPost]
+  [Route("login")]
+  public ActionResult<ResultInfo<Dictionary<string, object>>> PostLogin([FromBody] RequestDto dto) {
+    ResultInfo<dynamic> data = _projService.GetData(dto);
+    return Ok(data);
+  }
+
+  [HttpPost]
+  [Route("sys")]
+  public ActionResult<ResultInfo<Dictionary<string, object>>> PostSys([FromBody] RequestDto dto) {
+    ResultInfo<dynamic> data = _projService.GetData(dto);
+    return Ok(data);
+  }
+
+
   //[HttpPost]
   //[Route("multydata")]
   //public ActionResult<ResultInfo<Dictionary<string, object>>> PostBodyMulty([FromBody] Dictionary<string, string> param) {
