@@ -148,14 +148,7 @@
     string master_cd = dic.GetValue("MASTER_CD");  
     string ctype = dic.GetValue("ctype");
 
-    if( ctype == "Table" ){
-      
-      DbPropData = await JsProcDbReturn<Dictionary<string, object>>("code_detail", dbType, new Dictionary<string, string>() {
-      { "parameter1",  master_cd }
-      });
-
-    }
-    else if( ctype == "Dynamic" ){     
+    if( ctype == "Dynamic" ){     
       string query = dic.GetValue("query_text"); 
       //_editor.SetValue(query);
       
@@ -168,6 +161,12 @@
       _editor.SetValue(query);
       
       DbPropData = await JsContQuery<Dictionary<string, object>>(dbType, Regex.Replace(query, @"(?<!:):\w+", "''"));
+
+    }
+    else{
+      DbPropData = await JsProcDbReturn<Dictionary<string, object>>("code_detail", dbType, new Dictionary<string, string>() {
+      { "parameter1",  master_cd }
+      });
 
     }
     

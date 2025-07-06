@@ -3,9 +3,9 @@ using ProjModel;
 using WasmShear;
 
 namespace ProjMngWasm.Commons {
-  public class AppProjData: AppData {
+  public class AppProjData {
     
-    public StandaloneEditorConstructionOptions PgsqlOtion { get; set; } =
+    public static StandaloneEditorConstructionOptions PgsqlOtion { get; set; } =
        new StandaloneEditorConstructionOptions {
          AutomaticLayout = true,
          Language = "pgsql",
@@ -15,7 +15,7 @@ namespace ProjMngWasm.Commons {
          }
        };
 
-    public StandaloneEditorConstructionOptions FnPgsqlOtion(StandaloneCodeEditor editor) {
+    public static StandaloneEditorConstructionOptions FnPgsqlOtion(StandaloneCodeEditor editor) {
       return PgsqlOtion;
     }
 

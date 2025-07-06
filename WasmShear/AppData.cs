@@ -61,6 +61,18 @@ public class AppData {
   }
 
 
+  public RequestDto CreateDto(string procName = null, IDictionary<string, string> dic = null) {
+
+
+    RequestDto rd = new RequestDto();
+    rd.SSUserId = User?.UserId??"";
+    rd.ProcName = procName;
+    rd.MainParam = dic;
+
+    return rd;
+
+  }
+
 
 }
 public class Member : UserProp {

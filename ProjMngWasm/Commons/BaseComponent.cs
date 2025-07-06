@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using ProjMngWasm.Commons;
 using ProjModel;
 using Radzen;
@@ -14,9 +15,11 @@ namespace ProjMngWasm;
 public class BaseComponent : CommonComponent {
 
   [Inject] protected NotificationService? NotificationService { get; set; }
-  [Inject] protected AppProjData? appProjData { get; set; }
+  [Inject] protected AppData? appData { get; set; }
   [Inject] protected DialogService DialogService { get; set; }
   [Inject] protected ContextMenuService ContextMenuService { get; set; }
+
+
 
 
 

@@ -33,7 +33,7 @@ builder.Services.AddScoped<JsiniService>();
 builder.Services.AddSingleton<DevService>();
 builder.Services.AddSingleton<SysService>();
 builder.Services.AddSingleton<AppData>();
-builder.Services.AddSingleton<AppProjData>();
+//builder.Services.AddSingleton<AppProjData>();
 
 var app = builder.Build();
 

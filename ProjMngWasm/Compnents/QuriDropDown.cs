@@ -13,7 +13,7 @@ namespace ProjMngWasm.Compnents;
 public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
 
   [Inject] private JsiniService? jsiniService { get; set; }
-  [Inject] AppProjData? appData { get; set; }
+  [Inject] AppData? appData { get; set; }
 
   [Parameter] public string? InitialCode { get; set; }
 
@@ -129,15 +129,18 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         Console.WriteLine($"LoadData LoadItems : {_codeId} etc0 : {_etc0}");
 
 
-        RequestDto rd = new RequestDto() {
-          ProcName = "sp_projCommon",
-          MainParam = new Dictionary<string, string>() {
+        RequestDto rd = appData.CreateDto("sp_projCommon", new Dictionary<string, string>() {
             { "code_id", _codeId },
             { "etc0", Etc0 }
-          }
-        };
+          });
 
-
+        //RequestDto rd = new RequestDto() {
+        //  ProcName = "sp_projCommon",
+        //  MainParam = new Dictionary<string, string>() {
+        //    { "code_id", _codeId },
+        //    { "etc0", Etc0 }
+        //  }
+        //};
 
         // _codeId에 해당하는 딕셔너리가 없을 경우 처리
         var data = await jsiniService.GetList<Dictionary<string, string>>(rd);
@@ -159,7 +162,7 @@ public class QuriDropDown<TValue> : RadzenDropDown<TValue> {
         }
 
         if (!appData.GlobalDic.ContainsKey(_codeId)) {
-          appData.GlobalDic.Add(_codeId, dic);
+          //appData.GlobalDic.Add(_codeId, dic);     // 자원 아끼기 위해 보관하는것 사용자 변경시 초기화 하고난 뒤 다시 살릴것.
         }
         tmp = WasmUtil.DeepCopy(dic);
 

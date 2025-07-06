@@ -94,11 +94,16 @@ public class JsiniService : BaseService {
 
   public async Task<Member> Login(string id, string pw) {
 
-    RequestDto rd = new RequestDto() { ProcName = "sp_proj_login", MainParam= new Dictionary<string, string>() {
+    RequestDto rd = _appData.CreateDto("sp_proj_login", new Dictionary<string, string>() {
       { "userid", id }
       , { "pwd", pw }
-    }
-    };
+    });
+
+    //RequestDto rd = new RequestDto() { ProcName = "sp_proj_login", MainParam= new Dictionary<string, string>() {
+    //  { "userid", id }
+    //  , { "pwd", pw }
+    //}
+    //};
     //var dic = new Dictionary<string, string>() {
     //  { "userid", id }
     //  , { "pwd", pw }

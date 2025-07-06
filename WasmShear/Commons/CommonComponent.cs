@@ -23,6 +23,7 @@ public class CommonComponent : ComponentBase {
   [Inject] protected AppData? appData { get; set; }
 
 
+
   public async Task<bool> AuthCheck() {
 
 
@@ -51,6 +52,77 @@ public class CommonComponent : ComponentBase {
 
 
   }
+
+
+  public async Task Login(string id, string pw) {
+
+
+    var user = await jsiniService.Login(id, pw);
+    if (user != null) {
+      appData.User = user;
+      appData.IsLogin = true;
+      //appData.ActiveServerUrl = null;
+      string json = JsonConvert.SerializeObject(user);
+
+      await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);
+      navigationManager.NavigateTo("/");
+    }
+    else {
+      //Notify(NotificationSeverity.Error, "Error Message", "로그인 실패", 50000, true);
+    }
+  }
+
+
+
+
+  protected async Task LoadInfo() {
+    try {
+      string json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
+      if (!string.IsNullOrEmpty(json)) {
+        Member user = JsonConvert.DeserializeObject<Member>(json);
+        appData.User = user;
+      }
+    }
+    catch (Exception eee) {
+      Console.WriteLine($"Error loading user info: {eee.Message}");
+    }
+  }
+
+  protected async Task SaveUserInfo() {
+    var user = appData.User;
+
+    await DbSave<Dictionary<string, object>>("sp_dev_user_exec_all", new Dictionary<string, string>() {
+      { "prop_type", "LASTPAGE" },
+      { "user_id", user.UserId },
+      { "page", user.Last_page },
+      { "page_nm", user.Last_page_nm },
+      { "theme", user.Theme },
+      { "page_yn", user.Last_page_yn.ToString() },
+      { "sideauto_close", user.SideBarAutoClose.ToString() },
+      { "serverurl", user.UserServerUrl },
+
+    }, false, true);
+    //appData.ActiveServerUrl = null;// user.UserServerUrl;
+
+    string json = JsonConvert.SerializeObject(user);
+
+    await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);
+
+  }
+
+
+  protected async Task Logout() {
+    appData.User = null;
+    appData.IsLogin = false;
+
+    await jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userInfo");
+    navigationManager.NavigateTo("/");
+  }
+
+
+
+
+
 
   protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false, bool isServerFix = false) {
     return await DbCont<T>(proc_name, dic, "srch", isFast, isServerFix);
@@ -184,69 +256,6 @@ public class CommonComponent : ComponentBase {
   //  return data;
   //}
 
-
-  public async Task Login(string id, string pw) {
-
-
-    var user =  await jsiniService.Login(id, pw);
-    if (user != null) {
-      appData.User = user;
-      appData.IsLogin = true;
-      //appData.ActiveServerUrl = null;
-      string json = JsonConvert.SerializeObject(user);
-
-      await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);
-      navigationManager.NavigateTo("/");
-    }
-    else {
-      //Notify(NotificationSeverity.Error, "Error Message", "로그인 실패", 50000, true);
-    }
-  }
-
-
-  protected async Task LoadInfo() {
-    try {
-      string json = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "userInfo");
-      if (!string.IsNullOrEmpty(json)) {
-        Member user = JsonConvert.DeserializeObject<Member>(json);
-        appData.User = user;
-      }
-    }
-    catch (Exception eee) {
-      Console.WriteLine($"Error loading user info: {eee.Message}");
-    }
-  }
-
-  protected async Task SaveUserInfo() {
-    var user = appData.User;
-
-    await DbSave<Dictionary<string, object>>("sp_dev_user_exec_all", new Dictionary<string, string>() {
-      { "prop_type", "LASTPAGE" },
-      { "user_id", user.UserId },
-      { "page", user.Last_page },
-      { "page_nm", user.Last_page_nm },
-      { "theme", user.Theme },
-      { "page_yn", user.Last_page_yn.ToString() },
-      { "sideauto_close", user.SideBarAutoClose.ToString() },
-      { "serverurl", user.UserServerUrl },
-
-    }, false, true);
-    //appData.ActiveServerUrl = null;// user.UserServerUrl;
-
-    string json = JsonConvert.SerializeObject(user);
-
-    await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);
-
-  }
-
-
-  protected async Task Logout() {
-    appData.User = null;
-    appData.IsLogin = false;
-
-    await jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userInfo");
-    navigationManager.NavigateTo("/");
-  }
 
 
   protected object GetDicValue(IDictionary<string, object> args, string key) {
