@@ -104,7 +104,7 @@ public class JsiniService : BaseService {
     //  , { "pwd", pw }
     //};
     var result = await GetData<Member>(rd, "api/Proj/login");
-    if (result.Code == 0) {
+    if (result != null && result.Code == 0) {
       return result.Data.FirstOrDefault();
     }
     return null; 

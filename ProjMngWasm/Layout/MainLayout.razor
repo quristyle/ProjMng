@@ -276,7 +276,7 @@
 
       // 로그인 성공시 SideBarMenu 의 OnLoadMenu 를 호출 하고 싶다.
       Console.WriteLine($"첫 번째 로드 : {appData.User}");
-      if( appData.User != null && appData.User.Last_page_yn && !string.IsNullOrEmpty(appData.User?.Last_page) ){
+      if( appData.User != null && appData.User.Last_page_yn == true && !string.IsNullOrEmpty(appData.User?.Last_page) ){
         Console.WriteLine($"첫 화면 열어 주기 : {appData.User.Last_page}");
        await _main.AddItem( appData.User.Last_page, appData.User.Last_page_nm, appData.User.Last_page_nm, appData.User.Last_page_nm, appData.User.Last_page_nm, false, false   );
       }
@@ -346,7 +346,7 @@
   
 
   public void AddCallTab((MenuInfo p, bool isOtherTab) args) {
-    if( appData.User.SideBarAutoClose ){
+    if( appData.User?.SideBarAutoClose == true ){
       sidebarExpanded = false;
     }
     _main.AddItem(args.p, args.isOtherTab);    

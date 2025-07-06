@@ -23,7 +23,7 @@ public class AppData {
   }
 
 
-  public string ActiveServerUrl { get; set; }
+  public string ActiveServerUrl { get; set; } = "defalut server";
 
   // session 값 비교를 통해 로그인 여부를 판단
   public bool IsLogin { get; set; }

@@ -16,7 +16,7 @@ public class BaseService {
   protected string FirstDataRow { get; set; } = "data[0]";
 
   protected HttpClient _httpClient;
-  protected readonly AppData _appData; // AppData 필드 추가
+  protected AppData _appData; // AppData 필드 추가
 
   public const string TargetBaseUrl = "api/Proj/sys";
   protected const string TargetUrl = "api/Proj";
@@ -85,24 +85,73 @@ public class BaseService {
     Get, Post, Put, Delete, DeleteAll, PostJson, PutJson, DeleteJson
   }
 
+  private string? _previousUserServerUrl;
+
+  private void CheckUserServerUrlChanged() {
+    var currentUrl = _appData.User?.UserServerUrl;
+
+    if (_previousUserServerUrl == currentUrl)
+      return; // 변경되지 않았으면 무시
+
+    _previousUserServerUrl = currentUrl;
+
+    if (string.IsNullOrWhiteSpace(currentUrl)) {
+      AbsoluteUrl = null;
+      _appData.ActiveServerUrl = "default Server";
+    }
+    else {
+      try {
+        AbsoluteUrl = new Uri(currentUrl);
+        _appData.ActiveServerUrl = AbsoluteUrl.Host;
+      }
+      catch {
+        AbsoluteUrl = null;
+        _appData.ActiveServerUrl = "default Server";
+      }
+    }
+
+  }
+
+
+
 
   protected async Task<ResultInfo<T>> GetData<T>(RequestDto rd, string targetUrl = TargetUrl, HttpCallType hctype = HttpCallType.PostJson) {
 
     
     Console.WriteLine($" 시이작. UserServerUrl : {UserServerUrl},  ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
 
-
-    if ( !string.IsNullOrWhiteSpace(_appData.User?.UserServerUrl) && AbsoluteUrl == null  ) {
-      //UserServerUrl = _appData.User?.UserServerUrl;
-      //_httpClient.BaseAddress = new Uri(UserServerUrl);
-     // _httpClient = new HttpClient { BaseAddress = new Uri(UserServerUrl) };
-      AbsoluteUrl = new Uri(_appData.User?.UserServerUrl);
-      _appData.ActiveServerUrl = AbsoluteUrl.Host;
-    }
+    CheckUserServerUrlChanged();
 
     Console.WriteLine($" 끄으엇. UserServerUrl : {UserServerUrl},  ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
 
 
+
+    /*
+    if ( !string.IsNullOrWhiteSpace(_appData.User?.UserServerUrl) && AbsoluteUrl == null) {
+      // UserServerUrl = _appData.User?.UserServerUrl;
+      // _httpClient .BaseAddress = new Uri(UserServerUrl);
+      // _httpClient = new HttpClient { BaseAddress = new Uri(UserServerUrl) };
+
+      AbsoluteUrl = new Uri(_appData.User?.UserServerUrl);
+      _appData.ActiveServerUrl = AbsoluteUrl.Host;
+      Console.WriteLine($"한번만 발생하자 11111111111111111 : {_appData.ActiveServerUrl} ...  ");
+    }
+    else if (string.IsNullOrWhiteSpace(_appData.User?.UserServerUrl) && AbsoluteUrl != null) {
+      AbsoluteUrl = null;
+      _appData.ActiveServerUrl = "defalut server";
+      Console.WriteLine($"한번만 발생하자 222222222222222 : {_appData.ActiveServerUrl} ...  ");
+    }
+    else if (!string.IsNullOrWhiteSpace(_appData.User?.UserServerUrl)) {
+      AbsoluteUrl = new Uri(_appData.User?.UserServerUrl);
+      _appData.ActiveServerUrl = AbsoluteUrl.Host;
+      Console.WriteLine($"한번만 발생하자 33333333333333333 : {_appData.ActiveServerUrl} ...  ");
+    }
+    else if (string.IsNullOrWhiteSpace(_appData.User?.UserServerUrl)) {
+      AbsoluteUrl = null;
+      _appData.ActiveServerUrl = "defalut server";
+      Console.WriteLine($"한번만 발생하자 444444444444 : {_appData.ActiveServerUrl} ...  ");
+    }
+    */
     ResultInfo<T> result = null;
 
     try {

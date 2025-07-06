@@ -192,7 +192,7 @@ public class CommonComponent : ComponentBase {
     if (user != null) {
       appData.User = user;
       appData.IsLogin = true;
-      appData.ActiveServerUrl = null;
+      //appData.ActiveServerUrl = null;
       string json = JsonConvert.SerializeObject(user);
 
       await jsRuntime.InvokeVoidAsync("localStorage.setItem", "userInfo", json);
@@ -231,7 +231,7 @@ public class CommonComponent : ComponentBase {
       { "serverurl", user.UserServerUrl },
 
     }, false, true);
-    appData.ActiveServerUrl = user.UserServerUrl;
+    //appData.ActiveServerUrl = null;// user.UserServerUrl;
 
     string json = JsonConvert.SerializeObject(user);
 
