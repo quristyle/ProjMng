@@ -269,7 +269,7 @@
     await DbCont<Dictionary<string, object>>("sp_dev_grp_menu_map_exec", new Dictionary<string, string>() {
     { "grp_id", _selectedItems.FirstOrDefault().GetValue("grp_id") },
     { "menu_id", SelectMenu.mnu_id }
-    }, (exsitMenu?"save":"deletge"));
+    }, (exsitMenu?"save":"delete"));
 
     
         Console.WriteLine($"OnCheckedValuesChanged exsitMenu : {exsitMenu}, {SelectMenu.mnu_nm}");

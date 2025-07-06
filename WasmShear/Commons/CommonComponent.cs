@@ -136,12 +136,23 @@ public class CommonComponent : ComponentBase {
       };
     }
 
-    RequestDto rd = new RequestDto() { 
-    ProcName = proc_name
-    , ProcType = proc_type
-    , IsFast = isFast
-    , MainParam = dic
-    };
+
+    RequestDto rd = appData.CreateDto(proc_name, dic);
+    rd.ProcType = proc_type;
+    rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+
+
+
+
+
+    //RequestDto rd = new RequestDto() { 
+    //ProcName = proc_name
+    //, ProcType = proc_type
+    //, IsFast = isFast
+    //, MainParam = dic
+    //};
 
     //var data = await jsiniService.GetList<T>(rd);
 
@@ -183,12 +194,24 @@ public class CommonComponent : ComponentBase {
       return null;
     }
 
-    RequestDto rd = new RequestDto() {
-      ProcName = md_name
-    ,      ProcType = proc_type
-    ,      IsFast = isFast
-    ,      MainParam = dic
-    };
+
+
+
+    RequestDto rd = appData.CreateDto(md_name, dic);
+    rd.ProcType = proc_type;
+    rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+
+
+
+
+    //RequestDto rd = new RequestDto() {
+    //  ProcName = md_name
+    //,      ProcType = proc_type
+    //,      IsFast = isFast
+    //,      MainParam = dic
+    //};
 
 
     var data = await jsiniService.GetList<T>(rd);
@@ -231,10 +254,19 @@ public class CommonComponent : ComponentBase {
     if (dic == null) dic = new Dictionary<string, string>() { };
 
 
-    RequestDto rd = new RequestDto() {
-      ProcName = action_name
-    ,      MainParam = dic
-    };
+
+    RequestDto rd = appData.CreateDto(action_name, dic);
+    //rd.ProcType = proc_type;
+    //rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+
+
+
+    //RequestDto rd = new RequestDto() {
+    //  ProcName = action_name
+    //,      MainParam = dic
+    //};
 
 
     var data = await devService.GetList<T>(rd);
@@ -310,14 +342,28 @@ protected void Notify(NotificationSeverity severity, string summary, string deta
   protected async Task<List<CommonCode>> GetCommon(string _codeId, string _key) {
 
 
-    RequestDto rd = new RequestDto() {
-      ProcName = "sp_projCommon"
-    ,
-      MainParam = new Dictionary<string, string>() {
+
+    RequestDto rd = appData.CreateDto("sp_projCommon", new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", _key }
-            }
-    };
+            });
+    //rd.ProcType = proc_type;
+    //rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+
+
+
+
+
+    //RequestDto rd = new RequestDto() {
+    //  ProcName = "sp_projCommon"
+    //,
+    //  MainParam = new Dictionary<string, string>() {
+    //            { "code_id", _codeId },
+    //            { "etc0", _key }
+    //        }
+    //};
 
 
 

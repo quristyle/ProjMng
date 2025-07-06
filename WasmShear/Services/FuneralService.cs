@@ -25,12 +25,18 @@ public class FuneralService : BaseService {
 
 
 
+    RequestDto rd = _appData.CreateDto(path, dicc);
+    //rd.ProcType = proc_type;
+    //rd.IsFast = isFast;
+    //rd.MultyData = mlist;
 
 
-    RequestDto rd = new RequestDto() {
-      ProcName = path
-    ,      MainParam = dicc
-    };
+
+
+    //RequestDto rd = new RequestDto() {
+    //  ProcName = path
+    //,      MainParam = dicc
+    //};
 
 
 

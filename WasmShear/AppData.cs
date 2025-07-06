@@ -68,6 +68,7 @@ public class AppData {
     rd.SSUserId = User?.UserId??"";
     rd.ProcName = procName;
     rd.MainParam = dic;
+    rd.Start = DateTime.Now;
 
     return rd;
 

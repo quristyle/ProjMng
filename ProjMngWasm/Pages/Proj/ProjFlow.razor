@@ -76,9 +76,21 @@
     // 새로 생성된 데이터
     Dictionary<string, string> dic = getParams();
 
-       RequestDto rd = new RequestDto() { 
-      ProcName="tablelist", MainParam = dic
-      };
+
+    
+
+      RequestDto rd = appData.CreateDto("tablelist", dic);
+      //rd.IsProjDb = true;
+      //rd.IsFast = isFast;
+      //rd.MultyData = mlist;
+
+
+
+
+
+      //  RequestDto rd = new RequestDto() { 
+      // ProcName="tablelist", MainParam = dic
+      // };
 
 
     var ri = await devService.GetList<TableInfo>(rd);

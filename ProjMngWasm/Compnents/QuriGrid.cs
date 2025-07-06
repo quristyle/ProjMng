@@ -2,12 +2,14 @@
 using ProjModel;
 using Radzen;
 using Radzen.Blazor;
+using WasmShear;
 using WasmShear.Services;
 
 namespace ProjMngWasm.Compnents {
   public class QuriGrid<TItem> : RadzenDataGrid<TItem> {
 
     [Inject] protected DevService? devService { get; set; }
+    [Inject] protected AppData? appData { get; set; }
     public QuriGrid() {
       Style = "height:100%;";
       FilterCaseSensitivity = Radzen. FilterCaseSensitivity.CaseInsensitive;
@@ -29,9 +31,16 @@ namespace ProjMngWasm.Compnents {
       IsLoading = true;
       await InvokeAsync(StateHasChanged);
 
-      RequestDto rd = new RequestDto() { 
-      ProcName=procName, MainParam = dic
-      };
+
+      RequestDto rd = appData.CreateDto(procName, dic);
+      //rd.IsProjDb = true;
+      //rd.IsFast = isFast;
+      //rd.MultyData = mlist;
+
+
+      //RequestDto rd = new RequestDto() { 
+      //ProcName=procName, MainParam = dic
+      //};
 
 
       var ri = await devService.GetList<TItem>(rd);

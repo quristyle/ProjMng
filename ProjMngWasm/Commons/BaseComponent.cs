@@ -52,14 +52,20 @@ public class BaseComponent : CommonComponent {
       };
     }
     if ( dic == null ) { dic = new(); }
-    RequestDto rd = new RequestDto() {
-      ProcName = proc_name      ,
-      ProcType = proc_type      ,
-      IsFast = isFast      ,
-      MainParam = dic      ,
-      SSUserId = appData.User?.UserId ?? ""      ,
-      Start = DateTime.Now
-    };
+
+
+    RequestDto rd = appData.CreateDto(proc_name, dic);
+    rd.ProcType = proc_type;
+    rd.IsFast = isFast;
+
+    //RequestDto rd = new RequestDto() {
+    //  ProcName = proc_name      ,
+    //  ProcType = proc_type      ,
+    //  IsFast = isFast      ,
+    //  MainParam = dic      ,
+    //  SSUserId = appData.User?.UserId ?? ""      ,
+    //  Start = DateTime.Now
+    //};
 
     //var data = await jsiniService.GetList<T>(proc_name, dic, proc_type, isFast);
 
@@ -128,7 +134,14 @@ public class BaseComponent : CommonComponent {
       return null;
     }
 
-    RequestDto rd = new RequestDto() { ProcName= md_name , MainParam = dic, ProcType=proc_type, IsFast=isFast};
+
+    RequestDto rd = appData.CreateDto(md_name, dic);
+    rd.ProcType = proc_type;
+    rd.IsFast = isFast;
+
+
+
+    //RequestDto rd = new RequestDto() { ProcName= md_name , MainParam = dic, ProcType=proc_type, IsFast=isFast};
 
     var data = await jsiniService.GetList<T>(rd);
 
@@ -206,7 +219,14 @@ public class BaseComponent : CommonComponent {
       return new ResultInfo<T>() { Code=-77, Message="수정대상이 존재하지 않습니다." } ;
     }
     else {
-      RequestDto rd = new RequestDto() { ProcName = proc_name, MainParam = dic, ProcType = "save", IsFast = isFast, MultyData = mlist };
+
+
+      RequestDto rd = appData.CreateDto(proc_name, dic);
+      rd.ProcType = "save";
+      rd.IsFast = isFast;
+      rd.MultyData = mlist;
+
+      //RequestDto rd = new RequestDto() { ProcName = proc_name, MainParam = dic, ProcType = "save", IsFast = isFast, MultyData = mlist };
 
       var res = await DbCont<T>(rd);
       Notify(res);
@@ -235,7 +255,14 @@ public class BaseComponent : CommonComponent {
 
     if (dic == null) dic = new Dictionary<string, string>() { };
 
-    RequestDto rd = new RequestDto() { ProcName = action_name, MainParam = dic };
+
+    RequestDto rd = appData.CreateDto(action_name, dic);
+    //rd.ProcType = "save";
+    //rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+
+   // RequestDto rd = new RequestDto() { ProcName = action_name, MainParam = dic };
     var data = await devService.GetList<T>(rd);
 
     if (data.Code < 0) {
@@ -255,7 +282,14 @@ public class BaseComponent : CommonComponent {
 
     var dic_a = WasmUtil.JoinDictionaries(param, dic);
 
-    RequestDto rd = new RequestDto() { ProcName = action_name, IsProjDb = true, MainParam = dic_a };
+
+
+    RequestDto rd = appData.CreateDto(action_name, dic_a);
+    rd.IsProjDb = true;
+    //rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+    //RequestDto rd = new RequestDto() { ProcName = action_name, IsProjDb = true, MainParam = dic_a };
 
     var data = await devService.GetList<T>(rd);
 
@@ -347,12 +381,19 @@ public class BaseComponent : CommonComponent {
 
   protected async Task<List<CommonCode>> GetCommon(string _codeId, string _key) {
 
-
-    RequestDto rd = new RequestDto() { ProcName = "sp_projCommon", MainParam = new Dictionary<string, string>() {
+    RequestDto rd = appData.CreateDto("sp_projCommon", new Dictionary<string, string>() {
                 { "code_id", _codeId },
                 { "etc0", _key }
-            }
-    };
+            });
+    //rd.IsProjDb = true;
+    //rd.IsFast = isFast;
+    //rd.MultyData = mlist;
+
+    //RequestDto rd = new RequestDto() { ProcName = "sp_projCommon", MainParam = new Dictionary<string, string>() {
+    //            { "code_id", _codeId },
+    //            { "etc0", _key }
+    //        }
+    //};
 
 
 
