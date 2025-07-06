@@ -23,7 +23,22 @@
                 <div class="main-page-context">
 
                 @if (item.ComponentType is not null) {
-                  <DynamicComponent Type="item.ComponentType" />
+                  <DynamicComponent Type="item.ComponentType" 
+                  
+                  
+                  
+                   Parameters="@(new Dictionary<string, object>
+                              {
+                                  ["OnRequestRemove"] = (Action)RemoveItem
+                              })"
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  />
                 }
                 else {
                   <p>1 @item.ProjName </p>

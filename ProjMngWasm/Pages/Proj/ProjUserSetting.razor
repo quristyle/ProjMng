@@ -94,7 +94,9 @@
 
 @code {
 
-  [Inject] AppData appData { get; set; }
+  //[Inject] AppData appData { get; set; }
+  //   [Parameter]    public Action? OnRequestRemove { get; set; }
+
 
   protected async Task OnLoadWrk() {
     // Data = await DbCont<Dictionary<string, object>>(_spName, new Dictionary<string, string>() {
@@ -113,6 +115,13 @@
      // { "last_page_yn", appData.User.Last_page_yn.ToString() },
     },false,true);
     await SaveUserInfo();
+    
+    
+        // 부모에게 탭 제거 요청
+        OnRequestRemove?.Invoke();
+
+    //StateHasChanged();
+        //InvokeAsync(StateHasChanged);
   }
 
   async Task ChangeTheme(object value) {
@@ -203,5 +212,5 @@ internal static RenderFragment RenderTheme(Theme theme, bool showTitle = true) {
     cursor:pointer;
     margin: 1%;
     border-radius:5px;
-
+}
 </style>
