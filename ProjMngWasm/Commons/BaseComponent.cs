@@ -35,8 +35,14 @@ public class BaseComponent : CommonComponent {
   }
 
 
+
+  protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, IDictionary<string, object> dic, bool isFast = false, bool isServerFix = false) {
+
+    var req = WasmUtil.JoinConvert(dic);
+    return await DbCont_h<T>(proc_name, req, "srch", isFast, isServerFix);
+  }
   protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, bool isFast = false, bool isServerFix = false) {
-    return await DbCont<T>(proc_name, dic, "srch", isFast, isServerFix);
+    return await DbCont_h<T>(proc_name, dic, "srch", isFast, isServerFix);
   }
 
   protected async Task<ResultInfo<T>> DbCont<T>(string proc_name, Dictionary<string, string> dic, string proc_type, bool isFast = false, bool isServerFix = false) {

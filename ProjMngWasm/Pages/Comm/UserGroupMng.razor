@@ -104,7 +104,7 @@
     get => checkedValues;
     set{
       checkedValues = value;
-      if (checkedValues != null)                {
+      if (checkedValues != null && !isCheckeding)                {
         Console.WriteLine($"CheckedValues Changed : {value}");
         OnCheckedValuesChanged(value);
 
@@ -197,7 +197,11 @@
     await DbSave<Dictionary<string, object>>("sp_dev_user_grp_map_exec", dic);
   }
   //string user_id { get; set; }
+
+  bool isCheckeding = false;
   private async Task RowClickEvent(IDictionary<string, object> args)  { 
+
+    isCheckeding = true;
 
     CheckedValues = null;
     //return ;
@@ -211,13 +215,13 @@
     ProjectUser(   args   );
 
     
-    var data = await DbCont<MenuInfo>("sp_dev_grp_menu_map_exec", null);
+    var data = await DbCont<MenuInfo>("sp_dev_grp_menu_map_exec", args);
     //data.Data
 
  CheckedValues = FlattenMenus(MenuData)
     .Where(menu => data.Data.Any(d => d.mnu_id == menu.mnu_id))
     .ToList();
-
+    isCheckeding = false;
     //CheckedValues = data.Data;
 
 
@@ -252,28 +256,19 @@
 
 
 
-
-
-
-
-
   private async Task OnCheckedValuesChanged(IEnumerable<object> args)  {
     
-        Console.WriteLine($"OnCheckedValuesChanged : {args}, {SelectMenu.mnu_nm}");
+    Console.WriteLine($"OnCheckedValuesChanged : {args}, {SelectMenu.mnu_nm}");
         
     var menuList = args.OfType<MenuInfo>().ToList();
     bool exsitMenu = menuList.Any(m => m.mnu_id == SelectMenu.mnu_id);
 
-
-    
     await DbCont<Dictionary<string, object>>("sp_dev_grp_menu_map_exec", new Dictionary<string, string>() {
     { "grp_id", _selectedItems.FirstOrDefault().GetValue("grp_id") },
     { "menu_id", SelectMenu.mnu_id }
     }, (exsitMenu?"save":"delete"));
 
-    
-        Console.WriteLine($"OnCheckedValuesChanged exsitMenu : {exsitMenu}, {SelectMenu.mnu_nm}");
-
+    Console.WriteLine($"OnCheckedValuesChanged exsitMenu : {exsitMenu}, {SelectMenu.mnu_nm}");
 
   }
 }
