@@ -22,7 +22,7 @@ builder.Services.AddRadzenQueryStringThemeService();
 
 builder.Services.AddHttpClient<UMSService>(client => {        client.BaseAddress = new Uri("https://nums.api.hanjucorp.co.kr");            });
 #if DEBUG
-builder.Services.AddHttpClient("jsini", client => { client.BaseAddress = new Uri("http://localhost:51668111"); });
+builder.Services.AddHttpClient("jsini", client => { client.BaseAddress = new Uri("http://localhost:51667"); });
 #else
 builder.Services.AddHttpClient("jsini", client => { client.BaseAddress = new Uri("https://api.jsini.co.kr"); });
 #endif
