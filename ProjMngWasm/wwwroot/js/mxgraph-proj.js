@@ -150,7 +150,8 @@ window.mxGraphInit = (containerId,  dotNetRef) => {
 
     if (graph.isEnabled() && !graph.isMouseDown && !graph.isEditing() && source.nodeName != 'INPUT') {
       if (evt.keyCode == 224 /* FF */ || (!mxClient.IS_MAC && evt.keyCode == 17 /* Control */) ||
-        (mxClient.IS_MAC && (evt.keyCode == 91 || evt.keyCode == 93) /* Left/Right Meta */)) {
+        (mxClient.IS_MAC && (evt.keyCode == 91 || evt.keyCode == 93
+        ) /* Left/Right Meta */)) {
         // Cannot use parentNode for check in IE
         if (!restoreFocus) {
           // Avoid autoscroll but allow handling of events
@@ -167,13 +168,31 @@ window.mxGraphInit = (containerId,  dotNetRef) => {
 
         }
       }
+      else if (evt.keyCode == 46) {
+        if (!restoreFocus) {
+          // Avoid autoscroll but allow handling of events
+          textInput.style.position = 'absolute';
+          graph.container.appendChild(textInput);
+
+          restoreFocus = true;
+          //textInput.focus();
+          //textInput.select();
+
+          console.log('keydown', evt);
+
+        }
+      }
     }
   });
 
   // Restores focus on graph container and removes text input from DOM
   mxEvent.addListener(document, 'keyup', function (evt) {
+
+    console.log('evt.keyCode :', evt.keyCode);
+
     if (restoreFocus && (evt.keyCode == 224 /* FF */ || evt.keyCode == 17 /* Control */ ||
-      evt.keyCode == 91 || evt.keyCode == 93 /* Meta */)) {
+      evt.keyCode == 91 || evt.keyCode == 93 /* Meta */ 
+    )) {
       restoreFocus = false;
 
       if (!graph.isEditing()) {
@@ -183,7 +202,25 @@ window.mxGraphInit = (containerId,  dotNetRef) => {
       textInput.parentNode.removeChild(textInput);
       console.log('keyup', evt);
     }
+    else if (restoreFocus && evt.keyCode == 46) {
+      restoreFocus = false;
+      if (graph.isEnabled() && !graph.isSelectionEmpty()) {
+        graph.removeCells();
+      }
+    }
   });
+
+
+
+
+  //this.addAction('delete', function (editor) {
+  //  if (editor.graph.isEnabled()) {
+  //    editor.graph.removeCells();
+  //  }
+  //});
+
+
+
 
   mxClipboard.cellsToString = function (cells) {
     var codec = new mxCodec();
@@ -254,6 +291,8 @@ window.mxGraphInit = (containerId,  dotNetRef) => {
       dy = -gs;
     }
   }));
+
+
 
   // Merges XML into existing graph and layers
   var importXml = function (xml, dx, dy) {

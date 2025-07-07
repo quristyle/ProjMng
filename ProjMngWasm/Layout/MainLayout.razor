@@ -16,7 +16,7 @@
 @inject ContextMenuService ContextMenuService
 
 <HeadContent>
-  <RadzenTheme />
+  <RadzenTheme Theme="software-dark" />
 </HeadContent>
 
 <PageTitle> Jsini | @appData.User?.Last_page_nm </PageTitle>
@@ -55,7 +55,7 @@
       <RadzenContentContainer Name="main">
               
             <!-- main content-->
-            <RadzenRow class="rz-mx-auto main-body-context rz-h-100 " theme="@appData.User.Theme" Style="">
+            <RadzenRow class="rz-mx-auto main-body-context rz-h-100 " theme="@appData.User?.Theme" Style="">
                             
               <RadzenColumn Size="12" class=" qurimaincont rz-h-100" Style=@("display:"+(IsBodyUrl?"block":"none")+";")
               >        
@@ -331,11 +331,11 @@
         appData.User = user;
 
         
-    Console.WriteLine($"LoadInfo themeService  : {user.Theme} ");
+    //Console.WriteLine($"LoadInfo themeService  : {user.Theme} ");
 
 
 
-        themeService.SetTheme(user.Theme ?? "software-dark");
+        themeService.SetTheme(user?.Theme ?? "software-dark");
         //sysTheme = appData.User.Theme ?? "software-dark";
       }
     }
