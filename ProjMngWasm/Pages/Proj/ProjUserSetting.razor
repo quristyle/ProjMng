@@ -61,6 +61,9 @@
               <QuriFormCheckField  @bind-Value=@appData.User.Last_page_yn Text="마지막 활성화면 다시 접근시 자동열기" />
               <QuriFormCheckField  @bind-Value=@appData.User.SideBarAutoClose Text="메뉴 클릭시 메뉴창 닫기" />
               <QuriFormTextField @bind-Value=@appData.User.UserServerUrl Text="대상서버Url"  />
+
+              <a href="@appData.User.UserServerUrl" target="_blank" >서버접근이 안될때 링크 열고 허용 한번 해주면 됩니다.</a>
+
               <QuriFormTextField @bind-Value=@appData.User.Remark Text="Remark"  />
             </RadzenStack>
           </RadzenColumn>
