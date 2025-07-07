@@ -34,7 +34,7 @@ public class DevService : BaseService {
 
 
     HttpResponseMessage response = null;
-    Dictionary<string, string> dic = new Dictionary<string, string>() { { "query", query }, { "db_nick", db_nick };
+    Dictionary<string, string> dic = new Dictionary<string, string>() { { "query", query }, { "db_nick", db_nick } };
 
 
     if (AbsoluteUrl == null ) {
