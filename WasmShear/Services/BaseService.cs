@@ -25,8 +25,8 @@ public class BaseService {
   protected const string TargetUrlMedia = "api/Media";
 
 
-  string UserServerUrl { get; set; }
-  Uri AbsoluteUrl { get; set; }
+  //string UserServerUrl { get; set; }
+  protected Uri AbsoluteUrl { get; set; }
 
   public BaseService(HttpClient httpClient, AppData appData) {
     _httpClient = httpClient;
@@ -87,7 +87,7 @@ public class BaseService {
 
   private string? _previousUserServerUrl;
 
-  private void CheckUserServerUrlChanged() {
+  protected void CheckUserServerUrlChanged() {
     var currentUrl = _appData.User?.UserServerUrl;
 
     if (_previousUserServerUrl == currentUrl)
@@ -118,11 +118,11 @@ public class BaseService {
   protected async Task<ResultInfo<T>> GetData<T>(RequestDto rd, string targetUrl = TargetUrl, HttpCallType hctype = HttpCallType.PostJson) {
 
     
-    Console.WriteLine($" 시이작. UserServerUrl : {UserServerUrl},  ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
+    Console.WriteLine($" 시이작.   ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
 
     CheckUserServerUrlChanged();
 
-    Console.WriteLine($" 끄으엇. UserServerUrl : {UserServerUrl},  ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
+    Console.WriteLine($" 끄으엇.   ActiveServerUrl : {_appData.ActiveServerUrl},  _appData.User?.UserServerUrl : {_appData.User?.UserServerUrl} ");
 
 
 
