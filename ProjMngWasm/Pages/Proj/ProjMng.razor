@@ -13,9 +13,13 @@
 <RadzenCard >
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+
+    
+    <QuriSearchs AllLoadComplete=OnLoadWrk >
       <RadzenTextBox @bind-Value="srtype" />
-    </RadzenStack>
+    </QuriSearchs>
+
+
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />
@@ -26,8 +30,8 @@
 
 <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
   <RadzenColumn Size="12" >
-
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent ReqData=@Data />
+    
+    <QuriDynamicGrid @ref=qdgrd SaveBtnEvent=SaveBtnEvent />
 
   </RadzenColumn>
 </RadzenRow>
@@ -35,18 +39,23 @@
 @code {
 
   public string srtype { get; set; } = "";
+  QuriDynamicGrid qdgrd{ get; set; }
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
-      OnLoadWrk();
+      //OnLoadWrk();
     }
   }
 
-  public ResultInfo<Dictionary<string, object>> Data { get; set; }
+  //public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
+   await qdgrd.Load("sp_dev_proj_exec");
+
+    /*
     Data = await DbCont<Dictionary<string, object>>("sp_dev_proj_exec", new Dictionary<string, string>() { });
-  StateHasChanged();
+    StateHasChanged();
+    */
   }
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {

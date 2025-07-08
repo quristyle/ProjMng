@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using ProjModel;
-using Radzen.Blazor;
-using Radzen;
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using ProjModel;
+using Radzen;
+using Radzen.Blazor;
+using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjMngWasm.Compnents;
 public class QuriDynamicGridBase : BaseComponent {
@@ -414,6 +415,49 @@ public class QuriDynamicGridBase : BaseComponent {
   protected async Task DataSave(IDictionary<string, object> order) {
     await SaveBtnEvent.InvokeAsync(order);
   }
+
+
+
+  public async Task Load(string procName) {
+    await Load(procName, null);
+  }
+
+  public async Task Load(string procName, Dictionary<string, string> dic) {
+
+    IsLoading = true;
+    //ReqData.Data = new();
+    await InvokeAsync(StateHasChanged);
+
+
+    //RequestDto rd = appData.CreateDto(procName, dic);
+
+
+    ReqData = await DbCont<Dictionary<string, object>>(procName, dic);
+    
+    if (ReqData.Code < 0) {
+      Console.WriteLine($" Grd Load Error : {ReqData.Message}");
+    }
+
+    IsLoading = false;
+    await InvokeAsync(StateHasChanged);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
