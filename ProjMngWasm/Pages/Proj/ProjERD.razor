@@ -16,11 +16,14 @@
 
 <RadzenCard>
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-    <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
-    <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
 
-    </RadzenStack>
+
+  
+    <QuriSearchs AllLoadComplete=OnLoad >
+      <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
+      <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
+    </QuriSearchs>
+
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
     <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
     <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>

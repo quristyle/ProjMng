@@ -12,13 +12,39 @@ public class ProjService : BaseService {
 
   public ProjService(IConfiguration configuration) { _configuration = configuration; }
 
+  private LogInfo InParamInit(string tname, RequestDto dto) {
+
+    if(dto.MainParam != null) {
+      dto.MainParam["req_type"] = dto.ProcType;
+      dto.MainParam["req_ss_user_id"] = dto.SSUserId;
+    }
+
+    LogInfo log = new LogInfo() { TicKs = DateTime.Now.Ticks.ToString(), Title = tname };
+
+    log.Message =
+      $" {Environment.NewLine} {tname} : {dto.Start} :: {DateTime.Now.ToLongTimeString()} ----------------------------------------------"
+    + $" {Environment.NewLine} ProcName : {dto.ProcName}"
+    + $" {Environment.NewLine} ProcType : {dto.ProcType}"
+    + $" {Environment.NewLine} SSUserId : {dto.SSUserId}"
+    //+ $" {Environment.NewLine} Start : {dto.Start}"
+    ;
+    if (dto.IsFast) { log.Message += $" {Environment.NewLine} Fast"; }
+    if (dto.IsProjDb) { log.Message += $" {Environment.NewLine} ProjDb : { dto.MainParam.GetValue("db_nick") }"; }
+
+    Console.WriteLine(log.Message);
+
+    return log;
+  }
 
   public ResultInfo<dynamic> GetData(RequestDto dto) {
-    string procedureName = dto.ProcName;
-    IDictionary<string, string> param = dto.MainParam;
-    param["req_type"] = dto.ProcType;
-    param["req_ss_user_id"] = dto.SSUserId;
-    return GetData( procedureName, param);
+
+    var log = InParamInit("ProjService [GetData] ", dto);
+
+    //string procedureName = dto.ProcName;
+    //IDictionary<string, string> param = dto.MainParam;
+    //param["req_type"] = dto.ProcType;
+    //param["req_ss_user_id"] = dto.SSUserId;
+    return GetData(dto.ProcName, dto.MainParam);
   }
 
 
@@ -80,8 +106,8 @@ public class ProjService : BaseService {
 
           if (ri.Code >= 0) {
 
-            Console.WriteLine($"-------------------------------------------------");
-            Console.WriteLine($" procedureName : {procedureName} ");
+            //Console.WriteLine($" param list : {DateTime.Now.ToShortTimeString()} ");
+            //Console.WriteLine($" procedureName : {procedureName} ");
             string outCursorParamName = null;
 
             db.Open();
@@ -91,7 +117,6 @@ public class ProjService : BaseService {
               if (procParams.Any()) { // 프로시저의 파라미터가 존재하는 경우만 처리.
                 foreach (var p in procParams) {
                   string paramName = p.parameter_name;
-
 
                   string paramKey = paramName.StartsWith("p_") ? paramName.Substring(2, paramName.Length - 2) : paramName;
 
@@ -106,11 +131,12 @@ public class ProjService : BaseService {
 
                     if (paramName == "ss_user_id") {
                       parameters.Add(paramName, param.GetValue("req_ss_user_id"), DbType.String);
+                      //Console.WriteLine($" {paramName} : {param.GetValue("req_ss_user_id")} ");
                     }
                     else {
                       object paramValue = param.TryGetValue(paramKey, out var value) && value != null ? value.ToString() : null;
                       parameters.Add(paramName, paramValue, DbType.String);
-                      Console.WriteLine($" {paramName} : {paramValue} ");
+                      //Console.WriteLine($" {paramName} : {paramValue} ");
                     }
 
                   }
@@ -212,12 +238,17 @@ public class ProjService : BaseService {
 
 
   public ResultInfo<dynamic> ExcuteMultyData(RequestDto dto) {
-    string procedureName = dto.ProcName;
-    IDictionary<string, string> param = dto.MainParam;
-    List<Dictionary<string, object>> rowdata = dto.MultyData;
 
-    param["req_type"] = dto.ProcType;
-    return ExcuteMultyData(procedureName, param, rowdata);
+
+   var log = InParamInit("ProjService [ExcuteMultyData] ", dto);
+
+
+    //string procedureName = dto.ProcName;
+    //IDictionary<string, string> param = dto.MainParam;
+    //List<Dictionary<string, object>> rowdata = dto.MultyData;
+
+    //param["req_type"] = dto.ProcType;
+    return ExcuteMultyData(dto.ProcName, dto.MainParam, dto.MultyData);
   }
 
 
@@ -311,8 +342,9 @@ public class ProjService : BaseService {
 
           if (ri.Code >= 0) {
 
-            Console.WriteLine($"-------------------------------------------------");
-            Console.WriteLine($" procedureName : {procedureName} ");
+            //Console.WriteLine($"-------------------------------------------------");
+            //Console.WriteLine($" param list : {DateTime.Now.ToShortTimeString()} -------------------------------------------");
+            //Console.WriteLine($" procedureName : {procedureName} ");
             string outCursorParamName = null;
 
             db.Open();
@@ -347,12 +379,23 @@ public class ProjService : BaseService {
                       parameters.Add(paramName, dbType: DbType.Object, direction: ParameterDirection.Output); // Output refcursor
                     }
                     else {
-                      object paramValue = param.TryGetValue(paramKey, out var value) && value != null ? value.ToString() : null;
-                      if (paramValue == null) {
-                        paramValue = itm.TryGetValue(paramKey, out var itm_value) && itm_value != null ? itm_value.ToString() : null;
+                      //object paramValue = param.TryGetValue(paramKey, out var value) && value != null ? value.ToString() : null;
+                      //if (paramValue == null) {
+                      //  paramValue = itm.TryGetValue(paramKey, out var itm_value) && itm_value != null ? itm_value.ToString() : null;
+                      //}
+
+                      var paramValue = param.GetValue(paramKey);
+
+                      if (paramName == "ss_user_id") {
+                        parameters.Add(paramName, param.GetValue("req_ss_user_id"), DbType.String);
+                        //Console.WriteLine($" {paramName} : {param.GetValue("req_ss_user_id")} ");
                       }
-                      parameters.Add(paramName, paramValue, DbType.String);
-                      Console.WriteLine($" {paramName} : {paramValue} ");
+                      else {
+                        parameters.Add(paramName, paramValue, DbType.String);
+                        //Console.WriteLine($" {paramName} : {paramValue} ");
+
+                      }
+
 
                     }
                   }
@@ -497,7 +540,7 @@ public class ProjService : BaseService {
         var activeList = ActivityParser.ParseActivityFiles(path);
 
         foreach (var item in activeList) {
-          Console.WriteLine($"{item.ServiceName} | {item.TransitionName} -> {item.TransitionValue} | {item.ProcedureName} -> {item.ResultKey}");
+          //Console.WriteLine($"{item.ServiceName} | {item.TransitionName} -> {item.TransitionValue} | {item.ProcedureName} -> {item.ResultKey}");
           //aaa.Add(item.ToDictionary());
 
           Dictionary<string, string> sItem = item.ToDictionary();
@@ -638,6 +681,10 @@ public class ProjService : BaseService {
 
 
 
-
+  public class LogInfo() {
+    public string TicKs { get; set; }
+    public string Title { get; set; }
+    public string Message { get; set; }
+  }
 
 }

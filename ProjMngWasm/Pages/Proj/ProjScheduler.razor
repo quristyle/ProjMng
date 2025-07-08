@@ -17,7 +17,7 @@
 
 
     <QuriSearchs AllLoadComplete=OnLoadWrk >
-      <QuriDropDown CodeId="projlist" @bind-Value=srtype />
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype Change=OnLoadWrk />
       <QuriDropDown CodeId="compstat" @bind-Value=compstat InitialCode="DISCOMP" IsAll=true />
       <QuriDropDown CodeId="schedule_type" @bind-Value=_schedule_type IsAll=true />
     </QuriSearchs>
