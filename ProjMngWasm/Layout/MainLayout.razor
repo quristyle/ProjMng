@@ -329,7 +329,7 @@
         Console.WriteLine($"LoadInfo try : {json}");
         Member user = JsonConvert.DeserializeObject<Member>(json);
         appData.User = user;
-
+        appData.SelectedFontValue = user.FontSize??"12";
         
     //Console.WriteLine($"LoadInfo themeService  : {user.Theme} ");
 
@@ -358,4 +358,13 @@
 
 
 
+}
+
+
+@if (!string.IsNullOrWhiteSpace( @appData.SelectedFontValue)) {
+<style>
+:root {
+  --rz-root-font-size: @(@appData.SelectedFontValue)px !important;
+}
+</style>
 }

@@ -23,7 +23,7 @@ public class DevService : BaseService {
   public DevService(IConfiguration configuration) { _configuration = configuration; }
 
 
-  public ResultInfo<dynamic> GetDataQuery(string dbNick, string query) {
+  public ResultInfo<dynamic> GetDataQuery(string dbNick, string query, string isBreakCnt = "") {
 
     ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
 
@@ -47,6 +47,10 @@ public class DevService : BaseService {
       rdr = db.ExecuteReader(sql: query);
 
       var resultList = new List<dynamic>();
+      int breakCount = 5000;
+      if( isBreakCnt.ToLower() == "true") {
+        breakCount = 20;
+      }
 
       while (rdr.Read()) {
 
@@ -67,6 +71,10 @@ public class DevService : BaseService {
           }
         }
         resultList.Add(expandoObject);
+        breakCount--;
+        if (breakCount < 0) {
+          break;
+        }
       }
 
 

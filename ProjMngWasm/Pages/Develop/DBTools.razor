@@ -13,17 +13,20 @@
 @inherits PageBaseComponent
 
 <RadzenCard >
-  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
 
     <QuriSearchs>
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
       <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true  />
-      </QuriSearchs>
+      <RadzenTextBox @bind-Value="srchText" />
+    </QuriSearchs>
 
-
-    <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+      
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
     </RadzenStack>
+
+
   </RadzenStack>
 </RadzenCard>
 
@@ -318,6 +321,8 @@ class="context-body-row"
 
   CommonCode? projectName { get; set; }
   CommonCode? dbType { get; set; }
+
+  string srchText{get;set;}
 
 
   QuriGrid<ProcInfo> ProcGrd{ get; set; }

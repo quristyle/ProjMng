@@ -6,7 +6,28 @@ using ProjModel;
 
 namespace WasmShear;
 public class AppData {
+
+
+  public AppData() {
+    Fonts = new() {
+      new ProjFons(){ Text="extra small", Value="11" },
+      new ProjFons(){ Text="small ", Value="12" },
+      new ProjFons(){ Text="standard", Value="14" },
+      new ProjFons(){ Text="medium ", Value="16" },
+      new ProjFons(){ Text="large ", Value="18" },
+      new ProjFons(){ Text="extra large", Value="20" },
+      new ProjFons(){ Text="2x extra large", Value="24" },
+      new ProjFons(){ Text="3x extra large", Value="28" },
+    };
+  }
+
+
+  public List<ProjFons> Fonts { get; set; }
+  public string SelectedFontValue { get; set; } = "12";
+
+
   public IDictionary<string, List<CommonCode>> GlobalDic { get; set; } = new Dictionary<string, List<CommonCode>>();
+
 
 
   public event Action? UserChanged;
@@ -106,4 +127,12 @@ public class UserProp {
   public bool Last_page_yn { get; set; }
   public bool SideBarAutoClose { get; set; }
   public string UserServerUrl { get; set; }
+  public string FontSize { get; set; }
+}
+
+
+
+public class ProjFons {
+  public string Text { get; set; } = "smaller";
+  public string Value { get; set; } = "11";
 }

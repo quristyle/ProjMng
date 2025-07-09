@@ -11,6 +11,11 @@ public class PageBaseComponent: BaseComponent {
 
   //[Inject] AppData appData { get; set; }
   [Parameter] public Action? OnRequestRemove { get; set; }
+  [Parameter] public Action? OnRequestStateHasChange { get; set; }
+
+  
+
+
 
 
   protected override async Task OnInitializedAsync() {

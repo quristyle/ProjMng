@@ -61,15 +61,34 @@
               <QuriFormCheckField  @bind-Value=@appData.User.Last_page_yn Text="마지막 활성화면 다시 접근시 자동열기" />
               <QuriFormCheckField  @bind-Value=@appData.User.SideBarAutoClose Text="메뉴 클릭시 메뉴창 닫기" />
               <QuriFormTextField @bind-Value=@appData.User.UserServerUrl Text="대상서버Url"  />
-
-              <a href="@appData.User.UserServerUrl" target="_blank" >서버접근이 안될때 링크 열고 허용 한번 해주면 됩니다.</a>
-
+              @if( !string.IsNullOrEmpty( appData.User?.UserServerUrl ) ){
+              <a href="@appData.User?.UserServerUrl" target="_blank" >서버접근이 안될때 링크 열고 허용 한번 해주면 됩니다.</a>
+              }
               <QuriFormTextField @bind-Value=@appData.User.Remark Text="Remark"  />
             </RadzenStack>
           </RadzenColumn>
     
           <RadzenColumn Size="6" SizeSM="6">
       
+            <RadzenListBox 
+              class="thema_listbox mb-2"
+              TextProperty="Text" 
+              ValueProperty="Value" 
+              Data="@appData.Fonts" 
+              Value="@appData.SelectedFontValue" 
+              Change="@ChangeFontSize"               
+            >
+            
+              <Template>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.25rem">
+                  @RenderFont(context)
+                </RadzenStack>
+              </Template>
+
+            </RadzenListBox>
+
+            <br />
+
             <RadzenListBox 
               class="thema_listbox"
               TValue="string" 
@@ -98,7 +117,7 @@
 @code {
 
   //[Inject] AppData appData { get; set; }
-  //   [Parameter]    public Action? OnRequestRemove { get; set; }
+  //[Parameter]    public Action? OnRequestRemove { get; set; }
 
 
   protected async Task OnLoadWrk() {
@@ -120,12 +139,27 @@
     await SaveUserInfo();
     
     
-        // 부모에게 탭 제거 요청
-        OnRequestRemove?.Invoke();
+    // 부모에게 탭 제거 요청
+    OnRequestRemove?.Invoke();
 
-    //StateHasChanged();
-        //InvokeAsync(StateHasChanged);
+    //InvokeAsync(StateHasChanged);
   }
+
+  
+  async Task ChangeFontSize(object value) {
+    
+    //Console.WriteLine($"ChangeTheme themeService  : {value} ");
+
+    //ThemeService.SetTheme($"{value}");
+    appData.SelectedFontValue = value?.ToString() ?? "12";
+    appData.User.FontSize = value?.ToString() ?? "12";
+
+    await SaveUserInfo();
+    OnRequestStateHasChange.Invoke();
+    //StateHasChanged();
+  }
+
+
 
   async Task ChangeTheme(object value) {
     
@@ -134,8 +168,22 @@
     ThemeService.SetTheme($"{value}");
     appData.User.Theme = value?.ToString() ?? "standard-dark";
     await SaveUserInfo();
-    StateHasChanged();
+    //StateHasChanged();
   }
+
+  
+internal static RenderFragment RenderFont(ProjFons fonts) {
+    return __builder => {
+      <text>
+          @fonts.Text
+
+        <div style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
+          <span style="font-size:@(fonts.Value)px;" >안녕3.!$#abcABC</span>
+        </div>
+      </text>
+    };
+  }
+
 
 
 internal static RenderFragment RenderTheme(Theme theme, bool showTitle = true) {
@@ -206,9 +254,13 @@ internal static RenderFragment RenderTheme(Theme theme, bool showTitle = true) {
   }
 
 
+
 }
 
 <style>
+.thema_listbox{
+    width: 100%;
+}
 .thema_listbox .rz-multiselect-item{
   float: left;
     width: 30%;

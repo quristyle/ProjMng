@@ -30,6 +30,16 @@
                    Parameters="@(new Dictionary<string, object>
                               {
                                   ["OnRequestRemove"] = (Action)RemoveItem
+, 
+                                  ["OnRequestStateHasChange"] = (Action)ParentStateHasChange
+
+
+
+
+
+
+
+
                               })"
                   
                   
@@ -155,6 +165,11 @@
     StateHasChanged();
   }
 
+  
+  public async void ParentStateHasChange() {
+    await OnChanged.InvokeAsync();
+    StateHasChanged();
+  }
 
 
 

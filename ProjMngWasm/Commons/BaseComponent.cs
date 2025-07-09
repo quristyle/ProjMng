@@ -315,9 +315,9 @@ public class BaseComponent : CommonComponent {
 
 
 
-  protected async Task<ResultInfo<T>> JsContQuery<T>(CommonCode db, string query) {
+  protected async Task<ResultInfo<T>> JsContQuery<T>(CommonCode db, string query, bool isBreakCnt = false) {
 
-    var data = await devService.GetListQuery<T>(db.Others["db_nick"], query);
+    var data = await devService.GetListQuery<T>(db.Others["db_nick"], query, isBreakCnt);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", $"다이렉트 쿼리 준비:{data.Message}", 50000, true);
@@ -326,9 +326,9 @@ public class BaseComponent : CommonComponent {
     return data;
   }
 
-  protected async Task<ResultInfo<T>> JsContQuery<T>(string db_nick, string query) {
+  protected async Task<ResultInfo<T>> JsContQuery<T>(string db_nick, string query, bool isBreakCnt = false) {
 
-    var data = await devService.GetListQuery<T>(db_nick, query);
+    var data = await devService.GetListQuery<T>(db_nick, query, isBreakCnt);
 
     if (data.Code < 0) {
       Notify(NotificationSeverity.Error, "Error Message", $"다이렉트 쿼리 준비:{data.Message}", 50000, true);

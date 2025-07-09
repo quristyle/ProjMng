@@ -30,7 +30,7 @@
 <RadzenSplitter Orientation="Orientation.Vertical" class="context-body-row">
 
   <RadzenSplitterPane  Size="60%" Min="10%" Max="90%">
-    <QuriCodeEditor @ref="_editor" KeyDownEvent=OnKeyDown />
+    <QuriCodeEditor @ref="_editor" KeyDownEvent=OnKeyDown  />
   </RadzenSplitterPane>
 
   <RadzenSplitterPane Size="40%" Min="10%" Max="90%">
@@ -65,7 +65,7 @@
   protected async Task OnKeyDown(KeyboardEvent e) {
 
     if (e.CtrlKey && e.KeyCode == KeyCode.Enter) {
-
+      
       await OnLoadWrk();
 
     }
@@ -77,7 +77,7 @@
 
       string query = await _editor.GetValue();
 
-      Data = await JsContQuery<Dictionary<string, object>>(dbType, query.Trim());
+      Data = await JsContQuery<Dictionary<string, object>>(dbType, query.Trim(), true);
 
   }
 

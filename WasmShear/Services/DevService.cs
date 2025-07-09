@@ -19,7 +19,7 @@ public class DevService : BaseService {
 
   
 
-  public async Task<ResultInfo<T>> GetListQuery<T>(string db_nick, string query) {
+  public async Task<ResultInfo<T>> GetListQuery<T>(string db_nick, string query, bool isBreakCnt = false) {
 
 
     CheckUserServerUrlChanged();
@@ -34,7 +34,7 @@ public class DevService : BaseService {
 
 
     HttpResponseMessage response = null;
-    Dictionary<string, string> dic = new Dictionary<string, string>() { { "query", query }, { "db_nick", db_nick } };
+    Dictionary<string, string> dic = new Dictionary<string, string>() { { "query", query }, { "db_nick", db_nick }, { "isBreakCnt", isBreakCnt.ToString() } };
 
 
     if (AbsoluteUrl == null ) {

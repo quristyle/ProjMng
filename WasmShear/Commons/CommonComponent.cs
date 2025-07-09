@@ -61,6 +61,7 @@ public class CommonComponent : ComponentBase {
     if (user != null) {
       appData.User = user;
       appData.IsLogin = true;
+      appData.SelectedFontValue = user.FontSize;
       //appData.ActiveServerUrl = null;
       string json = JsonConvert.SerializeObject(user);
 
@@ -99,6 +100,7 @@ public class CommonComponent : ComponentBase {
       { "theme", user.Theme },
       { "page_yn", user.Last_page_yn.ToString() },
       { "sideauto_close", user.SideBarAutoClose.ToString() },
+      { "fontsize", appData.SelectedFontValue },
       { "serverurl", user.UserServerUrl },
 
     }, false, true);

@@ -46,8 +46,9 @@ public class DevController : ControllerBase {
 
     string query = param.TryGetValue("query", out var dbValue) && dbValue != null ? dbValue.ToString() : string.Empty;
     string db_nick = param.TryGetValue("db_nick", out var stpValue) && stpValue != null ? stpValue.ToString() : string.Empty;
+    string isBreakCnt = param.GetValue("isBreakCnt");
 
-    var data = _devService.GetDataQuery(db_nick, query);
+    var data = _devService.GetDataQuery(db_nick, query, isBreakCnt);
     return Ok(data);
   }
 

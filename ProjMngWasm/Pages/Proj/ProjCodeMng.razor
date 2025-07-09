@@ -60,6 +60,8 @@
   <RadzenSplitterPane  Size="80%" Min="10%" Max="90%">
     
     <QuriDynamicGrid 
+      AllowPaging=true
+      PageSize=25
       ReqData=DbPropData  />
 
 
@@ -67,7 +69,7 @@
     <!-- 아래쪽 -->
   <RadzenSplitterPane Size="20%" Min="10%" Max="90%">
     
-    <QuriCodeEditor @ref="_editor"  />
+    <QuriCodeEditor @ref="_editor"  KeyDownEvent=OnKeyDown />
 
   </RadzenSplitterPane>
 
@@ -111,6 +113,26 @@
   public CommonCode? srtype { get; set; }
   CommonCode? dbType { get; set; }
   QuriCodeEditor? _editor;
+
+
+
+  
+  protected async Task OnKeyDown(KeyboardEvent e) {
+
+    if (e.CtrlKey && e.KeyCode == KeyCode.Enter) {
+
+     string query = await _editor.GetValue();
+
+      DbPropData = await JsContQuery<Dictionary<string, object>>(dbType, Regex.Replace(query, @"(?<!:):\w+", "''"), true);
+
+
+    }
+
+
+  }
+
+
+
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
@@ -160,7 +182,7 @@
       
       _editor.SetValue(query);
       
-      DbPropData = await JsContQuery<Dictionary<string, object>>(dbType, Regex.Replace(query, @"(?<!:):\w+", "''"));
+      DbPropData = await JsContQuery<Dictionary<string, object>>(dbType, Regex.Replace(query, @"(?<!:):\w+", "''"), true);
 
     }
     else{

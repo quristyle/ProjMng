@@ -778,12 +778,12 @@ a[class^=action]:hover {
 
 :root {
   --main-context-body-offset: 6.4rem;
-  --context-body-offset: 11rem;
+  --context-body-offset: 11.5rem;
 }
 
 div[theme="material-dark"] .main-page-context {
   --main-context-body-offset: 7.4rem;
-  --context-body-offset: 12rem;
+  --context-body-offset: 11.5rem;
 }
 
 

@@ -1,9 +1,12 @@
 ﻿@using System.Diagnostics.CodeAnalysis
+@using BlazorMonaco;
+@using BlazorMonaco.Editor;
 
 @inherits BaseComponent
 <div class="editor-wrapper">
 <StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="AppProjData.FnPgsqlOtion"
-OnKeyDown=OnKeyDown
+OnKeyDown="OnKeyDown" 
+OnDidInit="OnEditorInit"
 />
 <a class="copy-button" @onclick="CopyTextToClipboard"><i class="bi bi-copy"></i></a>
 </div>
@@ -37,9 +40,25 @@ OnKeyDown=OnKeyDown
 @code {
    StandaloneCodeEditor? _editor;
 
-
    
   [Parameter] public EventCallback<KeyboardEvent> KeyDownEvent { get; set; }
+
+  //public delegate Task CommandHandler();
+
+  private async Task OnEditorInit()
+{
+    // Ctrl+Enter 단축키 등록
+    
+
+
+        await _editor.AddCommand((int)KeyMod.CtrlCmd | (int)KeyCode.Enter, (editor, keyCode) =>
+        {
+            Console.WriteLine("Ctrl+Enter : Editor command is triggered.");
+        });
+}
+
+
+
 
   protected async Task OnKeyDown(KeyboardEvent e) {
 
