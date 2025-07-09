@@ -423,7 +423,7 @@ public class QuriDynamicGridBase : BaseComponent {
   }
 
   public async Task Load(string procName, Dictionary<string, string> dic) {
-
+  
     IsLoading = true;
     //ReqData.Data = new();
     await InvokeAsync(StateHasChanged);
@@ -431,14 +431,22 @@ public class QuriDynamicGridBase : BaseComponent {
 
     //RequestDto rd = appData.CreateDto(procName, dic);
 
-
     ReqData = await DbCont<Dictionary<string, object>>(procName, dic);
-    
+
+
     if (ReqData.Code < 0) {
       Console.WriteLine($" Grd Load Error : {ReqData.Message}");
     }
 
     IsLoading = false;
+
+
+    //await ordersGrid.RefreshDataAsync();
+
+    //StateHasChanged();
+
+    //return;
+
     await InvokeAsync(StateHasChanged);
   }
 

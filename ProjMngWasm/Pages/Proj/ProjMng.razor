@@ -15,7 +15,7 @@
 
 
     
-    <QuriSearchs AllLoadComplete=OnLoadWrk >
+    <QuriSearchs  >
       <RadzenTextBox @bind-Value="srtype" />
     </QuriSearchs>
 
@@ -43,14 +43,17 @@
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
-      //OnLoadWrk();
+      OnLoadWrk();
     }
   }
 
   //public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
-   await qdgrd.Load("sp_dev_proj_exec");
+
+
+    
+    qdgrd.Load("sp_dev_proj_exec");
 
     /*
     Data = await DbCont<Dictionary<string, object>>("sp_dev_proj_exec", new Dictionary<string, string>() { });

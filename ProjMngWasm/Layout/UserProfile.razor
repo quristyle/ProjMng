@@ -2,7 +2,7 @@
 <RadzenProfileMenu Click=OnProfileMenuClick >
   <Template>
     <img src="@appData.User?.User_photo" alt="@appData.User?.LastName" class="avatar" />
-    <RadzenLabel Text="@appData.User?.LastName" />
+    <RadzenLabel Text="@appData.User?.LastName" role='button' class="p-2"  />
   </Template>
   <ChildContent>
       @* <RadzenProfileMenuItem Text="Buttons" Value="adsfadsf"  Icon="account_circle"></RadzenProfileMenuItem>

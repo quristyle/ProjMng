@@ -4,8 +4,8 @@
 @inherits CommonComponent
 
 <HeadContent>
-    <title>로그인 - Jsini</title>
-    <meta name="description" content="로그인 페이지입니다." />
+  <title>Jsini | login</title>
+  <meta name="description" content="로그인 페이지입니다." />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/core@1.2.0/dist/css/tabler.min.css" />
 </HeadContent>
 
@@ -18,7 +18,7 @@
     <div class="card card-md">
       <div class="card-body">
         <h2 class="h2 text-center mb-4">Login to account</h2>
-        @* <form action="/work" method="get" autocomplete="off" novalidate> *@
+        <form action="/work" method="post" autocomplete="off" novalidate @onsubmit=@(e=>OnLogin()) >
           <div class="mb-3">
             <label class="form-label">User</label>
             <input type="text" class="form-control" placeholder="User Id" autocomplete="off" @bind=@UserId />
@@ -58,9 +58,9 @@
             </label>
           </div>
           <div class="form-footer">
-            <button class="btn btn-primary w-100" @onclick=@(e=>OnLogin()) >Sign in</button>
+            <button class="btn btn-primary w-100"  >Sign in</button>
           </div>
-        @* </form> *@
+        </form>
       </div>
       <div class="hr-text">or</div>
       <div class="card-body">

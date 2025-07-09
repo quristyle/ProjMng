@@ -10,6 +10,8 @@ public class AppData {
 
   public AppData() {
     Fonts = new() {
+      new ProjFons(){ Text="3x extra small", Value="9" },
+      new ProjFons(){ Text="2x extra small", Value="10" },
       new ProjFons(){ Text="extra small", Value="11" },
       new ProjFons(){ Text="small ", Value="12" },
       new ProjFons(){ Text="standard", Value="14" },
@@ -17,7 +19,6 @@ public class AppData {
       new ProjFons(){ Text="large ", Value="18" },
       new ProjFons(){ Text="extra large", Value="20" },
       new ProjFons(){ Text="2x extra large", Value="24" },
-      new ProjFons(){ Text="3x extra large", Value="28" },
     };
   }
 
