@@ -15,28 +15,26 @@
 @inherits PageBaseComponent
 
 <RadzenCard>
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
 
-
-  
     <QuriSearchs AllLoadComplete=OnLoad >
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
       <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true Change=OnLoad />
     </QuriSearchs>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-    <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
-    <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>
+      <RadzenButton Click="@OnLoad" Text="Search"></RadzenButton>
+      <RadzenButton Click="@OnSave" Text="Save"></RadzenButton>
     </RadzenStack>
-</RadzenStack>
+  </RadzenStack>
 </RadzenCard>
 
 
-  <RadzenRow Gap="1rem" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row" >
-    <RadzenColumn Size="12" SizeSM="12">
-<QuriDiagram @ref="diagram" />
-      </RadzenColumn>
-   </RadzenRow>
+<RadzenRow Gap="1rem" JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row" >
+  <RadzenColumn Size="12" SizeSM="12" Style="height:100%;">
+    <QuriDiagram @ref="diagram" />
+  </RadzenColumn>
+</RadzenRow>
 
 
 @code {
