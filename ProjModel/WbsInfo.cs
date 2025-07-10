@@ -26,7 +26,7 @@ public class WbsInfo : BaseModel {
         return dev_edt.Value.AddDays(1);
       }
       else {
-        return plan_edt;
+        return plan_edt.Value.AddDays(1);
       }
     } 
   }
