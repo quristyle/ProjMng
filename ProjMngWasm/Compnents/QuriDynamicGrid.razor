@@ -203,7 +203,7 @@
                   }
                 }
                 else if (col.Value == "System.Boolean") {
-                  @if((bool)context[@col.Key]){
+                  @if( !string.IsNullOrWhiteSpace(context[@col.Key].ToString()) &&  bool.TryParse(context[@col.Key].ToString(), out bool result) ){
                     <RadzenIcon Icon="done" />
                   }
                   else {                  

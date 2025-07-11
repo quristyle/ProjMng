@@ -15,7 +15,7 @@
 
     
     
-    <QuriSearchs>
+    <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
       <QuriDropDown @bind-Value="SrouceName" CodeId="sourcelist" Etc0=@projectName?.Code />
       <QuriDropDown @bind-Value="SrouceLang" CodeId="SOURCE_LANG"  />
@@ -24,49 +24,79 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />
-      <RadzenButton Click="@OnSaveWrk" Text="Save" />
     </RadzenStack>
 
   </RadzenStack>
 </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
-  <RadzenColumn Size="12" >
 
+
+        
+<RadzenSplitter Orientation="Orientation.Horizontal" class="context-body-row" >
+
+  
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="30%" Min="10%" Max="90%">
     <QuriDynamicGrid  
       ReqData=@Data 
+      @bind-SItems=SelectedItems
       HiddenCols="activity,resultkey,src_rid,dao,transitionvalue"
       AllowPaging=true />
+  </RadzenSplitterPane>
+  <!-- 오른쪽 -->
+  <RadzenSplitterPane  Size="70%" Min="10%" Max="90%">
+      <QuriCodeEditor @ref="_editor" EditOption="html" />
+  </RadzenSplitterPane>
 
-  </RadzenColumn>
-</RadzenRow>
+</RadzenSplitter>
+
 
 @code {
   
   CommonCode? projectName { get; set; }
   CommonCode? SrouceName { get; set; }
   CommonCode? SrouceLang { get; set; }
+  private QuriCodeEditor? _editor;
+
+  
+  IList<IDictionary<string, object>> _selectedItems { get; set; } 
+
+  public IList<IDictionary<string, object>> SelectedItems { 
+    get { return _selectedItems; } 
+    set { 
+      if( _selectedItems != value ){
+        _selectedItems = value; 
+        LoadContext(_selectedItems[0]?["fullpath"] + "");
+        //_editor.SetValue(_selectedItems[0]?["fullpath"] + "");
+      }
+    } 
+  }
+
+  
+  protected async Task LoadContext(string fullpath) {
+    var finfo = await MdCont<Dictionary<string, object>>("md_source_context", new Dictionary<string, string>(){{"fullpath",fullpath}});
+  
+    _editor.SetValue( finfo.Data?[0]["context"].ToString() );
+  }
+
+
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
-      OnLoadWrk();
+     // OnLoadWrk();
     }
   }
 
   public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
-    Data = await DbCont<Dictionary<string, object>>("sp_dev_activityinfo_exec", new Dictionary<string, string>(){{"prj_rid",projectName?.Code}, {"src_rid",SrouceName?.Code}});
-
+  Data = await MdCont<Dictionary<string, object>>("md_source_trace", new Dictionary<string, string>(){{"prj_rid",projectName?.Code}, {"src_rid",SrouceName?.Code}, {"src_lang",SrouceLang?.Code}});
+  
+  //Data = new();
   StateHasChanged();
   }
 
   
-  protected async Task OnSaveWrk() {
-    MdCont<Dictionary<string, object>>("md_glue_service", new Dictionary<string, string>(){{"prj_rid",projectName?.Code}, {"src_rid",SrouceName?.Code}});
-    Notify(NotificationSeverity.Info, "정보", "back ground 동작함 알아서 도니깐 이제 신경 끄셔도 됩니다.", 5000);
-  }
-
 
 
 

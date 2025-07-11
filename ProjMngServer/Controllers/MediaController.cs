@@ -30,14 +30,23 @@ public class MediaController : ControllerBase {
   public ActionResult<ResultInfo<Dictionary<string, object>>> PostBody([FromBody] RequestDto dto) {
     //ResultInfo<dynamic> data = null;
     //if (
-      //dto.MultyData == null || dto.MultyData.Count <= 0) {
-    var  data = _projService.GetMdData(dto);
-    //}
-    //else {
+    //dto.MultyData == null || dto.MultyData.Count <= 0) {
+    ResultInfo<Dictionary<string, string>> data = null;
 
-    //  data = _projService.ExcuteMultyData(dto);
+    if (dto.ProcName == "md_blazor_scan") {
+      data = _projService.GetMdBlazorData(dto);
+    }
+    else if (dto.ProcName == "md_glue_service") {
+      data = _projService.GetMdGlueData (dto);
+    }
+    else if (dto.ProcName == "md_source_trace") {
+      data = _projService.GetMdSourData(dto);
+    }
+    else if (dto.ProcName == "md_source_context") {
+      data = _projService.GetMdContent(dto);
+    }
 
-    //}
+
     return Ok(data);
   }
 

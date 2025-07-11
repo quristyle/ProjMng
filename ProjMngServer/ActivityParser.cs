@@ -10,6 +10,8 @@ using System.Linq;
 using System.Xml.Linq;
 
 public class ActivityParser {
+
+  //glue xml 읽고 추출
   public static List<ActivityInfo> ParseActivityFiles(string rootPath) {
     var activityList = new List<ActivityInfo>();
     var xmlFiles = Directory.GetFiles(rootPath, "*-service.xml", SearchOption.AllDirectories);
@@ -101,4 +103,47 @@ public class ActivityParser {
 
     return activityList;
   }
+
+
+
+  public static List<SrcFileInfo> ParseSrcFiles(string rootPath, string extend) {
+    var activityList = new List<SrcFileInfo>();
+    var jspFiles = Directory.GetFiles(rootPath, "*."+ extend, SearchOption.AllDirectories);
+
+    foreach (var file in jspFiles) {
+      try {
+
+        FileInfo fi = new FileInfo(file);
+
+
+
+        string relativePath = Path.GetRelativePath(rootPath, fi.FullName);
+        string[] parts = relativePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        string firstDir = parts.Length > 0 ? parts[0] : "";
+
+
+        string fileNameOnly = Path.GetFileNameWithoutExtension(fi.Name);
+
+        activityList.Add(new SrcFileInfo {
+          GubunDir = firstDir,
+          FullPath = fi.FullName,
+          FileName = fileNameOnly,
+          FileNameNExtend = fi.Name,
+          Extend = fi.Extension,
+          CreateDate = fi.CreationTime,
+          ModifyDate = fi.LastWriteTime,
+          LastDate = fi.LastAccessTime
+        });
+      }
+      catch (Exception ex) {
+        Console.WriteLine($"[ERROR] {file}: {ex.Message}");
+      }
+    }
+
+    return activityList;
+  }
+
+
+
+
 }

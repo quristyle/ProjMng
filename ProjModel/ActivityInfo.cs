@@ -14,3 +14,15 @@ public class ActivityInfo : BaseModel {
 }
 
 
+
+public class SrcFileInfo : BaseModel {
+  public string GubunDir { get; set; }
+  public string FullPath { get; set; }
+  public string FileName { get; set; }
+  public string FileNameNExtend { get; set; }
+  public string Extend { get; set; }
+  public DateTime? CreateDate { get; set; }
+  public DateTime? ModifyDate { get; set; }
+  public DateTime? LastDate { get; set; }
+}
+

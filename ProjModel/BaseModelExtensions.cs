@@ -71,3 +71,31 @@ public static class BaseModelExtensions {
 
 
 }
+
+
+public static class ModelHelper {
+  public static Dictionary<string, string> ToCols(Type modelType) {
+    Dictionary<string, string> col = new Dictionary<string, string>();
+
+    var properties = modelType.GetProperties();
+
+    foreach (var prop in properties) {
+      string name = prop.Name.ToLower();
+      string type = prop.PropertyType.FullName;
+
+      if (prop.PropertyType == typeof(DateTime?))
+        type = "System.DateTime";
+
+      col[name] = type;
+    }
+
+    return col;
+  }
+
+  // 제네릭 오버로드도 제공 가능
+  public static Dictionary<string, string> ToCols<T>() where T : BaseModel {
+    return ToCols(typeof(T));
+  }
+}
+
+

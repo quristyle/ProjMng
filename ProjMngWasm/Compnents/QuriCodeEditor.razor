@@ -2,9 +2,15 @@
 @using BlazorMonaco;
 @using BlazorMonaco.Editor;
 
+
+
+
+@* ConstructionOptions=AppProjData.FnPgsqlOtion *@
+
+
 @inherits BaseComponent
 <div class="editor-wrapper">
-<StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="AppProjData.FnPgsqlOtion"
+<StandaloneCodeEditor @ref="_editor" CssClass="code-editor"  ConstructionOptions="GetEditorOptions" 
 OnKeyDown="OnKeyDown" 
 OnDidInit="OnEditorInit"
 />
@@ -45,8 +51,47 @@ OnDidInit="OnEditorInit"
 
   //public delegate Task CommandHandler();
 
-  private async Task OnEditorInit()
-{
+
+  
+    // 외부에서 주입받을 파라미터
+    [Parameter] public string EditOption { get; set; }
+
+    // ConstructionOptions 에 전달될 함수
+    private StandaloneEditorConstructionOptions GetEditorOptions(StandaloneCodeEditor editor)    {
+        if (string.IsNullOrEmpty(EditOption))        {
+        return AppProjData.PgsqlOption;
+        }
+        else if(EditOption=="html"){
+        return AppProjData.HtmlOption;
+        }
+
+        // 기본 옵션
+        return AppProjData.PgsqlOption;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  private async Task OnEditorInit(){
+
+
+    //ConstructionOptions
+
+    //_editor.ConstructionOptions = AppProjData.FnPgsqlOtion(_editor);
+
     // Ctrl+Enter 단축키 등록
     
 
