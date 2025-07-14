@@ -18,7 +18,7 @@
     <QuriSearchs>
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
       <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@projectName?.Code IsEtcFix=true  />
-      <RadzenTextBox @bind-Value="srchText" />
+      <RadzenTextBox @bind-Value="srchText" Style="width: 25rem;" />
     </QuriSearchs>
 
       
@@ -448,7 +448,9 @@ class="context-body-row"
   protected async Task LoadProc() {
 
     Dictionary<string, string> dic = getParams();
-    //dic.Add("stp", "proclist");
+    dic.Add("param1", srchText);
+
+    
 
     await ProcGrd.Load("proclist", dic);
     return;
