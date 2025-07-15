@@ -441,6 +441,7 @@ class="context-body-row"
   {"db",dbType?.Others["db_type"]??string.Empty},
   {"dbnick",dbType?.Others["db_nick"]??string.Empty},
   {"schema",dbType?.Others["db_schema"]??string.Empty},
+  {"param1", srchText},
 
   };
   }
@@ -448,7 +449,6 @@ class="context-body-row"
   protected async Task LoadProc() {
 
     Dictionary<string, string> dic = getParams();
-    dic.Add("param1", srchText);
 
     
 

@@ -237,7 +237,7 @@ public class DevService : BaseService {
       param["db_id"] = di.Db_id;
 
 
-      //Console.WriteLine($"Dsl_query : {dsr.Dsl_query}");
+      Console.WriteLine($"Dsl_query : {dsr.Dsl_query}");
 
 
       string directString = ChangeQueryDirectQuery(dsr.Dsl_query, param);
@@ -391,9 +391,10 @@ public class DevService : BaseService {
 
       foreach (string str in _dd_kkk) {
         string key = str.Replace("$", "");
-        if (param.TryGetValue(key, out var strValue) && strValue != null) {
-          result = result.Replace(str, strValue);
-        }
+        //if (param.TryGetValue(key, out var strValue) && strValue != null) {
+          //result = result.Replace(str, strValue);
+        //}
+        result = result.Replace(str, param.GetValue(key) );
       }
 
     }

@@ -21,7 +21,7 @@
       <!-- 왼쪽 위 컨텐츠 -->
       <RadzenSplitterPane Size="60%" Min="10%" Max="90%">
         <!-- 왼쪽 조회부 -->
-        <RadzenStack Orientation="Orientation.Horizontal" Style="height:38px;" Gap="4px">
+        <RadzenStack Orientation="Orientation.Horizontal"  Gap="4px">
 
           <QuriDropDown @bind-Value="tableName" CodeId="projlist" />
           <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@tableName?.Code IsEtcFix=true />
@@ -33,27 +33,20 @@
         <RadzenStack Orientation="Orientation.Vertical" Style="height:calc(100% - 38px);" Gap="4px">
 
 
-          <RadzenDataGrid @bind-Value=@selectedTable
-          Style="height:100%;"
-          Data="@Data"
+
+          <QuriGrid @bind-Value=@selectedTable
+                 @ref=@MainTableGrd
           TItem="TableInfo"
-          IsLoading=@isLoading
+           CellClick="@OnCellClick"
           RowSelect=OnRowSelect
-          FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-          LogicalFilterOperator="LogicalFilterOperator.And"
-          AllowFiltering="true"
-          AllowColumnResize="true"
-          FilterMode="FilterMode.Simple"
-          SelectionMode="DataGridSelectionMode.Single"
-          AllowPaging="false"
-          AllowSorting="true"
-          PagerHorizontalAlign="HorizontalAlign.Left"
-          ShowPagingSummary="true">
+          
+          
+          >
             <Columns>
-              <RadzenDataGridColumn title="TableName" Property="TableName" />
-              <RadzenDataGridColumn title="Desc" Property="Description" />
+              <RadzenDataGridColumn TItem="TableInfo" title="TableName" Property="TableName" />
+              <RadzenDataGridColumn TItem="TableInfo" title="Desc" Property="Description" />
             </Columns>
-          </RadzenDataGrid>
+          </QuriGrid>
 
 
 
@@ -113,7 +106,7 @@
         <!-- 오른쪽 조회부 -->
         <RadzenStack Orientation="Orientation.Vertical" Style="height:100%;" Gap="4px">
 
-          <RadzenStack Orientation="Orientation.Horizontal" Style="height:38px;" Gap="4px">
+          <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
             <QuriDropDown @bind-Value="projectName2" CodeId="projlist" />
             <QuriDropDown @bind-Value="dbType2" CodeId="projdb" Etc0=@projectName2?.Code IsEtcFix=true />
             <div class="rz-p-2 rz-text-align-center">
@@ -168,13 +161,17 @@
 
 @code {
 
+  
+  QuriGrid<TableInfo> MainTableGrd{ get; set; }
+
+
+
   CommonCode tableName { get; set; }
   CommonCode projectName2 { get; set; }
 
   CommonCode dbType { get; set; }
   CommonCode dbType2 { get; set; }
 
-  bool isLoading { get; set; }
   bool isLoading2 { get; set; }
   bool isLoading3 { get; set; }
   bool isLoading4 { get; set; }
@@ -185,7 +182,7 @@
   //IList<ColumnInfo> selectedColumn2;
 
 
-  public IEnumerable<TableInfo> Data { get; set; }
+  //public IEnumerable<TableInfo> Data { get; set; }
   public IEnumerable<ColumnInfo> dataCol { get; set; }
 
   public ResultInfo<Dictionary<string, object>> DataMenu { get; set; }
@@ -195,6 +192,76 @@
 
   public ResultInfo<Dictionary<string, object>> DataProc { get; set; } = new ResultInfo<Dictionary<string, object>>();
 
+
+
+
+    string columnEditing;
+    List<KeyValuePair<string, string>> editedFields = new List<KeyValuePair<string, string>>();
+    List<TableInfo> ordersToUpdate = new List<TableInfo>();
+  async Task OnCellClick(DataGridCellMouseEventArgs<TableInfo> args)    {
+        if (!MainTableGrd.IsValid || 
+            (ordersToUpdate.Contains(args.Data) && columnEditing == args.Column.Property)) return;
+
+        // Record the previous edited field, if you're not using IRevertibleChangeTracking to track object changes
+        if (ordersToUpdate.Any())        {
+            editedFields.Add(new(ordersToUpdate.First().TableName, columnEditing));
+            await Update();
+        }
+
+        // This sets which column is currently being edited.
+        columnEditing = args.Column.Property;
+
+        // This sets the Item to be edited.
+        await EditRow(args.Data);
+    }
+
+
+    
+    void Reset(TableInfo order = null)    {
+        editorFocused = false;
+
+        if (order != null)        {
+            ordersToUpdate.Remove(order);
+        }
+        else        {
+            ordersToUpdate.Clear();
+        }
+    }
+
+    async Task Update()    {
+        editorFocused = false;
+
+        if (ordersToUpdate.Any())        {
+            await MainTableGrd.UpdateRow(ordersToUpdate.First());
+        }
+    }
+
+    async Task EditRow(TableInfo order)    {
+        Reset();
+
+        ordersToUpdate.Add(order);
+
+        await MainTableGrd.EditRow(order);
+    }
+
+
+    
+    IRadzenFormComponent editor;
+    bool editorFocused;
+    protected override async Task OnAfterRenderAsync(bool firstRender)    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (!editorFocused && editor != null)        {
+            editorFocused = true;
+
+            try            {
+                await editor.FocusAsync();
+            }
+            catch            {
+                //
+            }
+        }
+    }
 
 
 
@@ -217,7 +284,6 @@
   // 왼쪽 테이블 조회
   async Task Search() {
 
-    isLoading = true;
     Dictionary<string, string> dic = new Dictionary<string, string>() {
   {"db",dbType.Others["db_type"]},
   {"dbnick",dbType.Others["db_nick"]},
@@ -225,10 +291,13 @@
   {"stp", "tablelist"},
 
   };
+
+  await MainTableGrd.Load("tablelist", dic);
+
+
     // Data = await DevService.GetList<TableInfo>(dic);
-    var ri = await JsCont<TableInfo>("tablelist", dic);
-    Data = ri.Data;
-    isLoading = false;
+    //var ri = await JsCont<TableInfo>("tablelist", dic);
+    //Data = ri.Data;
   }
 
 
@@ -236,6 +305,7 @@
 
   // 왼쪽 테이블의 칼럼 조회
   async Task OnRowSelect(TableInfo tableInfo) {
+    return;
     isLoading2 = true;
     Dictionary<string, string> dic = new Dictionary<string, string>() {
       {"db",dbType.Others["db_type"]},
