@@ -37,7 +37,8 @@
         <RadzenColumn Size="5">
           <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
             <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-            <a href="/"><span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Project Managerment - @appData.ActiveServerUrl</span></a>
+            <a href="/"><span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Project Managerment</span></a>
+            <a href="@appData.User?.UserServerUrl" target="_blank"> - @appData.ActiveServerUrl (  @appData.User?.UserServerUrl ) </a>
           </RadzenStack>
         </RadzenColumn>
         <RadzenColumn Size="7">
