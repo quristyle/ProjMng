@@ -83,45 +83,63 @@
 
   void FilterPanelMenu(ChangeEventArgs args) {
     var term = args.Value??string.Empty;
-    /*
     if (string.IsNullOrEmpty(term?.ToString())) {
-
-      dirs.ForEach(menuDir =>
-{
-    Console.WriteLine($"Before2: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-        menuDir.expend = menuDir.pre_expend; // 값 복사
-
-        menuDir.first_memory = false;
-    Console.WriteLine($"After2: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-});
-
-    //  _Data = _Data2;
+      Data = Data2;
     }
-    else {
-
-
-      dirs.ForEach(menuDir =>
-{
-    Console.WriteLine($"Before: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
+    else{
+    /*
+    else { 
+      dirs.ForEach(menuDir => {
       if(  !menuDir.first_memory ){
     menuDir.pre_expend = menuDir.expend; // 값 복사
           menuDir.first_memory = true;
       }
     menuDir.expend = true; // 새로운 값 설정
-    Console.WriteLine($"After: pre_expend = {menuDir.pre_expend}, expend = {menuDir.expend}");
-});
+}); 
+*/
 
 
-      _Data = _Data2?.Where(x => 
-        x["title"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)||
-        x["description"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase) ||
-        x["url"].ToString().Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)
-      );
-      
+      Data = FilterMenuTree(Data2, term?.ToString()).ToList();
     }
+/*
+ * 
+      Data = Data2?.Where(x => 
+        x.mnu_nm.Contains(term.ToString(), StringComparison.OrdinalIgnoreCase)
+        || string.IsNullOrEmpty(x.pgm_id  )
+      ).ToList()   ;
+
+      foreach( var d in Data){
+        d.Expanded = true;
+      }
+*/
+      
+    //}
     StateHasChanged();
-    */
   }
+
+
+
+private IEnumerable<MenuInfo> FilterMenuTree(IEnumerable<MenuInfo> menus, string term) {
+    foreach (var menu in menus) {
+        // 현재 메뉴가 조건에 맞는지 확인
+        var matches = menu.mnu_nm.Contains(term, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(menu.pgm_id);
+
+        // 하위 메뉴를 재귀적으로 필터링
+        var filteredChildren = FilterMenuTree(menu.Children, term).ToList();
+
+        // 조건에 맞거나 하위 메뉴 중 조건에 맞는 항목이 있을 경우 결과에 포함
+        if (matches || filteredChildren.Any()) {
+            yield return new MenuInfo {
+                mnu_nm = menu.mnu_nm,
+                pgm_id = menu.pgm_id,
+                Children = filteredChildren,
+                Expanded = true // 검색 결과를 펼치기 위해 설정
+            };
+        }
+    }
+} 
+
+
 
 RenderFragment RenderMenuMarkup(MenuInfo p2) => 
   @<div>@if( string.IsNullOrEmpty( p2.pgm_id) ){
@@ -153,6 +171,7 @@ RenderFragment RenderMenuMarkup(MenuInfo p2) =>
   }</div>;
 
 public List<MenuInfo> Data { get; set; } = new List<MenuInfo>();
+public List<MenuInfo> Data2 { get; set; } = new List<MenuInfo>();
 
 void OnMenuExpand(MenuInfo menu){
   return;
@@ -165,7 +184,7 @@ void OnMenuExpand(MenuInfo menu){
     }
 
     // 최상위 메뉴(Data) 중에서, menu와 그 부모가 아닌 것만 Expanded = false
-    foreach (var root in Data)    {
+    foreach (var root in Data2)    {
         if (!parentIds.Contains(root.mnu_id))        {
             root.Expanded = false;
         }
@@ -182,7 +201,9 @@ public async Task OnLoadMenu() {
       }, false, true);
         
       if( rdata != null ){
-        Data = MenuInfo.BuildMenuTree(rdata.Data);
+        Data2 = MenuInfo.BuildMenuTree(rdata.Data);
+        Data = Data2;
+        //Data = Data2;
       }
    
   }
