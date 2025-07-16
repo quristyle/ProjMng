@@ -33,18 +33,38 @@
         <RadzenStack Orientation="Orientation.Vertical" Style="height:calc(100% - 38px);" Gap="4px">
 
 
-
-          <QuriGrid @bind-Value=@selectedTable
-                 @ref=@MainTableGrd
-          TItem="TableInfo"
-           CellClick="@OnCellClick"
-          RowSelect=OnRowSelect
           
+          @* RowSelect=OnRowSelect
+           RowUpdate="@OnUpdateRow" 
+           CellClick="@OnCellClick"
+           
+           *@
+
+
+          <QuriGrid 
+            @bind-Value=@selectedTable
+            @ref=@_tGrd
+            KeySelector=@(i=>i.TableName)
+           RowUpdate="@OnUpdateRow" 
+                 CellClick=OnCellClick
+                 RowSelect=OnRowSelect
+          TItem="TableInfo"
+            Sort="@(args => _tGrd.Reset())" Page="@(args => _tGrd.Reset())" Filter="@(args => _tGrd.Reset())"
           
           >
             <Columns>
-              <RadzenDataGridColumn TItem="TableInfo" title="TableName" Property="TableName" />
-              <RadzenDataGridColumn TItem="TableInfo" title="Desc" Property="Description" />
+              <RadzenDataGridColumn TItem="TableInfo" title="TableName" Property="TableName"  />
+
+              <RadzenDataGridColumn TItem="TableInfo" Property="Description" Title="Desc" IsInEditMode="@_tGrd.IsEditing">
+                  <Template Context="order">
+                      <RadzenText Text="@(order.Description)" />
+                  </Template>
+                  <EditTemplate Context="order">
+                      <RadzenTextBox  Change="@(args => _tGrd.Update())" @bind-Value="order.Description" Name="Description" aria-label="Enter Description" />
+                      <RadzenRequiredValidator Text="Description is required" Component="Description" Popup="true" />
+                  </EditTemplate>
+              </RadzenDataGridColumn>
+
             </Columns>
           </QuriGrid>
 
@@ -61,28 +81,34 @@
           <!-- left columns -->
       
 
-            <RadzenDataGrid Style="height:100%;"
+          <QuriGrid 
             @bind-Value=@selectedColumn
-            Data="@dataCol"
+            @ref=@_cGrd            
+            KeySelector=@(i=>i.ColunmName)
+           RowUpdate="@OnUpdateColumnDesc" 
+                 CellClick=@( args => _cGrd.OnCellClickCehck(args))
             TItem="ColumnInfo"
-            IsLoading=@isLoading2
             RowSelect=OnRowSelectCol
-            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-            LogicalFilterOperator="LogicalFilterOperator.And"
-            AllowColumnResize="true"
-            SelectionMode="DataGridSelectionMode.Single"
-            AllowPaging="false"
-            AllowSorting="true"
-            PagerHorizontalAlign="HorizontalAlign.Left"
-            ShowPagingSummary="true">
+            >
               <Columns>
-                <RadzenDataGridColumn title="ColunmName" Property="ColunmName" />
-                <RadzenDataGridColumn title="Desc" Property="Description" Width="150px" />
-                <RadzenDataGridColumn title="Type" Property="Type_NM" />
-                <RadzenDataGridColumn title="Null" Property="NullAble" />
-                <RadzenDataGridColumn title="Ident" Property="Ident" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="ColunmName" Property="ColunmName" />
+                
+              <RadzenDataGridColumn TItem="ColumnInfo" Property="Description" Title="Desc" IsInEditMode="@_cGrd.IsEditing">
+                  <Template Context="order">
+                      <RadzenText Text="@(order.Description)" />
+                  </Template>
+                  <EditTemplate Context="order">
+                      <RadzenTextBox  Change="@(args => _cGrd.Update())" @bind-Value="order.Description" Name="Description" aria-label="Enter Description" />
+                      <RadzenRequiredValidator Text="Description is required" Component="Description" Popup="true" />
+                  </EditTemplate>
+              </RadzenDataGridColumn>
+
+
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Type" Property="Type_NM" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Null" Property="NullAble" />
+                <RadzenDataGridColumn TItem="ColumnInfo" title="Ident" Property="Ident" />
               </Columns>
-            </RadzenDataGrid>
+          </QuriGrid>
 
 
 
@@ -120,7 +146,7 @@
 
           <RadzenStack Orientation="Orientation.Vertical" Style="height:calc(100% - 38px);" Gap="4px">
 
-            <QuriDynamicGrid ActionBtnEvent=OnTableCommentSave  ReqData=DataMenu  IsLoading=isLoading3 />
+            @* <QuriDynamicGrid ActionBtnEvent=OnTableCommentSave  ReqData=DataMenu  /> *@
 
           </RadzenStack>
 
@@ -134,7 +160,7 @@
 
         <RadzenStack Orientation="Orientation.Vertical" Style="height:100%;" Gap="4px">
            
-          <QuriDynamicGrid ActionBtnEvent=OnProcCommentSave  ReqData=DataProc  IsLoading=isLoading4 />
+          @* <QuriDynamicGrid ActionBtnEvent=OnProcCommentSave  ReqData=DataProc  /> *@
            
         </RadzenStack>
 
@@ -162,7 +188,8 @@
 @code {
 
   
-  QuriGrid<TableInfo> MainTableGrd{ get; set; }
+  QuriGrid<TableInfo> _tGrd{ get; set; }
+  QuriGrid<ColumnInfo> _cGrd{ get; set; }
 
 
 
@@ -172,9 +199,7 @@
   CommonCode dbType { get; set; }
   CommonCode dbType2 { get; set; }
 
-  bool isLoading2 { get; set; }
-  bool isLoading3 { get; set; }
-  bool isLoading4 { get; set; }
+
 
   IList<TableInfo> selectedTable;
   //IList<TableInfo> selectedTable2;
@@ -183,7 +208,7 @@
 
 
   //public IEnumerable<TableInfo> Data { get; set; }
-  public IEnumerable<ColumnInfo> dataCol { get; set; }
+  //public IEnumerable<ColumnInfo> dataCol { get; set; }
 
   public ResultInfo<Dictionary<string, object>> DataMenu { get; set; }
 
@@ -194,75 +219,61 @@
 
 
 
+  
 
-    string columnEditing;
-    List<KeyValuePair<string, string>> editedFields = new List<KeyValuePair<string, string>>();
-    List<TableInfo> ordersToUpdate = new List<TableInfo>();
-  async Task OnCellClick(DataGridCellMouseEventArgs<TableInfo> args)    {
-        if (!MainTableGrd.IsValid || 
-            (ordersToUpdate.Contains(args.Data) && columnEditing == args.Column.Property)) return;
+    //string columnEditing;
+    //List<KeyValuePair<string, string>> editedFields = new List<KeyValuePair<string, string>>();
+    //List<TableInfo> ordersToUpdate = new List<TableInfo>();
+    public async Task OnCellClick(DataGridCellMouseEventArgs<TableInfo> args) {
+      await _tGrd.OnCellClickCehck(args);
+    }
 
-        // Record the previous edited field, if you're not using IRevertibleChangeTracking to track object changes
-        if (ordersToUpdate.Any())        {
-            editedFields.Add(new(ordersToUpdate.First().TableName, columnEditing));
-            await Update();
-        }
 
-        // This sets which column is currently being edited.
-        columnEditing = args.Column.Property;
 
-        // This sets the Item to be edited.
-        await EditRow(args.Data);
+
+    
+    void OnUpdateRow(TableInfo order)    {
+      //return;
+        _tGrd.Reset(order);
+
+
+        //tableCommentUpdate
+
+
+        
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType.Others["db_type"]},
+      {"dbnick",dbType.Others["db_nick"]},
+      {"schema",dbType.Others["db_schema"]},
+      {"table_name", order.TableName },
+      {"table_desc", order.Description },
+      };
+
+      JsCont<TableInfo>("tableCommentUpdate", dic);
+
+    }
+
+    
+    
+    void OnUpdateColumnDesc(ColumnInfo cinfo)    {
+        _cGrd.Reset(cinfo);
+
+        
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType.Others["db_type"]},
+      {"dbnick",dbType.Others["db_nick"]},
+      {"schema",dbType.Others["db_schema"]},
+      {"table_name", cinfo.TableName },
+      {"column_name", cinfo.ColunmName },
+      {"column_desc", cinfo.Description },
+      };
+
+      JsCont<ColumnInfo>("columnsCommentUpdate", dic);
+
     }
 
 
     
-    void Reset(TableInfo order = null)    {
-        editorFocused = false;
-
-        if (order != null)        {
-            ordersToUpdate.Remove(order);
-        }
-        else        {
-            ordersToUpdate.Clear();
-        }
-    }
-
-    async Task Update()    {
-        editorFocused = false;
-
-        if (ordersToUpdate.Any())        {
-            await MainTableGrd.UpdateRow(ordersToUpdate.First());
-        }
-    }
-
-    async Task EditRow(TableInfo order)    {
-        Reset();
-
-        ordersToUpdate.Add(order);
-
-        await MainTableGrd.EditRow(order);
-    }
-
-
-    
-    IRadzenFormComponent editor;
-    bool editorFocused;
-    protected override async Task OnAfterRenderAsync(bool firstRender)    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (!editorFocused && editor != null)        {
-            editorFocused = true;
-
-            try            {
-                await editor.FocusAsync();
-            }
-            catch            {
-                //
-            }
-        }
-    }
-
 
 
 
@@ -276,9 +287,6 @@
   string MenuName { get; set; }
 
 
-  protected override async Task OnInitializedAsync() {
-    await base.OnInitializedAsync();
-  }
 
 
   // 왼쪽 테이블 조회
@@ -292,7 +300,7 @@
 
   };
 
-  await MainTableGrd.Load("tablelist", dic);
+  await _tGrd.Load("tablelist", dic);
 
 
     // Data = await DevService.GetList<TableInfo>(dic);
@@ -305,27 +313,28 @@
 
   // 왼쪽 테이블의 칼럼 조회
   async Task OnRowSelect(TableInfo tableInfo) {
-    return;
-    isLoading2 = true;
+    //return;
     Dictionary<string, string> dic = new Dictionary<string, string>() {
       {"db",dbType.Others["db_type"]},
       {"dbnick",dbType.Others["db_nick"]},
       {"schema",dbType.Others["db_schema"]},
-      {"stp", "columnsOftable"},
+      //{"stp", "columnsOftable"},
       {"table_name", tableInfo.TableName},
 
     };
 
-    var ri = await JsCont<ColumnInfo>("columnsOftable", dic);
-    dataCol = ri.Data;
-    isLoading2 = false;
+    _cGrd.Load("columnsOftable", dic);
+
+
+    // var ri = await JsCont<ColumnInfo>("columnsOftable", dic);
+    // dataCol = ri.Data;
     StateHasChanged();
   }
 
 
   // 왼쪽 테이블의 칼럼 선택
   async Task OnRowSelectCol(ColumnInfo colInfo) {
-    isLoading3 = true;
+    return;
     Dictionary<string, string> dic = new Dictionary<string, string>() {
       {"db",dbType2.Others["db_type"]},
       {"dbnick",dbType2.Others["db_nick"]},
@@ -342,7 +351,6 @@
     DataMenu = ri;
 
 
-    isLoading3 = false;
     FindProc();
   }
 
@@ -351,7 +359,6 @@
 
   // 왼쪽 테이블의 칼럼 에 해당하는 프로시저 문자열 조회
   async Task FindProc() {
-    isLoading4 = true;
 
     if (procList == null){
       Dictionary<string, string> dic2 = new Dictionary<string, string>() {
@@ -417,7 +424,6 @@
 
     //DataProc = ri2;
 
-    isLoading4 = false;
     StateHasChanged();
 
   }

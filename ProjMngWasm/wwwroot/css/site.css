@@ -33,6 +33,7 @@
   --rz-tabs-padding: 0.25rem !important;
   --rz-root-font-size: 12px !important;
   --rz-scheduler-event-font-size: 1rem !important;
+  --rz-text-body1-font-size: 0.875rem !important;
 }
 
 * {
@@ -882,4 +883,10 @@ a{
   width: 22px;
   height: 22px;
   border-radius: 50%;
+}
+
+
+
+.rz-text-body1 {
+  margin-block-end: 0;
 }

@@ -1,6 +1,5 @@
 ﻿@page "/proj-shceduler";
-@{
-  
+@{  
   /* description : Schedule calendar
   * title : Schedule
   * sort : 5
@@ -194,8 +193,7 @@ if (result is WbsInfo deleted && deleted.wbs_state == "DELETE"){
     if (result is WbsInfo deleted && deleted.wbs_state == "DELETE")    {
         // Data에서 삭제
         var item = Data.FirstOrDefault(x => x.wbs_id == deleted.wbs_id);
-        if (item != null)
-        {
+        if (item != null)        {
             Data.Remove(item);
             StateHasChanged();
         }
@@ -261,10 +259,3 @@ if (result is WbsInfo deleted && deleted.wbs_state == "DELETE"){
 
 }
 
-
-<style>
-  
-/* .main-page-context .context-body-row.overheight {
-  height: calc(100vh - 20rem) !important;
-} */
-  </style>
