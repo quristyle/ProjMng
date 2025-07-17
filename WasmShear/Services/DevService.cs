@@ -61,7 +61,7 @@ public class DevService : BaseService {
 
     }
     else {
-      SetResultCode<T>(result, -96, $"응답 실패, 응답코드 : {response.StatusCode}");
+      SetResultCode<T>(ref result, -96, $"응답 실패, 응답코드 : {response.StatusCode}");
     }
 
 

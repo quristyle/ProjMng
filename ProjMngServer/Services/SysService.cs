@@ -182,7 +182,7 @@ public class SysService : BaseService {
 
 
   /// <summary> AppData clear </summary>
-  public ResultInfo<dynamic> AppDataClear(string action_name, Dictionary<string, string> param) {
+  public ResultInfo<dynamic> AppDataClear(string action_name, IDictionary<string, string> param) {
 
     ResultInfo<dynamic> ri = new ResultInfo<dynamic>();
 

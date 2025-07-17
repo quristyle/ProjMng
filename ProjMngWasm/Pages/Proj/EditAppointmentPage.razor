@@ -4,6 +4,15 @@
 @inherits PageBaseComponent
 <RadzenTemplateForm TItem="WbsInfo" Data="@model" Submit=@OnSubmit>
   <RadzenStack Gap="1rem">
+    
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+      <RadzenLabel Text="project" Style="width: 6rem;" />
+      <QuriDropDown CodeId="projlist" @bind-Value=@_selectProject Style="width: 12rem;" InitialCode=@model.prj_rid />
+    </RadzenStack>
+
+
+
+
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="Title" Style="width: 6rem;" />
       <RadzenTextBox @bind-Value="@model.proc_nm" Name="Text" Style="width: 20rem;" />
@@ -16,7 +25,6 @@
     
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
       <RadzenLabel Text="종류" Style="width: 6rem;" />
-      <QuriDropDown CodeId="projlist" @bind-Value=@_selectProject Style="width: 12rem;" InitialCode=@model.prj_rid />
       <QuriDropDown CodeId="schedule_type" @bind-Value=@_schedule_type Name="schedule_type"  Style="width: 12rem;" />
       <RadzenRequiredValidator Component="schedule_type" Text="Start is required" />
     </RadzenStack>
@@ -126,6 +134,8 @@
     if(model.isComplatge){
       if( model.dev_sdt == null ) model.dev_sdt = DateTime.Now;
       if( model.dev_edt == null ) model.dev_edt = DateTime.Now;
+      if( model.plan_sdt > model.dev_edt ) model.plan_sdt = model.dev_edt ;
+      if( model.plan_edt > model.dev_edt ) model.plan_edt = model.dev_edt ;
       model.wbs_state = "COMP";
     }
     else{
@@ -148,7 +158,12 @@
 
     Dictionary<string, string> dic = model.ToDictionary();
 
-    await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);
+   var dt = await DbSave<Dictionary<string, object>>("sp_proj_wbs_exec", dic);
+
+
+   if( dt.Code >= 0 && dt.Data != null && dt.Data.Count > 0 && string.IsNullOrEmpty( model.wbs_id) ){
+    model.wbs_id =  dt.Data[0].GetValue("wbs_id");
+   }
 
     DialogService.Close(model);
   }

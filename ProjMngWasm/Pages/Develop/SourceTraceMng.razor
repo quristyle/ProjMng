@@ -18,7 +18,7 @@
     <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown @bind-Value="projectName" CodeId="projlist" />
       <QuriDropDown @bind-Value="SrouceName" CodeId="sourcelist" Etc0=@projectName?.Code />
-      <QuriDropDown @bind-Value="SrouceLang" CodeId="SOURCE_LANG"  />
+      <QuriDropDown @bind-Value="SrouceLang" CodeId="SOURCE_LANG" Change=OnLoadWrk  />
     </QuriSearchs>
 
 
@@ -45,7 +45,7 @@
   </RadzenSplitterPane>
   <!-- 오른쪽 -->
   <RadzenSplitterPane  Size="70%" Min="10%" Max="90%">
-      <QuriCodeEditor @ref="_editor" EditOption="html" />
+      <QuriCodeEditor @ref="_editor" />
   </RadzenSplitterPane>
 
 </RadzenSplitter>
@@ -66,15 +66,21 @@
     set { 
       if( _selectedItems != value ){
         _selectedItems = value; 
-        LoadContext(_selectedItems[0]?["fullpath"] + "");
+        LoadContext(_selectedItems[0]);
         //_editor.SetValue(_selectedItems[0]?["fullpath"] + "");
       }
     } 
   }
 
   
-  protected async Task LoadContext(string fullpath) {
-    var finfo = await MdCont<Dictionary<string, object>>("md_source_context", new Dictionary<string, string>(){{"fullpath",fullpath}});
+  protected async Task LoadContext(IDictionary<string,object> dic) {
+
+
+    string fullpath = dic.GetValue("fullpath");
+    string expendstr = dic.GetValue("extend");
+
+
+    var finfo = await MdCont<Dictionary<string, object>>("md_source_context", new Dictionary<string, string>(){{"fullpath",fullpath}}); 
   
     _editor.SetValue( finfo.Data?[0]["context"].ToString() );
   }
@@ -90,6 +96,16 @@
   public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
+
+  var lang =  SrouceLang?.Code;
+  
+  if( lang == "js" ){ lang = "javascript"; }
+  else if( lang == "jsp" ){ lang = "html"; }
+
+
+   _editor.LanguageChange(lang);
+
+
   Data = await MdCont<Dictionary<string, object>>("md_source_trace", new Dictionary<string, string>(){{"prj_rid",projectName?.Code}, {"src_rid",SrouceName?.Code}, {"src_lang",SrouceLang?.Code}});
   
   //Data = new();

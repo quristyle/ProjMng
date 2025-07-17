@@ -67,12 +67,12 @@ public class BaseService {
 
     }
     else {
-      SetResultCode<T>(result, -97, $"응답 실패, 응답이 비어 있습니다");
+      SetResultCode<T>( ref result, -97, $"응답 실패, 응답이 비어 있습니다");
     }
     return result;
   }
 
-  protected void SetResultCode<T>(ResultInfo<T> ri, int code, string message) {
+  protected void SetResultCode<T>(ref ResultInfo<T> ri, int code, string message) {
     if (ri == null) {
       ri = new ResultInfo<T>();
     }
@@ -143,7 +143,7 @@ public class BaseService {
       }
 
       if (response == null) {
-        SetResultCode<T>(result, -1001, $"호출타입정의 확인 필요 : {hctype.ToString()}");
+        SetResultCode<T>(ref result, -1001, $"호출타입정의 확인 필요 : {hctype.ToString()}");
       }
 
       //요청 성공 여부 확인
@@ -156,17 +156,17 @@ public class BaseService {
 
       }
       else {
-        SetResultCode<T>(result, -96, $"응답 실패, 응답코드 : {response.StatusCode}");
+        SetResultCode<T>(ref result, -96, $"응답 실패, 응답코드 : {response.StatusCode}");
       }
     }
     catch (HttpRequestException ex) {
-      SetResultCode<T>(result, -95, $"HTTP 요청 실패: {ex.Message}");
+      SetResultCode<T>(ref result, -95, $"HTTP 요청 실패: {ex.Message}");
     }
     catch (JsonException ex) {
-      SetResultCode<T>(result, -94, $"JSON 파싱 실패: {ex.Message}");
+      SetResultCode<T>(ref result, -94, $"JSON 파싱 실패: {ex.Message}");
     }
     catch (Exception ex) {
-      SetResultCode<T>(result, -93, $"예외 발생: {ex.Message}");
+      SetResultCode<T>(ref result, -93, $"예외 발생: {ex.Message}");
     }
     return result;
   }

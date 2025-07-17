@@ -10,7 +10,7 @@
 
 @inherits BaseComponent
 <div class="editor-wrapper">
-<StandaloneCodeEditor @ref="_editor" CssClass="code-editor"  ConstructionOptions="GetEditorOptions" 
+<StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions=GetEditorOptions
 OnKeyDown="OnKeyDown" 
 OnDidInit="OnEditorInit"
 />
@@ -46,6 +46,11 @@ OnDidInit="OnEditorInit"
 @code {
    StandaloneCodeEditor? _editor;
 
+
+   // 이런식으로 접근해서 변경 가능한것 같다.
+      //  await BlazorMonaco.Editor.Global.SetTheme(jsRuntime, e.Value?.ToString());
+
+
    
   [Parameter] public EventCallback<KeyboardEvent> KeyDownEvent { get; set; }
 
@@ -55,31 +60,109 @@ OnDidInit="OnEditorInit"
   
     // 외부에서 주입받을 파라미터
     [Parameter] public string EditOption { get; set; }
+    [Parameter] public EventCallback<string> EditOptionChanged { get; set; }
+
+    //2.	EditOption 값 변경 시 EditOptionChanged 호출 만약 컴포넌트 내부에서 EditOption 값을 변경한다면, 아래처럼 호출해야 합니다:
+    //await EditOptionChanged.InvokeAsync(newValue);
 
     // ConstructionOptions 에 전달될 함수
     private StandaloneEditorConstructionOptions GetEditorOptions(StandaloneCodeEditor editor)    {
+          Console.WriteLine($" GetEditorOptions : {EditOption}");
         if (string.IsNullOrEmpty(EditOption))        {
-        return AppProjData.PgsqlOption;
+          return AppProjData.PgsqlOption;
         }
-        else if(EditOption=="html"){
-        return AppProjData.HtmlOption;
+        else if(EditOption=="html" ||EditOption=="jsp"){
+          return AppProjData.HtmlOption;
+        } 
+        else if(EditOption=="js"){
+          return AppProjData.JsOption;
+        } 
+        else {
+          return AppProjData.GetOption( EditOption );
         }
 
         // 기본 옵션
-        return AppProjData.PgsqlOption;
+        //return AppProjData.PgsqlOption;
     }
 
 
+    
+    // private async Task ChangeLanguageAsync(string newLanguage)
+    // {
+    //     var model = await _editor.GetModel();
+    //     if (model != null)
+    //     {
+    //         await _editor   .SetModelLanguage(model.Id, newLanguage);
+    //     }
+    // }
+
+
+    private string _prevEditOption;
+
+    protected override async Task OnParametersSetAsync() {
+        // EditOption 값이 변경된 경우에만 동작
+        if (_editor != null && _prevEditOption != EditOption)        {
+
+          //_editor.ConstructionOptions = AppProjData.GetOption( EditOption );
+         // _editor.ConstructionOptions = editor => AppProjData.GetOption(EditOption);
+
+
+         
+ //await ChangeLanguageAsync( EditOption );
+
+          //StateHasChanged();
+
+            // var newOptions = GetEditorOptions(_editor);
+
+            // _editor.
+
+
+            // await _editor.UpdateOptions(newOptions);
+             _prevEditOption = EditOption;
+        }
+    }
+
+private string? _modelUri;
+
+    private async Task ChangeLanguageAsync(string newLang)
+{
+    var model = await _editor.GetModel();
+    if (model is not null)
+    {
 
 
 
+        _modelUri = model.Uri;
+        await jsRuntime.InvokeVoidAsync("window.blazorMonaco.editor.setModelLanguage",            _modelUri, newLang);
+    }
+}
 
 
 
+public async Task LanguageChange(string lang){
+  
+        // EditOption 값이 변경된 경우에만 동작
+        if (_editor != null && _prevEditOption != lang)        {
+
+          //_editor.ConstructionOptions = AppProjData.GetOption( EditOption );
+         // _editor.ConstructionOptions = editor => AppProjData.GetOption(EditOption);
 
 
+         
+ await ChangeLanguageAsync( lang );
+
+          //StateHasChanged();
+
+            // var newOptions = GetEditorOptions(_editor);
+
+            // _editor.
 
 
+            // await _editor.UpdateOptions(newOptions);
+             _prevEditOption = lang;
+             StateHasChanged();
+        }
+}
 
 
 

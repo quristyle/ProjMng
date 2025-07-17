@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjMngServer.Services;
+using ProjModel;
 using System.Collections.Generic;
 
 namespace ProjMngServer.Controllers;
@@ -13,14 +14,16 @@ public class SysController : ControllerBase {
     _sysService = sysService;
   }
 
+
   [HttpPost]
-  public ActionResult<Dictionary<string, object>> PostBody([FromBody] Dictionary<string, string> parameters) {
-
-    string req_cname = parameters.TryGetValue("req_cname", out var stpValue) && stpValue != null ? stpValue.ToString().ToLower() : string.Empty;
-
-    var data = _sysService.AppDataClear(req_cname,parameters);
+  public ActionResult<ResultInfo<Dictionary<string, object>>> PostBody([FromBody] RequestDto dto) {
+    var param = dto.MainParam; 
+    string req_cname = param.GetValue("req_cname");// parameters.TryGetValue("req_cname", out var stpValue) && stpValue != null ? stpValue.ToString().ToLower() : string.Empty; 
+    var data = _sysService.AppDataClear(req_cname,param);
     return Ok(data);
   }
+
+
 
 
 }

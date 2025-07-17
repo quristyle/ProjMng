@@ -83,6 +83,31 @@ namespace ProjMngWasm.Commons {
            Enabled = false,
          }
        };
+    public static StandaloneEditorConstructionOptions JsOption { get; set; } =
+       new StandaloneEditorConstructionOptions {
+         AutomaticLayout = true,
+         Language = "javascript",
+         Theme = "vs-dark",
+         StickyScroll = new EditorStickyScrollOptions() {
+           Enabled = false,
+         }
+       };
+
+    public static StandaloneEditorConstructionOptions GetOption(string lang) {
+      if (lang == "sql") { lang = "pgsq"; }
+      return new StandaloneEditorConstructionOptions {
+        AutomaticLayout = true,
+        Language = lang,
+        Theme = "vs-dark",
+        StickyScroll = new EditorStickyScrollOptions() {
+          Enabled = false,
+        }
+      };
+    }
+
+
+
+
 
     public static StandaloneEditorConstructionOptions FnPgsqlOtion(StandaloneCodeEditor editor) {
       return PgsqlOption;

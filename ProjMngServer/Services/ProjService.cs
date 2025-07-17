@@ -384,7 +384,11 @@ public class ProjService : BaseService {
                       //  paramValue = itm.TryGetValue(paramKey, out var itm_value) && itm_value != null ? itm_value.ToString() : null;
                       //}
 
-                      var paramValue = param.GetValue(paramKey);
+                      //var paramValue = param.GetValue(paramKey);
+                      object paramValue = param.TryGetValue(paramKey, out var value) && value != null ? value.ToString() : null;
+                      if (paramValue == null) {
+                        paramValue = itm.GetValue(paramKey);// .TryGetValue(paramKey, out var itm_value) && itm_value != null ? itm_value.ToString() : null;
+                      }
 
                       if (paramName == "ss_user_id") {
                         parameters.Add(paramName, param.GetValue("req_ss_user_id"), DbType.String);
@@ -503,16 +507,17 @@ public class ProjService : BaseService {
 
   }
 
-  string GetUrlPattern(IDictionary<string, string> param, string src_extend) {
+  IDictionary<string,object> GetUrlPattern(IDictionary<string, string> param, string src_extend) {
 
     var srcInfo = GetData("sp_dev_srcinfo_dtl_exec", param);
-    var ccc = srcInfo.Data
+   IDictionary<string,object> ccc = srcInfo.Data
   .OfType<IDictionary<string, object>>()
   .FirstOrDefault(d => d.ContainsKey("src_extend") && d["src_extend"]?.ToString() == src_extend);
 
-    string path = ccc["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\";
+    // string path = ccc?["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\";
 
-    return path;
+    // return path;
+    return ccc;
   }
 
   public ResultInfo<Dictionary<string, string>> GetMdGlueData(RequestDto dto) {
@@ -536,7 +541,19 @@ public class ProjService : BaseService {
 
     ri.Cols = col;
 
-    string path = GetUrlPattern(param, "glue");//  ccc["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\";
+    var ccc = GetUrlPattern(param, "glue");//  ccc["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\"; 
+    string path = ccc.GetValue("url_pattern");// string.Empty;
+//    string path = GetUrlPattern(param, "glue");//  ccc["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\";
+
+
+
+    // string path = ccc?["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\";
+
+    // return path;
+
+
+
+
     if (!string.IsNullOrEmpty(path)) {
 
       List<Dictionary<string, string>> rowdata = new();
@@ -596,12 +613,16 @@ public class ProjService : BaseService {
 
     string extend = param.GetValue("src_lang");
 
-    string path = GetUrlPattern(param, extend); // jsp, blazor 등의 url_patten 을 가져온다.
+    var ccc = GetUrlPattern(param, extend);//  ccc["url_pattern"]?.ToString();// @"c:\projects\ProjMng\samples\"; 
+    string path = ccc.GetValue("url_pattern");// string.Empty;
+    string skipStr = ccc.GetValue("src_pattern_comment");// string.Empty;
+
+    //string path = GetUrlPattern(param, extend); // jsp, blazor 등의 url_patten 을 가져온다.
     List<Dictionary<string, string>> rowdata = new();
     if (!string.IsNullOrEmpty(path)) {
 
 
-      var activeList = ActivityParser.ParseSrcFiles(path, extend);
+      var activeList = ActivityParser.ParseSrcFiles(path, extend, skipStr);
 
       foreach (var item in activeList) {
 

@@ -106,7 +106,7 @@ public class ActivityParser {
 
 
 
-  public static List<SrcFileInfo> ParseSrcFiles(string rootPath, string extend) {
+  public static List<SrcFileInfo> ParseSrcFiles(string rootPath, string extend, string skipStr) {
     var activityList = new List<SrcFileInfo>();
     var jspFiles = Directory.GetFiles(rootPath, "*."+ extend, SearchOption.AllDirectories);
 
@@ -114,8 +114,15 @@ public class ActivityParser {
       try {
 
         FileInfo fi = new FileInfo(file);
+        if( fi.FullName.IndexOf(".metadata") >= 0 ) {
+          continue;
+        }
 
-
+        if(!string.IsNullOrEmpty(skipStr)) {
+          if( fi.FullName.IndexOf(skipStr) < 0 ) {
+            continue;
+          } 
+        }
 
         string relativePath = Path.GetRelativePath(rootPath, fi.FullName);
         string[] parts = relativePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);

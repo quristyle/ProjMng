@@ -145,7 +145,7 @@
 
     if (args.View.Text != "Year") {
       WbsInfo data = await DialogService.OpenAsync<EditAppointmentPage>("Add Schedule",
-          new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End }, {"PrjRid", srtype?.Code} });
+          new Dictionary<string, object> { { "Start", args.Start }, { "End", args.Start }, {"PrjRid", srtype?.Code} });
 
       if (data != null) {
         Data.Add(data);
