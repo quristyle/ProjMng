@@ -166,6 +166,31 @@
   }
 
   
+  public async void AllRemoveItem() {
+
+    ProjItems.Clear();
+    selectedIndex = -1;
+    ProjTabs.Reload();
+    await OnChanged.InvokeAsync();
+    StateHasChanged();
+  }
+
+  
+  
+  public async void OthersRemoveItem() {
+    if (ProjItems == null || ProjItems.Count == 0 || selectedIndex < 0 || selectedIndex >= ProjItems.Count)
+        return;
+
+    var selectedItem = ProjItems[selectedIndex];
+    ProjItems.Clear();
+    ProjItems.Add(selectedItem);
+    selectedIndex = 0;
+
+    ProjTabs.Reload();
+    await OnChanged.InvokeAsync();
+    StateHasChanged();
+  }
+  
   public async void ParentStateHasChange() {
     await OnChanged.InvokeAsync();
     StateHasChanged();
@@ -177,13 +202,16 @@
   void ShowContextMenuWithContent(MouseEventArgs args, ProgramInfo item) => ContextMenuService.Open(args, ds =>
   @<RadzenMenu Click="@( ee =>  OnMenuItemClick(ee, item))">
     <RadzenMenuItem Text="Open Url" Value="1"></RadzenMenuItem>
-    <RadzenMenuItem Text="Close Url Page" Value="99"></RadzenMenuItem>
+    <RadzenMenuItem Text="MoveRoot" Value="99"></RadzenMenuItem>
     <RadzenMenuItem Text="More items" Value="3">
       <RadzenMenuItem Text="More sub items" Value="4">
         <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
         <RadzenMenuItem Text="Item2" Value="6"></RadzenMenuItem>
       </RadzenMenuItem>
     </RadzenMenuItem>
+    <RadzenMenuItem Text="Close" Value="100"></RadzenMenuItem>
+    <RadzenMenuItem Text="Others Tab Close" Value="98"></RadzenMenuItem>
+    <RadzenMenuItem Text="All Close" Value="97"></RadzenMenuItem>
   </RadzenMenu>
   );
 
@@ -200,8 +228,17 @@
         navigationManager.NavigateTo(url);
       }
     }
+    else if (args.Value.Equals(97)) {
+      AllRemoveItem();
+    }
+    else if (args.Value.Equals(98)) {
+      OthersRemoveItem();
+    }
     else if (args.Value.Equals(99)) {
       navigationManager.NavigateTo("/");
+    }
+    else if (args.Value.Equals(100)) {
+      RemoveItem();
     }
     else if (args.Value.Equals(3)) {
       // Do something else

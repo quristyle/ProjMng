@@ -751,15 +751,10 @@ a[class^=action]:hover {
   font-weight: 100 !important;
 }
 
-
 /*
 .main-body-context {
-  height: calc(100vh - 130px);
+  height: calc(100vh - var(--context-body-offset2)) !important;
 }
-
-
-
-
 */
 
 .context-body-rowcol {
@@ -773,6 +768,16 @@ a[class^=action]:hover {
     height: calc(100vh - 8rem) !important;
 }
 
+
+.quriUrlcont .context-body-row {
+  height: calc(100vh - 9rem) !important;
+}
+
+
+
+
+
+
 /* 특정 theme 별로 context 의 길이가 각각 다르다.. 어떻게 해결할수 있나*/
 
 
@@ -780,6 +785,7 @@ a[class^=action]:hover {
 :root {
   --main-context-body-offset: 6.7rem;
   --context-body-offset: 11.5rem;
+  --context-body-offset2: 15.5rem;
 }
 
 div[theme="material-dark"] .main-page-context {
