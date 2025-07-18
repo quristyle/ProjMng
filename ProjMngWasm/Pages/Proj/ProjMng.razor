@@ -13,13 +13,9 @@
 <RadzenCard >
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-
-    
     <QuriSearchs  >
       <RadzenTextBox @bind-Value="srtype" />
     </QuriSearchs>
-
-
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />
@@ -47,18 +43,11 @@
     }
   }
 
-  //public ResultInfo<Dictionary<string, object>> Data { get; set; }
 
   protected async Task OnLoadWrk() {
 
+    await qdgrd.Load("sp_dev_proj_exec");
 
-    
-    qdgrd.Load("sp_dev_proj_exec");
-
-    /*
-    Data = await DbCont<Dictionary<string, object>>("sp_dev_proj_exec", new Dictionary<string, string>() { });
-    StateHasChanged();
-    */
   }
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {

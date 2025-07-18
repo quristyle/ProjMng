@@ -327,8 +327,7 @@
    
      List<string> aaa = new();
      foreach( var col in columnsToExport ){
-       var c = GetProp(col.Property);
-       aaa.Add( c );
+       aaa.Add( col.Title );
      }
      data.Add(aaa.ToArray());
 
@@ -355,7 +354,7 @@
         // };
 
         // JavaScript로 엑셀 다운로드 함수 호출
-        await jsRuntime.InvokeVoidAsync("downloadExcel", data.ToArray(), "엑셀파일.xlsx");
+    await jsRuntime.InvokeVoidAsync("downloadExcel", data.ToArray(), "엑셀파일.xlsx");
 
 
 
@@ -369,8 +368,7 @@
 string pattern = @"\[""(.*?)""\]";
 Match match = Regex.Match(property, pattern);
 
-if (match.Success)
-{
+if (match.Success){
     string extractedValue = match.Groups[1].Value;
     return extractedValue; // 출력: prj_rid
 }

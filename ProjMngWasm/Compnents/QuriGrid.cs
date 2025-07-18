@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ProjModel;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq;
+using System.Text.RegularExpressions;
 using WasmShear;
 using WasmShear.Services;
 
@@ -11,6 +13,9 @@ namespace ProjMngWasm.Compnents {
 
     [Inject] protected DevService? devService { get; set; }
     [Inject] protected AppData? appData { get; set; }
+    [Inject] protected IJSRuntime? jsRuntime { get; set; }
+
+
     public QuriGrid() {
       Style = "height:100%;";
       FilterCaseSensitivity = Radzen. FilterCaseSensitivity.CaseInsensitive;
@@ -27,6 +32,104 @@ namespace ProjMngWasm.Compnents {
 
 
     }
+
+
+    public void ToggleFilter() {
+      AllowFiltering = !AllowFiltering;
+    }
+    public int DataCount() {
+      if (this.Data == null) { return 0; }
+      return this.Data.Count();
+    }
+
+
+    public async Task ExportXlsx() {
+
+      var columnsToExport = this.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property));
+      /*
+      //var OrderBy = ordersGrid.Query.OrderBy;
+      //var Filter = ordersGrid.Query.Filter;
+
+      Console.WriteLine($" export xlsx : {Select}");
+      */
+
+      var Select = string.Join(",", this.ColumnsCollection
+                   .Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property))
+                   .Select(c => c.Property.Contains(".") ? $"{c.Property} as {c.Property.Replace(".", "_")}" : c.Property));
+
+
+      Console.WriteLine($" export2 xlsx : {Select}");
+
+
+
+
+      IEnumerable<TItem> rows = this.Data;
+
+      List<string[]> data = new();
+
+      List<string> aaa = new();
+      foreach (var col in columnsToExport) {
+        aaa.Add(col.Title);
+      }
+      data.Add(aaa.ToArray());
+
+      
+      foreach (var row in rows) {
+        List<string> bbb = new();
+        foreach (var col in columnsToExport) {
+          // col.Property와 동일한 이름의 프로퍼티 또는 필드 값을 가져옴
+          var propInfo = typeof(TItem).GetProperty(col.Property);
+          object? value = null;
+          if (propInfo != null) {
+            value = propInfo.GetValue(row);
+          }
+          else {
+            // 프로퍼티가 없으면 필드도 시도
+            var fieldInfo = typeof(TItem).GetField(col.Property);
+            if (fieldInfo != null) {
+              value = fieldInfo.GetValue(row);
+            }
+          }
+          bbb.Add(value?.ToString() ?? "");
+        }
+        data.Add(bbb.ToArray());
+      }
+
+      
+      //  return;
+
+
+      // 엑셀에 들어갈 데이터 (예시)
+      // var data = new[]
+      // {
+      //     new[] { "이름", "나이", "직업" },
+      //     new[] { "홍길동", "25", "개발자" },
+      //     new[] { "김철수", "30", "디자이너" },
+      //     new[] { "박영희", "28", "마케팅" }
+      // };
+
+      // JavaScript로 엑셀 다운로드 함수 호출
+      await jsRuntime.InvokeVoidAsync("downloadExcel", data.ToArray(), "엑셀파일s.xlsx");
+
+
+
+
+    }
+
+    public string GetProp(string property) {
+
+      string pattern = @"\[""(.*?)""\]";
+      Match match = Regex.Match(property, pattern);
+
+      if (match.Success) {
+        string extractedValue = match.Groups[1].Value;
+        return extractedValue; // 출력: prj_rid
+      }
+      return string.Empty;
+
+
+    }
+
 
 
 

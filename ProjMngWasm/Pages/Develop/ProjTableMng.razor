@@ -23,32 +23,45 @@
         <!-- 왼쪽 조회부 -->
         <RadzenStack Orientation="Orientation.Horizontal"  Gap="4px">
 
+
+
+
+          
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" >
           <QuriDropDown @bind-Value="tableName" CodeId="projlist" />
           <QuriDropDown @bind-Value="dbType" CodeId="projdb" Etc0=@tableName?.Code IsEtcFix=true />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
           <RadzenButton Click="@Search" Text="Search" />
+          <RadzenButton Click="@ExportTableDoc" Text="선택Table 정의서" />
+          @* <RadzenButton Click="@ExportTableAllDoc" Text="All Table 정의서" /> *@
+    </RadzenStack>
+
+
+
+
+
+
+
+
+
+
+
 
         </RadzenStack>
 
         <!-- left table -->
         <RadzenStack Orientation="Orientation.Vertical" Style="height:calc(100% - 38px);" Gap="4px">
 
-
-          
-          @* RowSelect=OnRowSelect
-           RowUpdate="@OnUpdateRow" 
-           CellClick="@OnCellClick"
-           
-           *@
-
-
           <QuriGrid 
             @bind-Value=@selectedTable
             @ref=@_tGrd
             KeySelector=@(i=>i.TableName)
-           RowUpdate="@OnUpdateRow" 
-                 CellClick=OnCellClick
-                 RowSelect=OnRowSelect
-          TItem="TableInfo"
+            RowUpdate="@OnUpdateRow" 
+            CellClick=@( args => _tGrd.OnCellClickCehck(args))
+            RowSelect=OnRowSelect
+            TItem="TableInfo"
             Sort="@(args => _tGrd.Reset())" Page="@(args => _tGrd.Reset())" Filter="@(args => _tGrd.Reset())"
           
           >
@@ -66,6 +79,17 @@
               </RadzenDataGridColumn>
 
             </Columns>
+            
+            <FooterTemplate >
+              <div class="action-btn px-1 py-1">
+                
+                <a class="action float-start" @onclick=@(() => _tGrd.ExportXlsx()) title="excel"><i class="bi bi bi-file-earmark-excel"></i></a>
+
+                <a class="action float-end" @onclick=@(() => _tGrd.ToggleFilter()) title="filter"><i class="bi bi-filter"></i></a>
+                <span class="action float-end">@_tGrd.DataCount() items</span>
+              </div>
+            </FooterTemplate>
+
           </QuriGrid>
 
 
@@ -85,8 +109,8 @@
             @bind-Value=@selectedColumn
             @ref=@_cGrd            
             KeySelector=@(i=>i.ColunmName)
-           RowUpdate="@OnUpdateColumnDesc" 
-                 CellClick=@( args => _cGrd.OnCellClickCehck(args))
+            RowUpdate="@OnUpdateColumnDesc" 
+            CellClick=@( args => _cGrd.OnCellClickCehck(args))
             TItem="ColumnInfo"
             RowSelect=OnRowSelectCol
             >
@@ -108,6 +132,19 @@
                 <RadzenDataGridColumn TItem="ColumnInfo" title="Null" Property="NullAble" />
                 <RadzenDataGridColumn TItem="ColumnInfo" title="Ident" Property="Ident" />
               </Columns>
+
+              
+            <FooterTemplate >
+              <div class="action-btn px-1 py-1">
+                
+                <a class="action float-start" @onclick=@(() => _cGrd.ExportXlsx()) title="excel"><i class="bi bi bi-file-earmark-excel"></i></a>
+
+                <a class="action float-end" @onclick=@(() => _cGrd.ToggleFilter()) title="filter"><i class="bi bi-filter"></i></a>
+                <span class="action float-end">@_cGrd.DataCount() items</span>
+              </div>
+            </FooterTemplate>
+
+
           </QuriGrid>
 
 
@@ -177,21 +214,11 @@
 </RadzenSplitter>
 
 
-
-
-
-
-
-
-
-
 @code {
 
   
   QuriGrid<TableInfo> _tGrd{ get; set; }
   QuriGrid<ColumnInfo> _cGrd{ get; set; }
-
-
 
   CommonCode tableName { get; set; }
   CommonCode projectName2 { get; set; }
@@ -202,80 +229,41 @@
 
 
   IList<TableInfo> selectedTable;
-  //IList<TableInfo> selectedTable2;
   IList<ColumnInfo> selectedColumn;
-  //IList<ColumnInfo> selectedColumn2;
-
-
-  //public IEnumerable<TableInfo> Data { get; set; }
-  //public IEnumerable<ColumnInfo> dataCol { get; set; }
 
   public ResultInfo<Dictionary<string, object>> DataMenu { get; set; }
-
-  //public IList<IDictionary<string, object>> selectedTProc { get; set; } = new List<IDictionary<string, object>>() { new Dictionary<string, object>() { { "dsl_query", "empty" } } };
-
 
   public ResultInfo<Dictionary<string, object>> DataProc { get; set; } = new ResultInfo<Dictionary<string, object>>();
 
 
+  void OnUpdateRow(TableInfo order)    {
+    _tGrd.Reset(order);
+  Dictionary<string, string> dic = new Dictionary<string, string>() {
+  {"db",dbType.Others["db_type"]},
+  {"dbnick",dbType.Others["db_nick"]},
+  {"schema",dbType.Others["db_schema"]},
+  {"table_name", order.TableName },
+  {"table_desc", order.Description },
+  };
 
-  
-
-    //string columnEditing;
-    //List<KeyValuePair<string, string>> editedFields = new List<KeyValuePair<string, string>>();
-    //List<TableInfo> ordersToUpdate = new List<TableInfo>();
-    public async Task OnCellClick(DataGridCellMouseEventArgs<TableInfo> args) {
-      await _tGrd.OnCellClickCehck(args);
-    }
-
-
-
-
-    
-    void OnUpdateRow(TableInfo order)    {
-      //return;
-        _tGrd.Reset(order);
-
-
-        //tableCommentUpdate
-
-
-        
-    Dictionary<string, string> dic = new Dictionary<string, string>() {
-      {"db",dbType.Others["db_type"]},
-      {"dbnick",dbType.Others["db_nick"]},
-      {"schema",dbType.Others["db_schema"]},
-      {"table_name", order.TableName },
-      {"table_desc", order.Description },
-      };
-
-      JsCont<TableInfo>("tableCommentUpdate", dic);
-
-    }
+  JsCont<TableInfo>("tableCommentUpdate", dic);
+  }
 
     
     
-    void OnUpdateColumnDesc(ColumnInfo cinfo)    {
-        _cGrd.Reset(cinfo);
+  void OnUpdateColumnDesc(ColumnInfo cinfo)    {
+    _cGrd.Reset(cinfo);
+  Dictionary<string, string> dic = new Dictionary<string, string>() {
+  {"db",dbType.Others["db_type"]},
+  {"dbnick",dbType.Others["db_nick"]},
+  {"schema",dbType.Others["db_schema"]},
+  {"table_name", cinfo.TableName },
+  {"column_name", cinfo.ColunmName },
+  {"column_desc", cinfo.Description },
+  };
+  JsCont<ColumnInfo>("columnsCommentUpdate", dic);
 
-        
-    Dictionary<string, string> dic = new Dictionary<string, string>() {
-      {"db",dbType.Others["db_type"]},
-      {"dbnick",dbType.Others["db_nick"]},
-      {"schema",dbType.Others["db_schema"]},
-      {"table_name", cinfo.TableName },
-      {"column_name", cinfo.ColunmName },
-      {"column_desc", cinfo.Description },
-      };
-
-      JsCont<ColumnInfo>("columnsCommentUpdate", dic);
-
-    }
-
-
-    
-
-
+  }
 
 
   bool IsSameTable { get; set; }
@@ -285,9 +273,6 @@
   public IList<IDictionary<string, object>>? SelectedItemsMenu { get; set; }
   string FoldName { get; set; }
   string MenuName { get; set; }
-
-
-
 
   // 왼쪽 테이블 조회
   async Task Search() {
@@ -302,18 +287,163 @@
 
   await _tGrd.Load("tablelist", dic);
 
-
-    // Data = await DevService.GetList<TableInfo>(dic);
-    //var ri = await JsCont<TableInfo>("tablelist", dic);
-    //Data = ri.Data;
   }
+
+  
+  async Task ExportTableDoc() {
+    
+
+    if( selectedTable != null ){
+      List<string[]> data = new();
+
+      //틀짜기
+      List<string> idt = new();
+      idt.Add("database");
+      idt.Add(selectedTable[0].DataBase);
+      idt.Add("");
+      idt.Add("");
+      idt.Add("schema");
+      idt.Add(selectedTable[0].Schema );
+      idt.Add("");
+      data.Add(idt.ToArray());
+
+      idt = new();
+      idt.Add("table name");
+      idt.Add(selectedTable[0].TableName);
+      idt.Add("");
+      idt.Add("");
+      idt.Add("description");
+      idt.Add(selectedTable[0].Description );
+      idt.Add("");
+      data.Add(idt.ToArray());
+      
+      
+      idt = new();
+      idt.Add("write date");
+      idt.Add(DateTime.Now.ToString("yyyy.MM.dd"));
+      idt.Add("");
+      idt.Add("");
+      idt.Add("writor");
+      idt.Add(appData.User.LastName);
+      idt.Add("");
+      data.Add(idt.ToArray());
+
+
+      idt = new();
+      idt.Add("");
+      data.Add(idt.ToArray());
+
+      
+      
+      idt = new();
+      idt.Add("filed name");
+      idt.Add("data type");
+      idt.Add("length");
+      idt.Add("null");
+      idt.Add("default");
+      idt.Add("description");
+      idt.Add("remark");
+      data.Add(idt.ToArray());
+
+
+      
+  List<string> bolds = [ "0,0", "0,1", "0,4", "0,5"
+                   , "1,0", "1,4"
+                   , "2,0", "2,4"
+    , "4,0", "4,1", "4,2", "4,3", "4,4", "4,5", "4,6" // 필더 해더
+  //  , "0,5", // 여기는 필드가 세로로 가변적이다. 늘어나면 자동으로 늘려주라...
+  ];
+
+
+    List<string> lines = new();
+    lines.Add("0,1");
+    lines.Add("1,1");
+    lines.Add("2,1");
+
+    lines.Add("0,5");
+    lines.Add("1,5");
+    lines.Add("2,5");
+
+    lines.AddRange(bolds.ToArray());
+
+      // 여기서 데이터 끌고 와서 처ㄹㅣ..
+
+
+      
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType.Others["db_type"]},
+      {"dbnick",dbType.Others["db_nick"]},
+      {"schema",dbType.Others["db_schema"]},
+      {"table_name", selectedTable[0].TableName},
+
+    };
+ 
+    
+    var ri = await JsCont<Dictionary<string, object>>("columnsOftable", dic);
+    int feild_cnt = 5;
+    foreach( var rdt in ri.Data){
+
+      
+      idt = new();
+      idt.Add( rdt.GetValue("colunmname")    );  // column name
+      idt.Add( rdt.GetValue("type_nm")    );  // type
+      idt.Add(""); // length
+      idt.Add( rdt.GetValue("nullable")    ); // is null
+      idt.Add( ""    ); // default
+      idt.Add( rdt.GetValue("description")    ); // desc
+      idt.Add( ""    ); //remark
+      data.Add(idt.ToArray());
+
+
+      bolds.Add( feild_cnt+",0");
+      for( int i = 0; i <= 6; i++){ 
+        lines.Add( feild_cnt+","+i);
+      }
+      feild_cnt++;
+
+    }
+
+
+ 
+      string[] bkcolors = bolds.ToArray();
+      string[] merges = [ "0,1,0,3", "0,5,0,6"
+                        , "1,1,1,3", "1,5,1,6"
+                        , "2,1,2,3", "2,5,2,6"
+      ];
+      int[] widths = [ 15, 20, 8, 7, 20, 30, 10 ];
+      
+
+      await jsRuntime.InvokeVoidAsync("downloadExcel_cust", data.ToArray(), bkcolors, bolds.ToArray(), lines.ToArray(), merges, widths, $"{selectedTable[0].TableName}.xlsx");
+    }
+
+
+   
+
+  }
+
+  
+
+  async Task ExportTableAllDoc() {
+
+    Dictionary<string, string> dic = new Dictionary<string, string>() {
+  {"db",dbType.Others["db_type"]},
+  {"dbnick",dbType.Others["db_nick"]},
+  {"schema",dbType.Others["db_schema"]},
+  {"stp", "tablelist"},
+
+  };
+
+  await _tGrd.Load("tablelist", dic);
+
+  }
+
 
 
 
 
   // 왼쪽 테이블의 칼럼 조회
   async Task OnRowSelect(TableInfo tableInfo) {
-    //return;
+
     Dictionary<string, string> dic = new Dictionary<string, string>() {
       {"db",dbType.Others["db_type"]},
       {"dbnick",dbType.Others["db_nick"]},
@@ -325,10 +455,6 @@
 
     await _cGrd.Load("columnsOftable", dic);
 
-
-    // var ri = await JsCont<ColumnInfo>("columnsOftable", dic);
-    // dataCol = ri.Data;
-    StateHasChanged();
   }
 
 
@@ -405,8 +531,7 @@
             }
           }
 
-          return new Dictionary<string, object>
-      {
+          return new Dictionary<string, object> {
             { "ProcedureName", i.ProcedureName },
             { "Description", i.Description },
             { "ROUTINE_DEFINITION", i.Routine_Definition },
@@ -422,20 +547,14 @@
 
     DataProc.Data = result;
 
-    //DataProc = ri2;
-
     StateHasChanged();
 
   }
-
-
-
 
   private async Task SaveBtnEvent(IDictionary<string, object> dic) {
     var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
     //var saveobj = await JsiniService.GetList<"sp_projwbssave",IDictionary<string, object>>(req);
   }
-
 
   private async Task SaveBtnEventMenu(IDictionary<string, object> dic) {
     var req = WasmUtil.JoinDictionaries(dic, new Dictionary<string, string>() { });
@@ -487,11 +606,5 @@
 
 
   }
-
-
-
-
-
-
 
 }
