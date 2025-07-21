@@ -10,7 +10,7 @@
 
 @inherits BaseComponent
 <div class="editor-wrapper">
-<StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions=GetEditorOptions
+<StandaloneCodeEditor @ref="_editor" CssClass="code-editor" ConstructionOptions="AppProjData.FnPgsqlOtion"
 OnKeyDown="OnKeyDown" 
 OnDidInit="OnEditorInit"
 />
@@ -66,8 +66,8 @@ OnDidInit="OnEditorInit"
     //await EditOptionChanged.InvokeAsync(newValue);
 
     // ConstructionOptions 에 전달될 함수
-    private StandaloneEditorConstructionOptions GetEditorOptions(StandaloneCodeEditor editor)    {
-          Console.WriteLine($" GetEditorOptions : {EditOption}");
+      private StandaloneEditorConstructionOptions GetEditorOptions(StandaloneCodeEditor editor)    {
+            Console.WriteLine($" GetEditorOptions : {EditOption}");
         if (string.IsNullOrEmpty(EditOption))        {
           return AppProjData.PgsqlOption;
         }
@@ -77,12 +77,15 @@ OnDidInit="OnEditorInit"
         else if(EditOption=="js"){
           return AppProjData.JsOption;
         } 
-        else {
-          return AppProjData.GetOption( EditOption );
-        }
+        //else if(EditOption=="sql"){
+        //  return AppProjData.PgsqlOption;
+        //} 
+        //else {
+        //  return AppProjData.GetOption( EditOption );
+        //}
 
         // 기본 옵션
-        //return AppProjData.PgsqlOption;
+        return AppProjData.PgsqlOption;
     }
 
 
@@ -141,8 +144,16 @@ private string? _modelUri;
 
 public async Task LanguageChange(string lang){
   
+            Console.WriteLine($" LanguageChange : {lang}");
+
+
+
         // EditOption 값이 변경된 경우에만 동작
         if (_editor != null && _prevEditOption != lang)        {
+
+
+
+
 
           //_editor.ConstructionOptions = AppProjData.GetOption( EditOption );
          // _editor.ConstructionOptions = editor => AppProjData.GetOption(EditOption);

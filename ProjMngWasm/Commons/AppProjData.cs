@@ -70,6 +70,7 @@ namespace ProjMngWasm.Commons {
          AutomaticLayout = true,
          Language = "pgsql",
          Theme = "vs-dark",
+         FontFamily = "Play",
          StickyScroll = new EditorStickyScrollOptions() {
            Enabled = false,
          }
@@ -79,6 +80,7 @@ namespace ProjMngWasm.Commons {
          AutomaticLayout = true,
          Language = "html",
          Theme = "vs-dark",
+         FontFamily = "Play",
          StickyScroll = new EditorStickyScrollOptions() {
            Enabled = false,
          }
@@ -88,17 +90,19 @@ namespace ProjMngWasm.Commons {
          AutomaticLayout = true,
          Language = "javascript",
          Theme = "vs-dark",
+         FontFamily = "Play",
          StickyScroll = new EditorStickyScrollOptions() {
            Enabled = false,
          }
        };
 
     public static StandaloneEditorConstructionOptions GetOption(string lang) {
-      if (lang == "sql") { lang = "pgsq"; }
+      //if (lang == "sql") { lang = "pgsql"; }
       return new StandaloneEditorConstructionOptions {
         AutomaticLayout = true,
         Language = lang,
         Theme = "vs-dark",
+        FontFamily = "Play",
         StickyScroll = new EditorStickyScrollOptions() {
           Enabled = false,
         }
