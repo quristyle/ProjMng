@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using ProjModel;
 using Radzen;
@@ -14,6 +15,8 @@ namespace ProjMngWasm.Compnents {
     [Inject] protected DevService? devService { get; set; }
     [Inject] protected AppData? appData { get; set; }
     [Inject] protected IJSRuntime? jsRuntime { get; set; }
+
+
 
 
     public QuriGrid() {
@@ -32,6 +35,41 @@ namespace ProjMngWasm.Compnents {
 
 
     }
+    protected override void OnInitialized() {
+      base.OnInitialized();
+
+      // FooterTemplate이 지정되지 않은 경우 기본 템플릿 할당
+      // FooterTemplate이 지정되지 않은 경우 기본 템플릿 할당
+      if (base.FooterTemplate == null) {
+        base.FooterTemplate = builder => {
+          builder.OpenElement(0, "div");
+          builder.AddAttribute(1, "class", "action-btn px-1 py-1");
+
+          builder.OpenElement(2, "a");
+          builder.AddAttribute(3, "class", "action float-start");
+          builder.AddAttribute(4, "onclick", EventCallback.Factory.Create(this, () => ExportXlsx()));
+          builder.AddAttribute(5, "title", "excel");
+          builder.AddMarkupContent(6, "<i class=\"bi bi-file-earmark-excel\"></i>");
+          builder.CloseElement();
+
+          builder.OpenElement(7, "a");
+          builder.AddAttribute(8, "class", "action float-end");
+          builder.AddAttribute(9, "onclick", EventCallback.Factory.Create(this, () => ToggleFilter()));
+          builder.AddAttribute(10, "title", "filter");
+          builder.AddMarkupContent(11, "<i class=\"bi bi-filter\"></i>");
+          builder.CloseElement();
+
+          builder.OpenElement(12, "span");
+          builder.AddAttribute(13, "class", "action float-end");
+          builder.AddContent(14, $"{DataCount()} items");
+          builder.CloseElement();
+
+          builder.CloseElement();
+        };
+      }
+    }
+
+
 
 
     public void ToggleFilter() {
