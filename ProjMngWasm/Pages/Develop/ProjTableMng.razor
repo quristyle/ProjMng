@@ -80,15 +80,6 @@
 
             </Columns>
             
-            <FooterTemplate >
-              <div class="action-btn px-1 py-1">
-                
-                <a class="action float-start" @onclick=@(() => _tGrd.ExportXlsx()) title="excel"><i class="bi bi bi-file-earmark-excel"></i></a>
-
-                <a class="action float-end" @onclick=@(() => _tGrd.ToggleFilter()) title="filter"><i class="bi bi-filter"></i></a>
-                <span class="action float-end">@_tGrd.DataCount() items</span>
-              </div>
-            </FooterTemplate>
 
           </QuriGrid>
 
@@ -134,15 +125,6 @@
               </Columns>
 
               
-            <FooterTemplate >
-              <div class="action-btn px-1 py-1">
-                
-                <a class="action float-start" @onclick=@(() => _cGrd.ExportXlsx()) title="excel"><i class="bi bi bi-file-earmark-excel"></i></a>
-
-                <a class="action float-end" @onclick=@(() => _cGrd.ToggleFilter()) title="filter"><i class="bi bi-filter"></i></a>
-                <span class="action float-end">@_cGrd.DataCount() items</span>
-              </div>
-            </FooterTemplate>
 
 
           </QuriGrid>

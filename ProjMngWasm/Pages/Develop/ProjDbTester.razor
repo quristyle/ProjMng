@@ -1,4 +1,5 @@
 ﻿@page "/projdb-tester";
+@using System.Text.RegularExpressions
 @{
   /* description : DB 정보 테스트
   * title : DB Query
@@ -20,7 +21,7 @@
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-      <RadzenButton Click="@OnLoadWrk" Text="Excute" />
+      <RadzenButton Click="@OnLoadWrkAll" Text="Excute" />
     </RadzenStack>
 
   </RadzenStack>
@@ -34,6 +35,21 @@
   </RadzenSplitterPane>
 
   <RadzenSplitterPane Size="40%" Min="10%" Max="90%">
+
+    <div class="position-absolute z-3 end-0 p-2">
+      @if(IsLoading){        
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      }
+      <div class="badge bg-secondary" role="status">
+        <span class="">@ResultMessage</span>
+      </div>
+    </div>
+
+
+
+
     <QuriDynamicGrid ReqData=Data />
   </RadzenSplitterPane>
 
@@ -42,6 +58,9 @@
 
 
 @code {
+  
+  bool IsLoading { get; set; } = true;
+  string ResultMessage { get; set; } = "Ready ...";
 
   CommonCode? srtype { get; set; }
   CommonCode? dbType { get; set; }
@@ -63,11 +82,14 @@
 
 
   protected async Task OnKeyDown(KeyboardEvent e) {
+     
+    Console.WriteLine($" keydown tester : {e.KeyCode}");
 
-    if (e.CtrlKey && e.KeyCode == KeyCode.Enter) {
-      
+    if (e.CtrlKey && e.KeyCode == KeyCode.Enter) {      
       await OnLoadWrk();
-
+    }
+    else if( e.KeyCode == KeyCode.F5 ){
+      await OnLoadWrkAll(); 
     }
 
 
@@ -75,10 +97,40 @@
 
   protected async Task OnLoadWrk() {
 
+      string query = await _editor.GetCursorPosValue();
+     await LoadData( query);
+
+  }
+
+  
+  protected async Task OnLoadWrkAll() {
+
       string query = await _editor.GetValue();
+     await LoadData( query);
 
-      Data = await JsContQuery<Dictionary<string, object>>(dbType, query.Trim(), true);
+  }
 
+
+  
+  protected async Task LoadData(string query) {
+      //로딩바 시작
+      IsLoading = true;
+      ResultMessage = "Loading ...";
+      
+      LoadDataResult( query);
+  }
+  
+  
+  protected async Task LoadDataResult(string query) {
+
+      var ri = await JsContQuery<Dictionary<string, object>>(dbType, query, true);
+
+      // 결과 표현
+      ResultMessage = $" time : {ri.Res.GetValue("dtgap")} sec";
+      // 로딩바 종료.
+      IsLoading = false;
+      Data = ri;
+      StateHasChanged();
   }
 
 

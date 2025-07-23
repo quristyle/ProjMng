@@ -260,5 +260,34 @@ window.downloadExcel_cust = async (data, bkcolors, bolds, lines, merges, widths,
 
 
 
+window.disableF5 = function () {
+
+
+
+  window.addEventListener('keydown', function (e) {
+
+    console.log('ffffffffffffffffffffffffffffff55555555555555555555555555555');
+    // F5: keyCode 116, 또는 e.key === 'F5'
+    if (e.key === 'F5' || e.keyCode === 116) {
+      e.preventDefault();
+    }
+  }, true);
+};
+
+
+
+
+window.copyClipboard = function (text) {
+  window.focus();
+  navigator.clipboard.writeText(text).then(function () {
+    console.log('Text copied to clipboard');
+  }).catch(function (error) {
+    console.error('Could not copy text: ', error);
+  });
+};
+
+
+
+
 
 

@@ -43,6 +43,8 @@ public class DevService : BaseService {
       }
 
 
+      DateTime spdt = DateTime.Now;
+      DateTime epdt = DateTime.Now;
 
       rdr = db.ExecuteReader(sql: query);
 
@@ -85,6 +87,9 @@ public class DevService : BaseService {
 
 
 
+
+      epdt = DateTime.Now;
+      GetRes(ref ri, null, sdt, spdt, epdt);
 
 
 

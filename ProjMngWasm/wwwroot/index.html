@@ -26,9 +26,7 @@
 
 
   <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>-->
-
   <!--<script src="/js/shetjs0.20.3/xlsx.full.min.js"></script>-->
-
   <!--<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>-->
 
 
@@ -37,7 +35,6 @@
 
   <link rel="manifest" href="/js/manifest.json" />
   <script src="/js/install.js"></script>
-
 
 
 </head><body>
@@ -81,14 +78,12 @@
 
 
   <script>
-    window.copyClipboard = function (text) {
-      window.focus();
-      navigator.clipboard.writeText(text).then(function () {
-        console.log('Text copied to clipboard');
-      }).catch(function (error) {
-        console.error('Could not copy text: ', error);
-      });
-    };
+
+
+      window.disableF5();
+
+
+
   </script>
   <!--<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>-->
 

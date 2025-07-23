@@ -34,17 +34,7 @@
                                   ["OnRequestStateHasChange"] = (Action)ParentStateHasChange
 
 
-
-
-
-
-
-
                               })"
-                  
-                  
-                  
-                  
                   
                   
                   
@@ -203,6 +193,7 @@
   @<RadzenMenu Click="@( ee =>  OnMenuItemClick(ee, item))">
     <RadzenMenuItem Text="Open Url" Value="1"></RadzenMenuItem>
     <RadzenMenuItem Text="MoveRoot" Value="99"></RadzenMenuItem>
+    <RadzenMenuItem Text="OtherTabOpen" Value="80"></RadzenMenuItem>
     <RadzenMenuItem Text="More items" Value="3">
       <RadzenMenuItem Text="More sub items" Value="4">
         <RadzenMenuItem Text="Item1" Value="5"></RadzenMenuItem>
@@ -218,34 +209,18 @@
   void OnMenuItemClick(MenuItemEventArgs args, ProgramInfo item) {
 
 
-    Console.WriteLine($"Clicked on {args.Value}");
+    Console.WriteLine($"Clicked on {item}");
+
+    switch( args.Value.ToString()){
+      case "1" : if (!string.IsNullOrEmpty(item.Url)) { navigationManager.NavigateTo(item.Url); } break;
+      case "80" : AddItem( item.ProjPath , item.ProjName , item.ProjName, item.Url, "", true, true); break;
+      case "97" : AllRemoveItem(); break;
+      case "98" : OthersRemoveItem(); break;
+      case "99" : navigationManager.NavigateTo("/"); break;
+      case "100" : RemoveItem(); break;
+    }
 
 
-    if (args.Value.Equals(1)) {
-      // Open URL
-      string url = item.Url;
-      if (!string.IsNullOrEmpty(url)) {
-        navigationManager.NavigateTo(url);
-      }
-    }
-    else if (args.Value.Equals(97)) {
-      AllRemoveItem();
-    }
-    else if (args.Value.Equals(98)) {
-      OthersRemoveItem();
-    }
-    else if (args.Value.Equals(99)) {
-      navigationManager.NavigateTo("/");
-    }
-    else if (args.Value.Equals(100)) {
-      RemoveItem();
-    }
-    else if (args.Value.Equals(3)) {
-      // Do something else
-    }
-    else if (args.Value.Equals(4)) {
-      // Do something else
-    }
     if (!args.Value.Equals(3) && !args.Value.Equals(4)) {
       ContextMenuService.Close();
     }

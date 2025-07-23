@@ -1,6 +1,7 @@
 ﻿@using System.Diagnostics.CodeAnalysis
 @using BlazorMonaco;
 @using BlazorMonaco.Editor;
+@using System.Text.RegularExpressions
 
 
 
@@ -211,8 +212,56 @@ public async Task LanguageChange(string lang){
     return editorValue;
   }
 
+  //커서가 속한 문장 블록을 리턴한다.
+  public async Task<string> GetCursorPosValue() {
+    string text = await _editor.GetValue();
+    var pos = await _editor.GetPosition();
+    int cursorLine = pos.LineNumber - 1; // 0-based index
+
+    // 줄 단위로 분리
+    var lines = Regex.Split(text, @"\r?\n");
+    var blocks = new List<(int startLine, int endLine, string blockText)>();
+
+    int start = 0;
+    while (start < lines.Length) {
+        // 빈 줄이 아닌 곳에서 시작
+        while (start < lines.Length && string.IsNullOrWhiteSpace(lines[start]))
+            start++;
+        if (start >= lines.Length) break;
+
+        int end = start;
+        // 빈 줄이 나올 때까지 블록 확장
+        while (end < lines.Length && !string.IsNullOrWhiteSpace(lines[end]))
+            end++;
+
+        // 블록 저장
+        var blockText = string.Join("\n", lines[start..end]);
+        blocks.Add((start, end - 1, blockText));
+        start = end;
+    }
+
+    // 커서가 속한 블록 찾기
+    foreach (var block in blocks) {
+        if (cursorLine >= block.startLine && cursorLine <= block.endLine)
+            return block.blockText;
+    }
+    // 못 찾았을 경우, 커서보다 위에 있는 가장 가까운 블록 반환
+    string lastBlock = string.Empty;
+    foreach (var block in blocks) {
+        if (cursorLine >= block.endLine)
+            lastBlock = block.blockText;
+        else
+            break;
+    }
+    return lastBlock;
+}
+
+
+
+
   public async Task SetValue(string value) {
     _editor.SetValue(value);
+    _editor.SetScrollPosition( new NewScrollPosition(){ ScrollLeft=0, ScrollTop=0} );
   }
 
   private async Task CopyTextToClipboard() {
