@@ -126,7 +126,7 @@
       var ri = await JsContQuery<Dictionary<string, object>>(dbType, query, true);
 
       // 결과 표현
-      ResultMessage = $" time : {ri.Res.GetValue("dtgap")} sec";
+      ResultMessage = $" time : {ri.Res?.GetValue("dtgap")} sec";
       // 로딩바 종료.
       IsLoading = false;
       Data = ri;

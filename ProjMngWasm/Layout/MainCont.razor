@@ -192,7 +192,9 @@
   void ShowContextMenuWithContent(MouseEventArgs args, ProgramInfo item) => ContextMenuService.Open(args, ds =>
   @<RadzenMenu Click="@( ee =>  OnMenuItemClick(ee, item))">
     <RadzenMenuItem Text="Open Url" Value="1"></RadzenMenuItem>
-    <RadzenMenuItem Text="MoveRoot" Value="99"></RadzenMenuItem>
+    
+    <RadzenMenuItem Text=@( item.ProjPath) Value="2"></RadzenMenuItem>
+
     <RadzenMenuItem Text="OtherTabOpen" Value="80"></RadzenMenuItem>
     <RadzenMenuItem Text="More items" Value="3">
       <RadzenMenuItem Text="More sub items" Value="4">
@@ -212,7 +214,8 @@
     Console.WriteLine($"Clicked on {item}");
 
     switch( args.Value.ToString()){
-      case "1" : if (!string.IsNullOrEmpty(item.Url)) { navigationManager.NavigateTo(item.Url); } break;
+      case "1" : if (!string.IsNullOrEmpty(item.Url)) { navigationManager.NavigateTo(item.Url); } break;      
+      case "2" :      jsRuntime.InvokeVoidAsync("copyClipboard", item.ProjPath);      break;
       case "80" : AddItem( item.ProjPath , item.ProjName , item.ProjName, item.Url, "", true, true); break;
       case "97" : AllRemoveItem(); break;
       case "98" : OthersRemoveItem(); break;

@@ -81,7 +81,11 @@
 
             <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
 
-              <ProcessCard Title="WBS" ProcName="sp_proj_wbs_moniter" DbNick=@db_nick CallType="db"
+              <ProcessCard 
+                Title="WBS" 
+                ProcName="sp_proj_wbs_moniter" 
+                DbNick=@db_nick 
+                CallType="db"
                 Project="@srtype"
                 TotalKey="total_task_count"
                 PlanKey="planned_until_now_count"
@@ -92,11 +96,15 @@
 
             <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
 
-              <ProcessCard Title="WBS pct" ProcName="sp_proj_wbs_moniter" DbNick=@db_nick CallType="db"
-                           Project="@srtype"
-                           TotalKey="total_task_count"
-                           PlanKey="planneds_until_now_count"
-                           CurrentKey="comp_and_ing_cnt" />
+              <ProcessCard 
+                Title="WBS pct" 
+                ProcName="sp_proj_wbs_moniter" 
+                DbNick=@db_nick 
+                CallType="db"
+                Project="@srtype"
+                TotalKey="total_task_count"
+                PlanKey="planneds_until_now_count"
+                CurrentKey="comp_and_ing_cnt" />
 
             </RadzenColumn>
 
