@@ -181,7 +181,7 @@
             <RadzenCard Style="width: 100%;">
                 <RadzenRow>
                     <RadzenColumn Size="8" class="rz-text-truncate">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{@user.Key}") class="rz-me-1" />
+                        <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@GetUserValue(@user.Key, "user_name")" class="rz-me-1" />
                         <b>@(@user.Key)</b>
                     </RadzenColumn>
                     <RadzenColumn Size="4" class="rz-text-align-end">
@@ -190,7 +190,7 @@
                 </RadzenRow>
                 <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-                    <RadzenImage Path="/images/user_profile.png"
+                    <RadzenImage Path="@GetUserValue(@user.Key, "user_photo")"
                     Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(@user.Key)" />
                     <RadzenStack Gap="0">
                         <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">file : @(@user.Value["author"])</RadzenText>
@@ -252,6 +252,9 @@
     Data = await MdCont<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>() { 
       { "prj_rid",  srtype?.Code ?? "3" }
     });
+
+
+    user_data = await DbCont<Dictionary<string, string>>("sp_dev_user_exec", new Dictionary<string,string>(){{"prj_rid",srtype?.Code}} );
 
     var dataList = Data.Data;
 
@@ -319,6 +322,26 @@
   Dictionary<string, Dictionary<string, int>> userData { get; set; } = new Dictionary<string, Dictionary<string, int>>();
 
 
+  ResultInfo<Dictionary<string, string>> user_data{ get; set; }
+
+
+  public string GetUserValue(string user, string key){
+    string result = string.Empty;
+    if( user_data != null && user_data.Data != null ){
+
+    
+      foreach( var udt in user_data.Data ){
+        if( udt.GetValue("user_id") == user ){                          
+          result = udt.GetValue(key);
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+
+
   public void CountUsersWithDevEdt(List<Dictionary<string, object>> dataList, string user_key) {
 
       foreach (var dict in dataList) {
@@ -332,7 +355,6 @@
                   if (!userData[user].ContainsKey(user_key)) {
                       userData[user][user_key] = 0;
                   }
-
 
                   userData[user][user_key]++;
 
