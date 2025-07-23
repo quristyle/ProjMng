@@ -31,6 +31,16 @@ public class QuriDynamicGridBase : BaseComponent {
   // 동작 버턴 활성 여부
 
 
+  [Parameter]  public  bool FooterIsLoading { get; set; }
+
+  [Parameter] public EventCallback<bool> FooterIsLoadingChanged { get; set; }
+
+  [Parameter]  public string FooterMessage { get; set; }
+
+  [Parameter] public EventCallback<string> FooterMessageChanged { get; set; }
+
+
+
   public bool IsSave {
     get {
       return SaveBtnEvent.HasDelegate;

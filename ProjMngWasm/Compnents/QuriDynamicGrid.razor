@@ -232,14 +232,34 @@
 
     <FooterTemplate >
       <div class="action-btn px-1 py-1">
+        <div class=" float-start pt-1">
         @if (cols != null && cols.Count > 0 && (IsSave || IsAction || IsDelete)) {
-          <a class="action float-start" @onclick=@(() => InsertAfterRow(null)) title="add"><i class="bi bi-plus-square"></i></a>
-          <a class="action float-start" @onclick=@(() => CopyAfterRow(null)) title="copy"><i class="bi bi-copy"></i></a>
+          <a class="action pe-2" @onclick=@(() => InsertAfterRow(null)) title="add"><i class="bi bi-plus-square"></i></a>
+          <a class="action pe-2" @onclick=@(() => CopyAfterRow(null)) title="copy"><i class="bi bi-copy"></i></a>
         }
-        <a class="action float-start" @onclick=@(() => ExportXlsx()) title="excel"><i class="bi bi bi-file-earmark-excel"></i></a>
+        <a class="action pe-2" @onclick=@(() => ExportXlsx()) title="excel"><i class="bi bi bi-file-earmark-excel"></i></a>
+        </div>
 
-        <a class="action float-end" @onclick=@(() => ToggleFilter()) title="filter"><i class="bi bi-filter"></i></a>
-        <span class="action float-end">@orders.Count items</span>
+        
+
+
+
+        <a class="action float-end  ps-2 pe-1 pt-1" @onclick=@(() => ToggleFilter()) title="filter"><i class="bi bi-filter"></i></a>
+        <span class="action float-end p-1">@orders.Count items</span>
+        
+      @if(!string.IsNullOrEmpty(FooterMessage)){   
+        <div class=" float-end pe-1">
+          @if(FooterIsLoading){        
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          }
+          <div class="badge bg-secondary" role="status">
+            <span class="">@FooterMessage</span>
+          </div>
+        </div>
+      }
+
       </div>
     </FooterTemplate>
 

@@ -36,21 +36,11 @@
 
   <RadzenSplitterPane Size="40%" Min="10%" Max="90%">
 
-    <div class="position-absolute z-3 end-0 p-2">
-      @if(IsLoading){        
-      <div class="spinner-border spinner-border-sm" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      }
-      <div class="badge bg-secondary" role="status">
-        <span class="">@ResultMessage</span>
-      </div>
-    </div>
 
 
 
 
-    <QuriDynamicGrid ReqData=Data />
+    <QuriDynamicGrid ReqData=Data @bind-FooterIsLoading=IsLoading @bind-FooterMessage=ResultMessage />
   </RadzenSplitterPane>
 
 </RadzenSplitter>
