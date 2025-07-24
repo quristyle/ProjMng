@@ -46,7 +46,7 @@ public class DevService : BaseService {
       DateTime spdt = DateTime.Now;
       DateTime epdt = DateTime.Now;
 
-      rdr = db.ExecuteReader(sql: query);
+      rdr = db.ExecuteReader(sql: query, commandTimeout: 240);
 
       var resultList = new List<dynamic>();
       int breakCount = 5000;
@@ -251,7 +251,7 @@ public class DevService : BaseService {
 
       DynamicParameters parameters = GetParams(directString, param);
 
-      rdr = db.ExecuteReader(sql: directString, param: parameters);
+      rdr = db.ExecuteReader(sql: directString, param: parameters, commandTimeout: 240);
 
       var resultList = new List<dynamic>();
 

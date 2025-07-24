@@ -13,9 +13,12 @@
 <RadzenCard >
   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+    
+    <QuriSearchs AllLoadComplete=OnLoadWrk >
       <QuriDropDown CodeId="projlist" @bind-Value=srtype IsAll=true InitialCode="7" />
-    </RadzenStack>
+    </QuriSearchs>
+
+
 
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
       <RadzenButton Click="@OnLoadWrk" Text="Search" />

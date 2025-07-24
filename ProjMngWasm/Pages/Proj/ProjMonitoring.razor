@@ -10,159 +10,165 @@
 
 @inherits PageBaseComponent
 
-      <RadzenCard >
-          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
+<RadzenCard >
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" >
 
-              <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
-            <QuriDropDown CodeId="projlist" @bind-Value=srtype Change=OnLoadWrk />
-              </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+      <QuriDropDown CodeId="projlist" @bind-Value=srtype Change=OnLoadWrk />
+    </RadzenStack>
 
-              <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
-                  <RadzenButton Click="@OnLoadWrk" Text="Search" />
-              </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="4px">
+     <RadzenButton Click="@OnLoadWrk" Text="Search" />
+    </RadzenStack>
 
-          </RadzenStack>
-      </RadzenCard>
-
-
-      <RadzenSteps >
-          <Steps>
-              <RadzenStepsItem Text="요건정의"></RadzenStepsItem>
-              <RadzenStepsItem Text="시스템" Disabled=true></RadzenStepsItem>
-              <RadzenStepsItem Text="통합테스트" Disabled=true></RadzenStepsItem>
-              <RadzenStepsItem Text="완료" Disabled=true></RadzenStepsItem>
-          </Steps>
-      </RadzenSteps>
+  </RadzenStack>
+</RadzenCard>
 
 
 
+<RadzenRow Style="--rz-text-h2-line-height: 1; --rz-text-h2-font-weight: 200;">
+  <RadzenColumn Size="12" SizeMD="12" SizeXL="12">
 
+    @* 프로젝트 total *@
+     <RadzenRow>
 
+        <RadzenColumn Size="12" SizeMD="3" SizeXL="3">
+            <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenText TextStyle="TextStyle.H6">Project</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@pmInfo.ProjectTotalPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
+                    </RadzenStack>
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@pmInfo.ProjectPlanPercentage  ShowValue=true />
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@pmInfo.ProjectCompPercentage  ShowValue=true />
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+      
+    </RadzenRow>
 
-      <RadzenRow Style="--rz-text-h2-line-height: 1; --rz-text-h2-font-weight: 200;">
-          <RadzenColumn Size="12" SizeMD="12" SizeXL="12">
-              <RadzenRow>
+    @if(pmInfo.WorkList != null && pmInfo.WorkList.Count > 0){
+    foreach(var w in pmInfo.WorkList ){
 
+    <RadzenCard Variant="Variant.Outlined" > 
+      <RadzenStack>
+        <RadzenText TextStyle="TextStyle.H6">@w.Title</RadzenText>
+      </RadzenStack>
 
-                  <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
-                      <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
-                          <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
-                              <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
-                                  <RadzenText TextStyle="TextStyle.H6">Project</RadzenText>
-                                  <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@closeRatioPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
-                              </RadzenStack>
-                              <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@closeRatioPercentage ShowValue=true />
-                              <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@closeRatioPercentage ShowValue=true />
-                          </RadzenStack>
-                      </RadzenCard>
-                  </RadzenColumn>
+      <RadzenRow>
 
+        <RadzenColumn Size="12" SizeMD="3" SizeXL="3">
+            <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
 
-
-                  <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
-                      <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
-                          <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
-                              <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
-
-                                  <RadzenStack Orientation="Orientation.Vertical">
-                                      <RadzenText TextStyle="TextStyle.H6">Front Source Commet</RadzenText>
-                                      <RadzenText TextStyle="TextStyle.Body1">@_compFileCount  / @_totalFileCount</RadzenText>
-                                  </RadzenStack>
-
-                                  <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@commentRatioPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
-                              </RadzenStack>
-                              <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@commentRatioPercentage ShowValue=true />
-                          </RadzenStack>
-                      </RadzenCard>
-
-                  </RadzenColumn>
-
-
-
-            <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
-
-              <ProcessCard 
-                Title="WBS" 
-                ProcName="sp_proj_wbs_moniter" 
-                DbNick=@db_nick 
-                CallType="db"
-                Project="@srtype"
-                TotalKey="total_task_count"
-                PlanKey="planned_until_now_count"
-                CurrentKey="completed_task_count" />
-
-            </RadzenColumn>
-
-
-            <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
-
-              <ProcessCard 
-                Title="WBS pct" 
-                ProcName="sp_proj_wbs_moniter" 
-                DbNick=@db_nick 
-                CallType="db"
-                Project="@srtype"
-                TotalKey="total_task_count"
-                PlanKey="planneds_until_now_count"
-                CurrentKey="comp_and_ing_cnt" />
-
-            </RadzenColumn>
-
-
-
-
-
-
-                  @if (@ProcInfoData != null) {
-
-                <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
-
-
-                    <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
-                        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
-                                <RadzenStack Orientation="Orientation.Vertical">
-                                    <RadzenText TextStyle="TextStyle.H6">Procedures</RadzenText>
-                                    <RadzenText TextStyle="TextStyle.Body2">@ProcInfoData.Data[0]["all_cnt"]    </RadzenText>
-                                </RadzenStack>
-                                <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["sp_cnt"] <span class=" badge bg-primary">proc</span></RadzenText>
-                                <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["fn_cnt"]<span class=" badge bg-primary">fn</span></RadzenText>
-                                <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["etc_cnt"]<span class=" badge bg-primary">etc</span></RadzenText>
-                            </RadzenStack>
-
-
-
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenText TextStyle="TextStyle.H6">Front Source Commet</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1">@w.FrontCompFileCount  / @w.FrontTotalFileCount</RadzenText>
                         </RadzenStack>
-                    </RadzenCard>
+
+                        <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@w.FrontTotalPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
+                    </RadzenStack>
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@w.FrontCompPercentage ShowValue=true />
+                </RadzenStack>
+            </RadzenCard>
+
+        </RadzenColumn>
 
 
-                </RadzenColumn>
+
+  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
+
+    <ProcessCard 
+      Title="WBS" 
+      ProcName="sp_proj_wbs_moniter" 
+      DbNick=@db_nick 
+      CallType="db"
+      Project="@srtype"
+      TotalKey="total_task_count"
+      PlanKey="planned_until_now_count"
+      CurrentKey="completed_task_count" />
+
+  </RadzenColumn>
+
+
+  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
+
+    <ProcessCard 
+      Title="WBS pct" 
+      ProcName="sp_proj_wbs_moniter" 
+      DbNick=@db_nick 
+      CallType="db"
+      Project="@srtype"
+      TotalKey="total_task_count"
+      PlanKey="planneds_until_now_count"
+      CurrentKey="comp_and_ing_cnt" />
+
+  </RadzenColumn>
 
 
 
 
-      }
+
+
+        @if (@ProcInfoData != null) {
+
+      <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
+
+
+          <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+              <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
+                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+                      <RadzenStack Orientation="Orientation.Vertical">
+                          <RadzenText TextStyle="TextStyle.H6">Procedures</RadzenText>
+                          <RadzenText TextStyle="TextStyle.Body2">@ProcInfoData.Data[0]["all_cnt"]    </RadzenText>
+                      </RadzenStack>
+                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["sp_cnt"] <span class=" badge bg-primary">proc</span></RadzenText>
+                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["fn_cnt"]<span class=" badge bg-primary">fn</span></RadzenText>
+                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["etc_cnt"]<span class=" badge bg-primary">etc</span></RadzenText>
+                  </RadzenStack>
+
+
+
+              </RadzenStack>
+          </RadzenCard>
+
+
+      </RadzenColumn>
+
+
+
+
+  }
 
            
 
-            <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
+  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
 
-        <ProcessCard Title="Table" ProcName="tableMonitoring" DbNick=@db_nick CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
+  <ProcessCard Title="Table" ProcName="tableMonitoring" DbNick=@db_nick CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
 
-            </RadzenColumn>
+  </RadzenColumn>
 
-            <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
+  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
 
-        <ProcessCard Title="Column" ProcName="columnsMonitoring" DbNick=@db_nick CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
+  <ProcessCard Title="Column" ProcName="columnsMonitoring" DbNick=@db_nick CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
 
-            </RadzenColumn>
-
-
+  </RadzenColumn>
 
 
 
-        </RadzenRow>
-    </RadzenColumn>
+
+
+  </RadzenRow>
+
+
+            </RadzenCard>
+
+      }
+    }
+
+
+</RadzenColumn>
 </RadzenRow>
 
 
@@ -185,7 +191,7 @@
                         <b>@(@user.Key)</b>
                     </RadzenColumn>
                     <RadzenColumn Size="4" class="rz-text-align-end">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@(Math.Round(@user.Value["author"] * 100 / @_totalFileCount, 1).ToString()) />
+                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@(Math.Round((user.Value.TryGetValue("author", out var authorVal) ? authorVal : 0.001) * 100 / @_totalFileCount, 1).ToString()) />
                     </RadzenColumn>
                 </RadzenRow>
                 <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
@@ -193,7 +199,7 @@
                     <RadzenImage Path="@GetUserValue(@user.Key, "user_photo")"
                     Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(@user.Key)" />
                     <RadzenStack Gap="0">
-                        <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">file : @(@user.Value["author"])</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">file : @(user.Value.TryGetValue("author", out var authorVal) ? authorVal : 0)</RadzenText>
                         <RadzenText TextStyle="TextStyle.H6">wbs : @(@user.Value["dev_user"])</RadzenText>
                         <RadzenText TextStyle="TextStyle.Body2">@(@user.Key), @(@user.Key)</RadzenText>
                     </RadzenStack>
@@ -215,17 +221,19 @@
 
 </RadzenRow>
 
+
+
+
+
+
+
+
+
+
+
 @code {
 
-  double closeRatioPercentage{get;set;}= 90;
-
-  double commentRatioPercentage { get; set; } = 0;
-
-  double _totalFileCount { get; set; } = 0;
-
-  double _planFileCount { get; set; } = 0;
-
-  double _compFileCount { get; set; } = 0;
+  ProjectMonitoringInfo pmInfo {get;set;} = new();
 
   public CommonCode? srtype { get; set; }
   Dictionary<string, string> db_dic = new Dictionary<string, string>();
@@ -250,7 +258,7 @@
     userData.Clear();
 
     Data = await MdCont<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>() { 
-      { "prj_rid",  srtype?.Code ?? "3" }
+      { "prj_rid",  srtype?.Code }
     });
 
 
@@ -268,7 +276,7 @@
 
     // wbs
     var wbsData = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
-      { "prj_rid", srtype?.Code ?? "3"  }
+      { "prj_rid", srtype?.Code  }
     });
 
     dataList = wbsData.Data;
@@ -341,7 +349,7 @@
   }
 
 
-
+  // 사용자별 user_key 의 해당 숫자를 구하기 위함이다.
   public void CountUsersWithDevEdt(List<Dictionary<string, object>> dataList, string user_key) {
 
       foreach (var dict in dataList) {
@@ -366,5 +374,31 @@
       }
 
   }
+
+
+
+  public class ProjectMonitoringInfo(){
+    public double ProjectTotalPercentage{get;set;} = 0;
+    public double ProjectPlanPercentage{get;set;} = 0;
+    public double ProjectCompPercentage{get;set;} = 0;
+    public List<WorkInfo> WorkList{get;set;}
+  }
+
+  
+  public class WorkInfo(){
+    public string Title{get;set;}
+    public double FrontTotalPercentage {get;set;} 
+    public double FrontTotalFileCount {get;set;} 
+    public double FrontCompFileCount {get;set;} 
+    public double FrontCompPercentage {get;set;} 
+
+
+
+
+
+
+
+  }
+
 
 }

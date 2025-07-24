@@ -70,6 +70,62 @@ public static class BaseModelExtensions {
 
 
 
+  public static List<T> ConvertDynamicList<T>(this IEnumerable<dynamic> source)
+        where T : new() {
+    var result = new List<T>();
+    var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+    foreach (var item in source) {
+      var dict = item as IDictionary<string, object>;
+      if (dict == null) continue;
+
+      // 딕셔너리 키를 소문자로 변환하여 lookup 생성
+      var dictLower = dict.ToDictionary(
+          kv => kv.Key.ToLowerInvariant(),
+          kv => kv.Value
+      );
+
+      var obj = new T();
+      foreach (var prop in props) {
+        // 속성명 소문자로 변환 후 매칭
+        if (dictLower.TryGetValue(prop.Name.ToLowerInvariant(), out var value) && value != null) {
+          prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+        }
+      }
+      result.Add(obj);
+    }
+    return result;
+  }
+
+
+
+
+  // IDictionary<string, string> → List<T> 변환용
+  public static List<T> ConvertStringDictionaryList<T>(this IEnumerable<IDictionary<string, string>> source)
+      where T : new() {
+    var result = new List<T>();
+    var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+    foreach (var dict in source) {
+      if (dict == null) continue;
+
+      var dictLower = dict.ToDictionary(
+          kv => kv.Key.ToLowerInvariant(),
+          kv => kv.Value
+      );
+
+      var obj = new T();
+      foreach (var prop in props) {
+        if (dictLower.TryGetValue(prop.Name.ToLowerInvariant(), out var value) && value != null) {
+          prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+        }
+      }
+      result.Add(obj);
+    }
+    return result;
+  }
+
+
 }
 
 

@@ -153,7 +153,7 @@ public class ProjService : BaseService {
                 if (cursor != null) {
 
                   using (var cmd = new NpgsqlCommand($"FETCH ALL IN \"{cursor}\"", db as NpgsqlConnection)) // db를 NpgsqlConnection으로 캐스팅
-                  using (var rdr = cmd.ExecuteReader()) {
+                  using (var rdr = cmd.ExecuteReader(  )) {
 
                     // var expandoObject2 = new ExpandoObject() as IDictionary<string, object>;
                     var resultList = new List<dynamic>();
@@ -440,6 +440,8 @@ public class ProjService : BaseService {
     return ri;
   }
 
+  /*
+
   public ResultInfo<Dictionary<string, string>> GetMdData(string action_name, Dictionary<string, string> param) {
 
     param["req_type"] = "srch";
@@ -493,12 +495,12 @@ public class ProjService : BaseService {
     GetRes<Dictionary<string, string>>(ref ri, param, DateTime.Now, DateTime.Now, DateTime.Now);
     return ri;
   }
-
+  */
 
   public ResultInfo<Dictionary<string, string>> GetMdBlazorData(RequestDto dto) {
 
     IDictionary<string, string> param = dto.MainParam;
-    param["req_type"] = "srch";
+    //param["req_type"] = "srch";
 
     ResultInfo<Dictionary<string, string>> ri = new ResultInfo<Dictionary<string, string>>();
     GetBlazorFile(ri, param);
@@ -686,37 +688,75 @@ public class ProjService : BaseService {
 
     ResultInfo<dynamic> srcInfo = GetData("sp_dev_srcinfo_exec", param);
 
-    List<Dictionary<string, object>> srcInfoData = ConvertToListOfDictionaries(srcInfo.Data.AsEnumerable());
+    List<SrcInfo> srcinfoList = srcInfo.Data.ConvertDynamicList<SrcInfo>();
+
+
+
+    //List<Dictionary<string, object>> srcInfoData = ConvertToListOfDictionaries(srcInfo.Data.AsEnumerable());
+
+
+
+    foreach (var si in srcinfoList) {
+
+
+      ResultInfo<dynamic> si_dtl = GetData("sp_dev_srcinfo_dtl_exec"
+        , new Dictionary<string, string>{ { "req_type", "srch" }
+          , { "src_rid", si.Src_rid } 
+        });
+
+
+
+      si.SiDtlList = si_dtl.Data.ConvertDynamicList<SrcInfoDtl>();
+
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     //ResultInfo<Dictionary<string, string>> ri = new ResultInfo<Dictionary<string, string>>();
-    if (srcInfoData.Count > 0) {
-      string basePath = srcInfoData[0]["src_path"].ToString();
-      string projNamespace = srcInfoData[0]["prj_namespace"].ToString();  // @"ProjMngWasm";
-      string pageRoot = srcInfoData[0]["src_ui_root"].ToString();         // @"Pages";
-      string pagePattern = srcInfoData[0].GetValue("url_pattern");//  ["url_pattern"].ToString();      // "@page\\s+\"(?<url>[^\"]+)\"";
+    if (srcinfoList.Count > 0) {
+      //string basePath = srcInfoData[0]["src_path"].ToString();
+      //string projNamespace = srcInfoData[0]["prj_namespace"].ToString();  // @"ProjMngWasm";
+      //string pageRoot = srcInfoData[0]["src_ui_root"].ToString();         // @"Pages";
+      //string pagePattern = srcInfoData[0].GetValue("url_pattern");//  ["url_pattern"].ToString();      // "@page\\s+\"(?<url>[^\"]+)\"";
 
       List<Dictionary<string, string>> aaa = null;
 
-      aaa = BlazorUtil.GetBlazorMenuList(basePath, projNamespace, pageRoot, pagePattern);
+      foreach (var si in srcinfoList) {
 
-      if (aaa == null || aaa.Count <= 0) {
-        // subdir 찾아서 가져오기
-        string src_rid = srcInfoData[0]["src_rid"].ToString();
-        param.Add("src_rid", src_rid);
+        aaa = BlazorUtil.GetBlazorMenuList(si);
 
-        ResultInfo<dynamic> srcInfo_dtl = GetData("sp_dev_srcinfo_dtl_exec", param);
 
-        List<Dictionary<string, object>> srcInfoDtlData = ConvertToListOfDictionaries(srcInfo_dtl.Data.AsEnumerable());
 
-        List<Dictionary<string, object>> srcPathList = srcInfoDtlData.Where(dict => dict.ContainsKey("src_pattern_grp") && dict["src_pattern_grp"]?.ToString() == "src_path").ToList();
 
-        if (srcPathList.Count > 0) {
+        //if (aaa == null || aaa.Count <= 0) {
+        //  // subdir 찾아서 가져오기
+        //  //string src_rid = srcInfoData[0]["src_rid"].ToString();
+        //  param.Add("src_rid", src_rid);
 
-          basePath = srcPathList[0]["url_pattern"].ToString();
+        //  ResultInfo<dynamic> srcInfo_dtl = GetData("sp_dev_srcinfo_dtl_exec", param);
 
-          aaa = BlazorUtil.GetBlazorMenuList(basePath, projNamespace, pageRoot, pagePattern);
-        }
+        //  List<Dictionary<string, object>> srcInfoDtlData = ConvertToListOfDictionaries(srcInfo_dtl.Data.AsEnumerable());
+
+        //  List<Dictionary<string, object>> srcPathList = srcInfoDtlData.Where(dict => dict.ContainsKey("src_pattern_grp") && dict["src_pattern_grp"]?.ToString() == "src_path").ToList();
+
+        //  if (srcPathList.Count > 0) {
+
+        //    basePath = srcPathList[0]["url_pattern"].ToString();
+
+        //    aaa = BlazorUtil.GetBlazorMenuList(si);
+        //  }
+        //}
+
+        break; // 나중에 지워.
       }
 
       Dictionary<string, string> col = new Dictionary<string, string>();
@@ -736,10 +776,17 @@ public class ProjService : BaseService {
 
 
 
-  public class LogInfo() {
-    public string TicKs { get; set; }
-    public string Title { get; set; }
-    public string Message { get; set; }
-  }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
