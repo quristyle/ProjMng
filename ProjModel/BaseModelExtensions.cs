@@ -101,8 +101,7 @@ public static class BaseModelExtensions {
 
 
   // IDictionary<string, string> → List<T> 변환용
-  public static List<T> ConvertStringDictionaryList<T>(this IEnumerable<IDictionary<string, string>> source)
-      where T : new() {
+  public static List<T> ConvertStringDictionaryList<T>(this IEnumerable<IDictionary<string, string>> source)  where T : new() {
     var result = new List<T>();
     var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -124,6 +123,32 @@ public static class BaseModelExtensions {
     }
     return result;
   }
+
+
+  public static List<T> ConvertStringDictionaryList<T>(this IEnumerable<IDictionary<string, object>> source) where T : new() {
+    var result = new List<T>();
+    var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+    foreach (var dict in source) {
+      if (dict == null) continue;
+
+      var dictLower = dict.ToDictionary(
+          kv => kv.Key.ToLowerInvariant(),
+          kv => kv.Value
+      );
+
+      var obj = new T();
+      foreach (var prop in props) {
+        if (dictLower.TryGetValue(prop.Name.ToLowerInvariant(), out var value) && value != null) {
+          prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+        }
+      }
+      result.Add(obj);
+    }
+    return result;
+  }
+
+
 
 
 }

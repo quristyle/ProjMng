@@ -52,7 +52,7 @@
 
     <RadzenCard Variant="Variant.Outlined" > 
       <RadzenStack>
-        <RadzenText TextStyle="TextStyle.H6">@w.Title</RadzenText>
+        <RadzenText TextStyle="TextStyle.H6">@w.Src_nick</RadzenText>
       </RadzenStack>
 
       <RadzenRow>
@@ -109,37 +109,26 @@
 
 
 
-
-
-        @if (@ProcInfoData != null) {
-
       <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
-
 
           <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
               <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
                   <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
                       <RadzenStack Orientation="Orientation.Vertical">
                           <RadzenText TextStyle="TextStyle.H6">Procedures</RadzenText>
-                          <RadzenText TextStyle="TextStyle.Body2">@ProcInfoData.Data[0]["all_cnt"]    </RadzenText>
+                          <RadzenText TextStyle="TextStyle.Body2">@w.All_cnt    </RadzenText>
                       </RadzenStack>
-                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["sp_cnt"] <span class=" badge bg-primary">proc</span></RadzenText>
-                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["fn_cnt"]<span class=" badge bg-primary">fn</span></RadzenText>
-                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @ProcInfoData.Data[0]["etc_cnt"]<span class=" badge bg-primary">etc</span></RadzenText>
+                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @w.Sp_cnt <span class=" badge bg-primary">proc</span></RadzenText>
+                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @w.Fn_cnt<span class=" badge bg-primary">fn</span></RadzenText>
+                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @w.Etc_cnt<span class=" badge bg-primary">etc</span></RadzenText>
                   </RadzenStack>
-
-
 
               </RadzenStack>
           </RadzenCard>
 
-
       </RadzenColumn>
 
-
-
-
-  }
+  
 
            
 
@@ -162,18 +151,7 @@
   </RadzenRow>
 
 
-            </RadzenCard>
-
-      }
-    }
-
-
-</RadzenColumn>
-</RadzenRow>
-
-
-
-
+  
 <RadzenRow Style="margin-top:10px;">
 
     @foreach (var user in userData) {
@@ -191,7 +169,7 @@
                         <b>@(@user.Key)</b>
                     </RadzenColumn>
                     <RadzenColumn Size="4" class="rz-text-align-end">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@(Math.Round((user.Value.TryGetValue("author", out var authorVal) ? authorVal : 0.001) * 100 / @_totalFileCount, 1).ToString()) />
+                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@(Math.Round((user.Value.TryGetValue("author", out var authorVal) ? authorVal : 0.001) * 100 / w.FrontTotalFileCount, 1).ToString()) />
                     </RadzenColumn>
                 </RadzenRow>
                 <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
@@ -227,6 +205,22 @@
 
 
 
+    </RadzenCard>
+
+      }
+    }
+
+
+</RadzenColumn>
+</RadzenRow>
+
+
+
+
+
+
+
+
 
 
 
@@ -239,6 +233,20 @@
   Dictionary<string, string> db_dic = new Dictionary<string, string>();
   public string db_nick { get; set; }
 
+  
+
+  //public ResultInfo<Dictionary<string, object>>? ProcInfoData { get; set; }
+
+
+
+
+  Dictionary<string, Dictionary<string, int>> userData { get; set; } = new Dictionary<string, Dictionary<string, int>>();
+
+
+  ResultInfo<Dictionary<string, string>> user_data{ get; set; }
+
+
+
   protected override async Task OnAfterRenderAsync(bool firstRender) {
       if (firstRender) {
           await OnLoadWrk();
@@ -246,63 +254,118 @@
   }
 
   //source data
-  public ResultInfo<Dictionary<string, object>>? Data { get; set; }
+  //public ResultInfo<Dictionary<string, object>>? Data { get; set; }
 
 
   protected async Task OnLoadWrk() {
 
     if (string.IsNullOrEmpty(srtype?.Code)) return;
     db_nick = null;
-    ProcInfoData = null;
+    //ProcInfoData = null;
     db_dic.Clear();
     userData.Clear();
 
-    Data = await MdCont<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>() { 
+    pmInfo = new();
+    
+    user_data = await DbCont<Dictionary<string, string>>("sp_dev_user_exec", new Dictionary<string,string>(){{"prj_rid",srtype?.Code}} );
+
+
+    var srcList = await DbCont<Dictionary<string, string>>("sp_dev_srcinfo_exec", new Dictionary<string, string>() { 
       { "prj_rid",  srtype?.Code }
     });
 
+    
+    List<WorkInfo> srcinfoList = srcList.Data.ConvertStringDictionaryList<WorkInfo>();
 
-    user_data = await DbCont<Dictionary<string, string>>("sp_dev_user_exec", new Dictionary<string,string>(){{"prj_rid",srtype?.Code}} );
 
-    var dataList = Data.Data;
+    foreach( var si in srcinfoList){
+      var src_scan = await MdCont<Dictionary<string, string>>("md_blazor_scan", new Dictionary<string, string>() { 
+        { "prj_rid",  srtype?.Code }, { "src_rid",  si.Src_rid }
+      });
 
-    _totalFileCount = dataList.Count;
-    int emptyCredtCount = dataList.Count(d => d.ContainsKey("credt") && string.IsNullOrEmpty(d["credt"]?.ToString()));
-    _compFileCount = dataList.Count(d => d.ContainsKey("credt") && !string.IsNullOrEmpty(d["credt"]?.ToString()));
+      si.Src_scan = src_scan.Data;
 
-    commentRatioPercentage = Math.Round((_compFileCount * 100) / _totalFileCount, 1);
+      // src_scan.Data.ConvertStringDictionaryList<WorkInfo>();
 
-    CountUsersWithDevEdt(dataList, "author");
-
-    // wbs
-    var wbsData = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
-      { "prj_rid", srtype?.Code  }
-    });
-
-    dataList = wbsData.Data;
-
-    emptyCredtCount = dataList.Count(d => d.ContainsKey("dev_edt") && string.IsNullOrEmpty(d["dev_edt"]?.ToString()));
       
-    CountUsersWithDevEdt(dataList, "dev_user");
+      // var dataList = Data.Data;
 
-    // dblist
-    var db4proj = await GetCommon("projdb", srtype?.Code);
+      // _totalFileCount = dataList.Count;
+      // int emptyCredtCount = dataList.Count(d => d.ContainsKey("credt") && string.IsNullOrEmpty(d["credt"]?.ToString()));
+      // _compFileCount = dataList.Count(d => d.ContainsKey("credt") && !string.IsNullOrEmpty(d["credt"]?.ToString()));
 
-    //   Dictionary<string, string> dic = new Dictionary<string, string>() {
-    // {"db",db4proj[0]      .Others["db_type"]},
-    // {"dbnick",db4proj[0].Others["db_nick"]},
-    // {"schema",db4proj[0].Others["db_schema"]},
-    // {"stp", "columnsMonitoring"},
+      // commentRatioPercentage = Math.Round((_compFileCount * 100) / _totalFileCount, 1);
 
-    // };
 
-    db_dic["db"]=db4proj[0].Others["db_type"];
-    db_dic["dbnick"] = db4proj[0].Others["db_nick"];
-    db_dic["schema"] = db4proj[0].Others["db_schema"];
-    //db_dic["stp"] = "columnsMonitoring";
-    db_nick = db4proj[0].Others["db_nick"];
 
-    ProcInfoData = await JsCont<Dictionary<string, object>>("procMonitoring", db_dic);
+      
+      //var dataList = Data.Data;
+
+      si.FrontTotalFileCount = si.Src_scan.Count;
+      int emptyCredtCount = si.Src_scan.Count(d => d.ContainsKey("credt") && string.IsNullOrEmpty(d["credt"]?.ToString()));
+      si.FrontCompFileCount = si.Src_scan.Count(d => d.ContainsKey("credt") && !string.IsNullOrEmpty(d["credt"]?.ToString()));
+
+      si.FrontTotalPercentage = Math.Round((si.FrontCompFileCount * 100) / si.FrontTotalFileCount, 1);
+
+
+
+
+
+      
+      // wbs
+      var wbsData = await DbCont<Dictionary<string, object>>("sp_proj_wbs_exec", new Dictionary<string, string>() {
+        { "prj_rid", srtype?.Code  }, { "src_rid",  si.Src_rid }
+      });
+
+      emptyCredtCount =  wbsData.Data.Count(d => d.ContainsKey("dev_edt") && string.IsNullOrEmpty(d["dev_edt"]?.ToString()));
+
+
+      
+      // dblist
+      var db4proj = await GetCommon("projdb", srtype?.Code);
+
+      //   Dictionary<string, string> dic = new Dictionary<string, string>() {
+      // {"db",db4proj[0]      .Others["db_type"]},
+      // {"dbnick",db4proj[0].Others["db_nick"]},
+      // {"schema",db4proj[0].Others["db_schema"]},
+      // {"stp", "columnsMonitoring"},
+
+      // };
+
+      db_dic["db"]=db4proj[0].Others["db_type"];
+      db_dic["dbnick"] = db4proj[0].Others["db_nick"];
+      db_dic["schema"] = db4proj[0].Others["db_schema"];
+      //db_dic["stp"] = "columnsMonitoring";
+      db_nick = db4proj[0].Others["db_nick"];
+      
+      //ProcInfoData = await JsCont<Dictionary<string, object>>("procMonitoring", db_dic);
+      var procData = await JsCont<Dictionary<string, object>>("procMonitoring", db_dic);
+
+      var pdt = procData.Data.FirstOrDefault();
+
+      
+      si.All_cnt = pdt.GetValue("all_cnt");
+      si.Sp_cnt = pdt.GetValue("sp_cnt");
+      si.Fn_cnt = pdt.GetValue("fn_cnt");
+      si.Etc_cnt = pdt.GetValue("etc_cnt");
+
+    }
+
+    
+    pmInfo.WorkList = srcinfoList;
+
+
+    // Data = await MdCont<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>() { 
+    //   { "prj_rid",  srtype?.Code }
+    // });
+
+
+
+
+    //CountUsersWithDevEdt(dataList, "author");
+
+      
+    //CountUsersWithDevEdt(dataList, "dev_user");
 
 
   }
@@ -321,16 +384,6 @@
 
 
 
-
-  public ResultInfo<Dictionary<string, object>>? ProcInfoData { get; set; }
-
-
-
-
-  Dictionary<string, Dictionary<string, int>> userData { get; set; } = new Dictionary<string, Dictionary<string, int>>();
-
-
-  ResultInfo<Dictionary<string, string>> user_data{ get; set; }
 
 
   public string GetUserValue(string user, string key){
@@ -377,7 +430,7 @@
 
 
 
-  public class ProjectMonitoringInfo(){
+  public class ProjectMonitoringInfo{
     public double ProjectTotalPercentage{get;set;} = 0;
     public double ProjectPlanPercentage{get;set;} = 0;
     public double ProjectCompPercentage{get;set;} = 0;
@@ -385,12 +438,30 @@
   }
 
   
-  public class WorkInfo(){
+  public class WorkInfo : SrcInfo{
     public string Title{get;set;}
     public double FrontTotalPercentage {get;set;} 
     public double FrontTotalFileCount {get;set;} 
     public double FrontCompFileCount {get;set;} 
     public double FrontCompPercentage {get;set;} 
+
+
+    public List<Dictionary<string, string>> Src_scan{get;set;} 
+
+
+
+
+    
+    public string All_cnt {get;set;} 
+    public string Sp_cnt {get;set;} 
+    public string Fn_cnt {get;set;} 
+    public string Etc_cnt {get;set;} 
+
+
+
+
+
+
 
 
 
