@@ -1,12 +1,12 @@
 ﻿@page "/proj-monitoring";
 @{
-    /* description : 프로젝트 상태 정보를 제공
-    * title : 모니터링
-    * sort : 30
-    * credt : 2021-09-01
-    * author : quristyle
-    */
-      }
+/* description : 프로젝트 상태 정보를 제공
+* title : 모니터링
+* sort : 30
+* credt : 2021-09-01
+* author : quristyle
+*/
+}
 
 @inherits PageBaseComponent
 
@@ -24,244 +24,273 @@
   </RadzenStack>
 </RadzenCard>
 
-
-
 <RadzenRow Style="--rz-text-h2-line-height: 1; --rz-text-h2-font-weight: 200;">
   <RadzenColumn Size="12" SizeMD="12" SizeXL="12">
+    
+    @if(pmInfo != null ){
 
     @* 프로젝트 total *@
-     <RadzenRow>
+    
+    <RadzenCardGroup >
 
-        <RadzenColumn Size="12" SizeMD="3" SizeXL="3">
-            <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
-                <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
-                        <RadzenText TextStyle="TextStyle.H6">Project</RadzenText>
-                        <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@pmInfo.ProjectTotalPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
-                    </RadzenStack>
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@pmInfo.ProjectPlanPercentage  ShowValue=true />
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@pmInfo.ProjectCompPercentage  ShowValue=true />
-                </RadzenStack>
-            </RadzenCard>
-        </RadzenColumn>
       
-    </RadzenRow>
+      <RadzenCard >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+
+        <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+          <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+              <RadzenText TextStyle="TextStyle.H6">Project</RadzenText>
+              <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@pmInfo.ProjectTotalPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
+            </RadzenStack>
+            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@pmInfo.ProjectPlanPercentage  ShowValue=true />
+            <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@pmInfo.ProjectCompPercentage  ShowValue=true />
+          </RadzenStack>
+        </RadzenCard>
+        
+        </RadzenStack>
+      </RadzenCard>
+        
+      <RadzenCard >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
+          <ProcessCard 
+            Title="WBS" 
+            ProcName="sp_proj_wbs_moniter" 
+            CallType="db"
+            Project="@srtype"
+            TotalKey="total_task_count"
+            PlanKey="planned_until_now_count"
+            CurrentKey="completed_task_count" />
+
+        </RadzenStack>
+      </RadzenCard>
+
+
+      
+      <RadzenCard >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
+          <ProcessCard 
+            Title="WBS pct" 
+            ProcName="sp_proj_wbs_moniter" 
+            CallType="db"
+            Project="@srtype"
+            TotalKey="total_task_count"
+            PlanKey="planneds_until_now_count"
+            CurrentKey="comp_and_ing_cnt" />
+
+        </RadzenStack>
+      </RadzenCard>
+
+
+
+
+
+    <RadzenCardGroup >
+        @if( user_data != null && user_data.Data.Count > 0){
+          @foreach (var user in user_data.Data) {
+
+           
+                
+      <RadzenCard >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
+
+
+
+                      <RadzenRow>
+                          <RadzenColumn Size="9" class="rz-text-truncate">
+                            <RadzenStack  Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" >
+                              <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@user.GetValue("user_name")" class="rz-me-1" />
+                              <RadzenText >@(@user.GetValue("user_id"))</RadzenText>
+                            </RadzenStack> 
+                          </RadzenColumn>
+                          <RadzenColumn Size="3" class="rz-text-align-end">
+                              <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="..%" />
+                          </RadzenColumn>
+                      </RadzenRow>
+                      <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin-top: 1rem;" />
+                      <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" >
+                          <RadzenImage 
+                            Path="@user.GetValue("user_photo")"
+                            Style="width: 40px; height: 40px; border-radius: 50%" 
+                            AlternateText="@user.GetValue("user_name")" />
+                          <RadzenStack Gap="0">
+                          </RadzenStack>
+                      </RadzenStack>
+
+
+
+        </RadzenStack>
+      </RadzenCard>
+
+
+
+
+
+
+          }
+
+          }
+
+    </RadzenCardGroup >
+
+
+
+
+
+
+
+
+      
+    </RadzenCardGroup>
+
+
+
+    
+
+    
+    @if( pmInfo.DbList != null && pmInfo.DbList.Count > 0){
+      foreach(var w in pmInfo.DbList ){
+        
+    @* db information *@
+    <RadzenCardGroup >
+      
+      
+      
+
+      <RadzenCard Variant=Variant.Filled >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
+        <RadzenText TextStyle="TextStyle.H5" >@w.Db_nick</RadzenText>
+         
+          <ProcessDispCard 
+            Title="Procedures" 
+            ProcName="procMonitoring" 
+            DbNick=@w.Db_nick 
+            CallType="js" 
+            TotalKey="all_cnt" CurrentKey="sp_cnt" PlanKey="fn_cnt" EtcKey="etc_cnt"
+            CurrentBedge="sp" PlanBedge="fn" EtcBedge="etc"
+             />
+
+
+        </RadzenStack>
+      </RadzenCard>
+
+
+
+      <RadzenCard Variant=Variant.Filled >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
+         
+          <ProcessCard 
+            Title="Tables" 
+            ProcName="tableMonitoring" 
+            DbNick=@w.Db_nick 
+            CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
+
+
+        </RadzenStack>
+      </RadzenCard>
+
+      
+      <RadzenCard Variant=Variant.Filled >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
+          <ProcessCard 
+            Title="Columns" 
+            ProcName="columnsMonitoring" 
+            DbNick=@w.Db_nick
+            CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
+
+
+        </RadzenStack>
+      </RadzenCard>
+
+      
+
+
+
+    </RadzenCardGroup>
+
+
+    
+      }
+    }
+    
 
     @if(pmInfo.WorkList != null && pmInfo.WorkList.Count > 0){
-    foreach(var w in pmInfo.WorkList ){
+      
+    @* source *@
+    <RadzenCardGroup >
 
-    <RadzenCard Variant="Variant.Outlined" > 
-      <RadzenStack>
-        <RadzenText TextStyle="TextStyle.H6">@w.Src_nick</RadzenText>
-      </RadzenStack>
 
-      <RadzenRow>
+    @foreach(var w in pmInfo.WorkList ){
 
-        <RadzenColumn Size="12" SizeMD="3" SizeXL="3">
+
+      
+      
+      <RadzenCard >
+        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
+          
             <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
                 <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
 
                         <RadzenStack Orientation="Orientation.Vertical">
-                            <RadzenText TextStyle="TextStyle.H6">Front Source Commet</RadzenText>
+                            <RadzenText TextStyle="TextStyle.H6">@w.Src_nick Commet</RadzenText>
                             <RadzenText TextStyle="TextStyle.Body1">@w.FrontCompFileCount  / @w.FrontTotalFileCount</RadzenText>
                         </RadzenStack>
 
                         <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@w.FrontTotalPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
                     </RadzenStack>
-                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@w.FrontCompPercentage ShowValue=true />
+                    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@w.FrontTotalPercentage ShowValue=true />
                 </RadzenStack>
             </RadzenCard>
 
-        </RadzenColumn>
+        </RadzenStack>
+      </RadzenCard>
+
+      
 
 
-
-  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
-
-    <ProcessCard 
-      Title="WBS" 
-      ProcName="sp_proj_wbs_moniter" 
-      DbNick=@db_nick 
-      CallType="db"
-      Project="@srtype"
-      TotalKey="total_task_count"
-      PlanKey="planned_until_now_count"
-      CurrentKey="completed_task_count" />
-
-  </RadzenColumn>
-
-
-  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
-
-    <ProcessCard 
-      Title="WBS pct" 
-      ProcName="sp_proj_wbs_moniter" 
-      DbNick=@db_nick 
-      CallType="db"
-      Project="@srtype"
-      TotalKey="total_task_count"
-      PlanKey="planneds_until_now_count"
-      CurrentKey="comp_and_ing_cnt" />
-
-  </RadzenColumn>
-
-
-
-
-      <RadzenColumn Size="12" SizeMD="4" SizeXL="4">
-
-          <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
-              <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
-                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
-                      <RadzenStack Orientation="Orientation.Vertical">
-                          <RadzenText TextStyle="TextStyle.H6">Procedures</RadzenText>
-                          <RadzenText TextStyle="TextStyle.Body2">@w.All_cnt    </RadzenText>
-                      </RadzenStack>
-                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @w.Sp_cnt <span class=" badge bg-primary">proc</span></RadzenText>
-                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @w.Fn_cnt<span class=" badge bg-primary">fn</span></RadzenText>
-                      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @w.Etc_cnt<span class=" badge bg-primary">etc</span></RadzenText>
-                  </RadzenStack>
-
-              </RadzenStack>
-          </RadzenCard>
-
-      </RadzenColumn>
-
-  
-
-           
-
-  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
-
-  <ProcessCard Title="Table" ProcName="tableMonitoring" DbNick=@db_nick CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
-
-  </RadzenColumn>
-
-  <RadzenColumn Size="12" SizeMD="3" SizeXL="2">
-
-  <ProcessCard Title="Column" ProcName="columnsMonitoring" DbNick=@db_nick CallType="js" TotalKey="all_cnt" CurrentKey="comment_cnt" />
-
-  </RadzenColumn>
-
-
-
-
-
-  </RadzenRow>
-
-
-  
-<RadzenRow Style="margin-top:10px;">
-
-    @foreach (var user in userData) {
-
-        <RadzenColumn Size="12" SizeMD="3" SizeXL="3">
-
-
-
-
-
-            <RadzenCard Style="width: 100%;">
-                <RadzenRow>
-                    <RadzenColumn Size="8" class="rz-text-truncate">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@GetUserValue(@user.Key, "user_name")" class="rz-me-1" />
-                        <b>@(@user.Key)</b>
-                    </RadzenColumn>
-                    <RadzenColumn Size="4" class="rz-text-align-end">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@(Math.Round((user.Value.TryGetValue("author", out var authorVal) ? authorVal : 0.001) * 100 / w.FrontTotalFileCount, 1).ToString()) />
-                    </RadzenColumn>
-                </RadzenRow>
-                <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-                    <RadzenImage Path="@GetUserValue(@user.Key, "user_photo")"
-                    Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(@user.Key)" />
-                    <RadzenStack Gap="0">
-                        <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">file : @(user.Value.TryGetValue("author", out var authorVal) ? authorVal : 0)</RadzenText>
-                        <RadzenText TextStyle="TextStyle.H6">wbs : @(@user.Value["dev_user"])</RadzenText>
-                        <RadzenText TextStyle="TextStyle.Body2">@(@user.Key), @(@user.Key)</RadzenText>
-                    </RadzenStack>
-                </RadzenStack>
-            </RadzenCard>
-
-
-
-
-
-
-
-
-        </RadzenColumn>
-
-
-
-    }
-
-</RadzenRow>
-
-
-
-
-
-
-
-    </RadzenCard>
 
       }
+
+      
+    </RadzenCardGroup>
+
+
+
     }
 
+    
+    }
 
-</RadzenColumn>
+  </RadzenColumn>
 </RadzenRow>
-
-
-
-
-
-
-
-
-
-
-
 
 @code {
 
-  ProjectMonitoringInfo pmInfo {get;set;} = new();
+  ProjectMonitoringInfo pmInfo {get;set;} 
 
   public CommonCode? srtype { get; set; }
   Dictionary<string, string> db_dic = new Dictionary<string, string>();
-  public string db_nick { get; set; }
-
-  
-
-  //public ResultInfo<Dictionary<string, object>>? ProcInfoData { get; set; }
-
-
-
 
   Dictionary<string, Dictionary<string, int>> userData { get; set; } = new Dictionary<string, Dictionary<string, int>>();
-
-
+ 
   ResultInfo<Dictionary<string, string>> user_data{ get; set; }
-
-
-
+ 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
-      if (firstRender) {
-          await OnLoadWrk();
-      }
+    if (firstRender) {
+        await OnLoadWrk();
+    }
   }
 
-  //source data
-  //public ResultInfo<Dictionary<string, object>>? Data { get; set; }
-
-
   protected async Task OnLoadWrk() {
-
+    
     if (string.IsNullOrEmpty(srtype?.Code)) return;
-    db_nick = null;
-    //ProcInfoData = null;
     db_dic.Clear();
     userData.Clear();
 
@@ -269,13 +298,20 @@
     
     user_data = await DbCont<Dictionary<string, string>>("sp_dev_user_exec", new Dictionary<string,string>(){{"prj_rid",srtype?.Code}} );
 
-
     var srcList = await DbCont<Dictionary<string, string>>("sp_dev_srcinfo_exec", new Dictionary<string, string>() { 
       { "prj_rid",  srtype?.Code }
     });
 
-    
     List<WorkInfo> srcinfoList = srcList.Data.ConvertStringDictionaryList<WorkInfo>();
+
+
+    //sp_projdblist
+
+    
+    var dbList = await DbCont<DbInfo>("sp_projdblist", new Dictionary<string, string>() { 
+      { "proj_rid",  srtype?.Code }
+    });
+    pmInfo.DbList = dbList.Data;
 
 
     foreach( var si in srcinfoList){
@@ -285,31 +321,11 @@
 
       si.Src_scan = src_scan.Data;
 
-      // src_scan.Data.ConvertStringDictionaryList<WorkInfo>();
-
-      
-      // var dataList = Data.Data;
-
-      // _totalFileCount = dataList.Count;
-      // int emptyCredtCount = dataList.Count(d => d.ContainsKey("credt") && string.IsNullOrEmpty(d["credt"]?.ToString()));
-      // _compFileCount = dataList.Count(d => d.ContainsKey("credt") && !string.IsNullOrEmpty(d["credt"]?.ToString()));
-
-      // commentRatioPercentage = Math.Round((_compFileCount * 100) / _totalFileCount, 1);
-
-
-
-      
-      //var dataList = Data.Data;
-
       si.FrontTotalFileCount = si.Src_scan.Count;
       int emptyCredtCount = si.Src_scan.Count(d => d.ContainsKey("credt") && string.IsNullOrEmpty(d["credt"]?.ToString()));
       si.FrontCompFileCount = si.Src_scan.Count(d => d.ContainsKey("credt") && !string.IsNullOrEmpty(d["credt"]?.ToString()));
 
       si.FrontTotalPercentage = Math.Round((si.FrontCompFileCount * 100) / si.FrontTotalFileCount, 1);
-
-
-
-
 
       
       // wbs
@@ -319,48 +335,10 @@
 
       emptyCredtCount =  wbsData.Data.Count(d => d.ContainsKey("dev_edt") && string.IsNullOrEmpty(d["dev_edt"]?.ToString()));
 
-
-      
-      // dblist
-      var db4proj = await GetCommon("projdb", srtype?.Code);
-
-      //   Dictionary<string, string> dic = new Dictionary<string, string>() {
-      // {"db",db4proj[0]      .Others["db_type"]},
-      // {"dbnick",db4proj[0].Others["db_nick"]},
-      // {"schema",db4proj[0].Others["db_schema"]},
-      // {"stp", "columnsMonitoring"},
-
-      // };
-
-      db_dic["db"]=db4proj[0].Others["db_type"];
-      db_dic["dbnick"] = db4proj[0].Others["db_nick"];
-      db_dic["schema"] = db4proj[0].Others["db_schema"];
-      //db_dic["stp"] = "columnsMonitoring";
-      db_nick = db4proj[0].Others["db_nick"];
-      
-      //ProcInfoData = await JsCont<Dictionary<string, object>>("procMonitoring", db_dic);
-      var procData = await JsCont<Dictionary<string, object>>("procMonitoring", db_dic);
-
-      var pdt = procData.Data.FirstOrDefault();
-
-      
-      si.All_cnt = pdt.GetValue("all_cnt");
-      si.Sp_cnt = pdt.GetValue("sp_cnt");
-      si.Fn_cnt = pdt.GetValue("fn_cnt");
-      si.Etc_cnt = pdt.GetValue("etc_cnt");
-
     }
 
     
     pmInfo.WorkList = srcinfoList;
-
-
-    // Data = await MdCont<Dictionary<string, object>>("md_blazor_scan", new Dictionary<string, string>() { 
-    //   { "prj_rid",  srtype?.Code }
-    // });
-
-
-
 
     //CountUsersWithDevEdt(dataList, "author");
 
@@ -369,8 +347,6 @@
 
 
   }
-
-
 
   double GetPercent(object p, object c){
 
@@ -382,25 +358,20 @@
       return r;
   }
 
-
-
-
-
   public string GetUserValue(string user, string key){
     string result = string.Empty;
     if( user_data != null && user_data.Data != null ){
 
-    
       foreach( var udt in user_data.Data ){
         if( udt.GetValue("user_id") == user ){                          
           result = udt.GetValue(key);
           break;
         }
       }
+
     }
     return result;
   }
-
 
   // 사용자별 user_key 의 해당 숫자를 구하기 위함이다.
   public void CountUsersWithDevEdt(List<Dictionary<string, object>> dataList, string user_key) {
@@ -435,6 +406,9 @@
     public double ProjectPlanPercentage{get;set;} = 0;
     public double ProjectCompPercentage{get;set;} = 0;
     public List<WorkInfo> WorkList{get;set;}
+
+    public List<DbInfo> DbList{get;set;}
+
   }
 
   
@@ -445,29 +419,14 @@
     public double FrontCompFileCount {get;set;} 
     public double FrontCompPercentage {get;set;} 
 
-
     public List<Dictionary<string, string>> Src_scan{get;set;} 
 
-
-
-
-    
     public string All_cnt {get;set;} 
     public string Sp_cnt {get;set;} 
     public string Fn_cnt {get;set;} 
     public string Etc_cnt {get;set;} 
 
-
-
-
-
-
-
-
-
-
-
-
+    public string DbNick {get;set;} 
 
   }
 

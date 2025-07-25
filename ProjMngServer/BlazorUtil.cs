@@ -113,13 +113,26 @@ public class BlazorUtil {
 
 
 
+  /// <summary> 경로에서 확장자에 맞는 파일 리스트를 가져온다. </summary>
+  /// <returns></returns>
+  public static string[] GetFiles(string basePath, string projNamespace, string extend) {
+
+    string folderPath = basePath + @"/" + projNamespace + @"/";
+    string searchPattern = $"*.{extend}";
+    string[] files = Directory.Exists(folderPath) ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories) : Array.Empty<string>();
+
+    if (files == null || files.Length <= 0) {
+      files = Directory.Exists(basePath) ? Directory.GetFiles(basePath, searchPattern, SearchOption.AllDirectories) : Array.Empty<string>();
+    }
+      return files;
+  }
+
   public static List<Dictionary<string, string>> GetBlazorMenuList(SrcInfo si ) {
 
 
     string basePath = si.Src_path; // srcInfoData[0]["src_path"].ToString();
     string projNamespace = si.Prj_namespace;  // = srcInfoData[0]["prj_namespace"].ToString();  // @"ProjMngWasm";
     string pageRoot = si.Src_ui_root; // = srcInfoData[0]["src_ui_root"].ToString();         // @"Pages";
-    //string pagePattern = si.Url_pattern; // = srcInfoData[0].GetValue("url_pattern");//  ["url_pattern"].ToString();      // "@page\\s+\"(?<url>[^\"]+)\"";
 
     var urlDtl = si.SiDtlList
     .Where(dtl => string.Equals(dtl.Src_pattern_grp, "url", StringComparison.OrdinalIgnoreCase))
@@ -129,69 +142,33 @@ public class BlazorUtil {
     .Where(dtl => string.Equals(dtl.Src_pattern_grp, "extend", StringComparison.OrdinalIgnoreCase))
     .ToList();
 
-
-
-
-
-    //Console.WriteLine("GetBlazorMenuList start ------------------------------------------------- ");
-    //Console.WriteLine("basePath : " + basePath);
-    //Console.WriteLine("projNamespace : " + projNamespace);
-    //Console.WriteLine("pageRoot : " + pageRoot);
-    //Console.WriteLine("pagePattern : " + pagePattern);
-
     List<Dictionary<string, string>> aaa = new List<Dictionary<string, string>>();
 
+    foreach (var extend in extends) { 
 
-
-    foreach (var extend in extends) {
-
-
-
-
-
-
-      // string basePath = @"c:\projects\ProjMng";
-      // string projNamespace = @"ProjMngWasm";
-      // string pageRoot = @"Pages";
       string folderPath = basePath + @"/" + projNamespace + @"/";
       string searchPattern = $"*.{extend.Url_pattern}";
-      string pagePattern = urlDtl?.Url_pattern?? "@page\\s+\"(?<url>[^\"]+)\"";
-      //string namePattern = "@\\* description :\\s*(?<title>[^*]+)\\s*\\*@";
-
-      Console.WriteLine("folderPath : " + folderPath);
+      string pagePattern = urlDtl?.Url_pattern?? " "; // "@page\\s+\"(?<url>[^\"]+)\"";
 
       try {
-        //string[] files = Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories);
 
-        string[] files = Directory.Exists(folderPath)
-    ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories)
-    : Array.Empty<string>();
-
-
+        //string[] files = Directory.Exists(folderPath) ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories) : Array.Empty<string>();
+        string[] files = GetFiles( basePath,  projNamespace, extend.Url_pattern);
 
         if ( files == null || files.Length <= 0) {
 
-          basePath = si.SiDtlList
-    .Where(dtl => string.Equals(dtl.Src_pattern_grp, "src_path", StringComparison.OrdinalIgnoreCase))
-    .ToList().FirstOrDefault().Url_pattern;
+          basePath = si.SiDtlList .Where(dtl => string.Equals(dtl.Src_pattern_grp, "src_path", StringComparison.OrdinalIgnoreCase)) .ToList().FirstOrDefault().Url_pattern;
 
-          folderPath = basePath + @"/" + projNamespace + @"/";
-          //files = Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories);
+          folderPath = basePath + @"/" + projNamespace + @"/"; 
 
+          //files = Directory.Exists(folderPath) ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories) : Array.Empty<string>();
 
-          files = Directory.Exists(folderPath)
-      ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories)
-      : Array.Empty<string>();
+          files = GetFiles(basePath, projNamespace, extend.Url_pattern);
 
 
         }
 
-        foreach (string file in files) {
-
-
-          Console.WriteLine("file : " + file);
-
-
+        foreach (string file in files) { 
 
           string content = File.ReadAllText(file);
           Match match = Regex.Match(content, pagePattern);
@@ -217,52 +194,35 @@ public class BlazorUtil {
             rurl = RemovePath(rurl, $".{extend.Url_pattern}");
             rurl = RemovePath(rurl, "..");
 
-            binfo.Add("fullname", RemoveNonAlphabeticLeadingChar(rurl.Replace("\\", ".").Replace("/", ".")));
+            binfo.Add("fullname", RemoveNonAlphabeticLeadingChar(rurl.Replace("\\", ".").Replace("/", "."))); 
 
+            binfo.Add("url", url); 
 
-
-            binfo.Add("url", url);
-
-
-            binfo.Add("description", ExtractValue(content, "description", Path.GetFileNameWithoutExtension(file)));
-
-
+            binfo.Add("description", ExtractValue(content, "description", Path.GetFileNameWithoutExtension(file))); 
 
             var descs = si.SiDtlList
             .Where(dtl => string.Equals(dtl.Src_extend, "desc", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
             foreach(var desc in descs) {
-              binfo.Add(desc.Src_pattern_grp, ExtractValue(content, desc.Src_pattern_grp, string.Empty));
+              if( string.IsNullOrEmpty( desc.Url_pattern)) {
+                binfo.Add(desc.Src_pattern_grp, ExtractValue(content, desc.Src_pattern_grp, string.Empty));
+              }
+              else {
+                binfo.Add(desc.Src_pattern_grp, ExtractValue(content, desc.Url_pattern, string.Empty));
+              }
             }
 
 
-            //binfo.Add("title", ExtractValue(content, "title", ExtractValue(content, "화면명", url)));
-            //binfo.Add("sort", ExtractValue(content, "sort", "999"));
-            //binfo.Add("credt", ExtractValue(content, "credt", ExtractValue(content, "작성일자", string.Empty)));
-            //binfo.Add("author", ExtractValue(content, "author", ExtractValue(content, "작성자명", string.Empty)));
-
-
-
-            aaa.Add(binfo);
-
-
-
-
+            aaa.Add(binfo); 
 
           }
         }
       }
       catch (Exception ex) {
         Console.WriteLine("오류 발생: " + ex.Message);
-      }
-      Console.WriteLine("GetBlazorMenuList end ------------------------------------------------- ");
-
-
-
-    }
-
-
+      } 
+    } 
     return aaa;
   }
 

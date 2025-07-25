@@ -5,6 +5,16 @@ using System.Collections.Generic;
 
 namespace ProjMngServer.Controllers;
 
+
+  /* description : 서버측 IO 관련 자료를 요청에 사용되는 컨트롤 
+  * title : 서버측 IO 접근 Controller 
+  * sort : 2 
+  * credt : 2021-09-01
+  * author : quristyle
+  */
+
+
+
 [ApiController]
 [Route("api/[controller]")]
 public class MediaController : ControllerBase {

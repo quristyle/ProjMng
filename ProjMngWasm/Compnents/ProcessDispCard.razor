@@ -5,16 +5,36 @@
 
       <RadzenStack Orientation="Orientation.Vertical">
         <RadzenText TextStyle="TextStyle.H6">@Title</RadzenText>
-        <RadzenText TextStyle="TextStyle.Body1">@(_totalCount - _currentCount)    ( @_currentCount  / @_totalCount )</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2">@_totalCount    </RadzenText>
       </RadzenStack>
 
-
-      <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0">@_currentPercentage  <span class="badge text-bg-secondary fs-6">%</span></RadzenText>
+      
+                <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @_currentCount <span class=" badge bg-primary">@CurrentBedge</span></RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @_planCount<span class=" badge bg-primary">@PlanBedge</span></RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" class="rz-color-info rz-m-0"> @_etcCount<span class=" badge bg-primary">@EtcBedge</span></RadzenText>
     </RadzenStack>
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value=@_planPercentage ShowValue=true Visible=IsPlanVisible />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value=@_currentPercentage ShowValue=true Visible=IsCurrentVisible />
+
+    
+
+
+
+
   </RadzenStack>
 </RadzenCard>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @code {
   [Parameter] public string ProcName { get; set; }
@@ -24,23 +44,25 @@
   [Parameter] public string TotalKey { get; set; }
   [Parameter] public CommonCode Project { get; set; } = new CommonCode();
 
-
-
-  [Parameter] public EventCallback<CommonCode> ProjectChanged { get; set; } 
-
-
-
-
   [Parameter] public string PlanKey { get; set; }
   [Parameter] public string CurrentKey { get; set; }
+  [Parameter] public string EtcKey { get; set; }
+  
+  [Parameter] public string PlanBedge { get; set; }
+  [Parameter] public string CurrentBedge { get; set; }
+  [Parameter] public string EtcBedge { get; set; }
+
+
   bool IsPlanVisible { get { return !string.IsNullOrEmpty(PlanKey); } }
   bool IsCurrentVisible { get { return !string.IsNullOrEmpty(CurrentKey); } }
+  bool IsEtcVisible { get { return !string.IsNullOrEmpty(EtcKey); } }
 
   double _planPercentage { get; set; } = 0;
   double _currentPercentage { get; set; } = 0;
   double _totalCount { get; set; } = 0;
   double _planCount { get; set; } = 0;
   double _currentCount { get; set; } = 0;
+  double _etcCount { get; set; } = 0;
 
   private string _previousDbNick;
   private string _previousProcName;
@@ -67,18 +89,6 @@
       // OnLoadWrk 호출
       await OnLoadWrk();
     }
-    else if ( CallType != "js" && (isDicChanged || isProcNameChanged) && !string.IsNullOrEmpty(ProcName)) {
-      // 이전 값을 현재 값으로 업데이트
-      //_previousDbNick = DbNick;
-      _previousProcName = ProcName;
-
-      // OnLoadWrk 호출
-      await OnLoadWrk();
-    }
-
-    
-
-
 
     // 초기화 하고 재 호출할때 동작 되도록 하기 위함.
     if (!string.IsNullOrEmpty(_previousDbNick) && string.IsNullOrEmpty(DbNick)) { _previousDbNick = DbNick; }
@@ -88,9 +98,6 @@
 
 
   protected async Task OnLoadWrk() {
-
-    if( Project == null ) return ;
-
     ResultInfo<Dictionary<string, object>> data = null;
     Dictionary<string, string> Dic = new Dictionary<string, string>(){ 
       { "dbnick", DbNick },
@@ -113,18 +120,20 @@
     _totalCount = GetDouble( dt, TotalKey );
     _planCount = GetDouble( dt, PlanKey );
     _currentCount = GetDouble( dt, CurrentKey );
+    _etcCount = GetDouble( dt, EtcKey );
 
   }
 
   double GetDouble(Dictionary<string, object> dt, string c) {
+    if (string.IsNullOrEmpty(c) || dt == null || dt.Count == 0 || !dt.ContainsKey(c) || dt[c] == null)
+        return 0;
 
-    if (string.IsNullOrEmpty(c) || dt == null || dt.Count == 0) {
-      return 0;
-    }
-    double r = double.Parse(dt[c].ToString());
+    double r;
+    if (!double.TryParse(dt[c].ToString(), out r))
+        r = 0;
 
     return r;
-  }
+}
 
   double GetPercent(Dictionary<string, object> dt, string p, string c) {
 
