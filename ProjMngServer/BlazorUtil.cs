@@ -157,14 +157,15 @@ public class BlazorUtil {
 
         if ( files == null || files.Length <= 0) {
 
-          basePath = si.SiDtlList .Where(dtl => string.Equals(dtl.Src_pattern_grp, "src_path", StringComparison.OrdinalIgnoreCase)) .ToList().FirstOrDefault().Url_pattern;
+          basePath = si.SiDtlList .Where(dtl => string.Equals(dtl.Src_pattern_grp, "src_path", StringComparison.OrdinalIgnoreCase)) .ToList().FirstOrDefault()?.Url_pattern;
 
-          folderPath = basePath + @"/" + projNamespace + @"/"; 
+          if (!string.IsNullOrEmpty(basePath)) {
+            folderPath = basePath + @"/" + projNamespace + @"/";
 
-          //files = Directory.Exists(folderPath) ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories) : Array.Empty<string>();
+            //files = Directory.Exists(folderPath) ? Directory.GetFiles(folderPath, searchPattern, SearchOption.AllDirectories) : Array.Empty<string>();
 
-          files = GetFiles(basePath, projNamespace, extend.Url_pattern);
-
+            files = GetFiles(basePath, projNamespace, extend.Url_pattern);
+          }
 
         }
 

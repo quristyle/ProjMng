@@ -46,21 +46,21 @@ namespace ProjMngWasm.Compnents {
           builder.AddAttribute(1, "class", "action-btn px-1 py-1");
 
           builder.OpenElement(2, "a");
-          builder.AddAttribute(3, "class", "action float-start");
+          builder.AddAttribute(3, "class", "action float-start pe-2");
           builder.AddAttribute(4, "onclick", EventCallback.Factory.Create(this, () => ExportXlsx()));
           builder.AddAttribute(5, "title", "excel");
           builder.AddMarkupContent(6, "<i class=\"bi bi-file-earmark-excel\"></i>");
           builder.CloseElement();
 
           builder.OpenElement(7, "a");
-          builder.AddAttribute(8, "class", "action float-end");
+          builder.AddAttribute(8, "class", "action float-end ps-2 pe-1 pt-1");
           builder.AddAttribute(9, "onclick", EventCallback.Factory.Create(this, () => ToggleFilter()));
           builder.AddAttribute(10, "title", "filter");
           builder.AddMarkupContent(11, "<i class=\"bi bi-filter\"></i>");
           builder.CloseElement();
 
           builder.OpenElement(12, "span");
-          builder.AddAttribute(13, "class", "action float-end");
+          builder.AddAttribute(13, "class", "action float-end p-1");
           builder.AddContent(14, $"{DataCount()} items");
           builder.CloseElement();
 

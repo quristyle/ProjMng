@@ -7,7 +7,7 @@
   * author : quristyle
   */
 }
-
+@using ProjModel
 @inherits PageBaseComponent
 
 <RadzenCard >
@@ -33,11 +33,22 @@
             
   <!-- up -->
   <RadzenSplitterPane Size="30%" Min="10%" Max="90%">
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent DeleteBtnEvent=DeleteBtnEvent RowClickEvent=OnLoadWrk_dtl ReqData=Data DropDownCols="src_comm|SOURCE_GB"  />
+    <QuriDynamicGrid 
+      SaveBtnEvent=SaveBtnEvent 
+      DeleteBtnEvent=DeleteBtnEvent 
+      RowClickEvent=OnLoadWrk_dtl 
+      ReqData=Data 
+      DropDownCols="src_comm|SOURCE_GB"  
+      />
   </RadzenSplitterPane>
   <!-- down -->
   <RadzenSplitterPane Size="70%" Min="10%" Max="90%">
-    <QuriDynamicGrid SaveBtnEvent=SaveBtnEvent_dtl DeleteBtnEvent=DeleteBtnEvent_dtl ReqData=Data_dtl />
+    <QuriDynamicGrid 
+      SaveBtnEvent=SaveBtnEvent_dtl 
+      DeleteBtnEvent=DeleteBtnEvent_dtl 
+      AddBtnEvent=OnAddDtlInfo
+      ReqData=Data_dtl 
+      />
   </RadzenSplitterPane>
 </RadzenSplitter>
 
@@ -54,6 +65,8 @@
 
   public ResultInfo<Dictionary<string, object>>? Data { get; set; }
   public ResultInfo<Dictionary<string, object>>? Data_dtl { get; set; }
+  IDictionary<string, object> SelSrc{ get; set; }
+
 
 
   protected async Task OnLoadWrk() {
@@ -64,8 +77,9 @@
 
 
   protected async Task OnLoadWrk_dtl(IDictionary<string, object> seldic) {
+    SelSrc = seldic;
     Data_dtl = await DbCont<Dictionary<string, object>>("sp_dev_srcinfo_dtl_exec", new Dictionary<string, string>() {
-    { "src_rid",  seldic["src_rid"].ToString() }
+    { "src_rid",  seldic.GetValue("src_rid") }
     });
   }
 
@@ -101,7 +115,16 @@
     var saveobj = await DbDelete<IDictionary<string, object>>("sp_dev_srcinfo_dtl_exec", req);
   }
 
+  
+  private async Task OnAddDtlInfo(IDictionary<string, object> dic) {
+    if( SelSrc != null ){
+      dic["src_rid"] = SelSrc.GetValue("src_rid");
+    }
+  }
 
+
+
+  
 
 
 }

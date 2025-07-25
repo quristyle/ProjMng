@@ -158,6 +158,12 @@
                       ValueChanged="@(v => order[col.Key] = v)" 
                       />
                     }
+                    else if (order[col.Key]?.GetType().ToString() == "System.String") {
+                      <RadzenTextBox                      
+                      Value="@(order[col.Key].ToString())" 
+                      ValueChanged="@(v => order[col.Key] = v)" 
+                      />
+                    }
                     else{
                       <RadzenNumeric TValue="int?" 
                       Value="@(order[col.Key] as int?)" 
