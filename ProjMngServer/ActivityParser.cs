@@ -17,6 +17,14 @@ public class ActivityParser {
     var xmlFiles = Directory.GetFiles(rootPath, "*-service.xml", SearchOption.AllDirectories);
 
     foreach (var file in xmlFiles) {
+
+      //if (file.IndexOf("ods.portal-service") >= 0) {
+      //  string aaa = "";
+      //}
+      //else {
+      //  continue;
+      //}
+
       try {
         XDocument doc = XDocument.Load(file);
         var serviceElement = doc.Root;
@@ -45,6 +53,8 @@ public class ActivityParser {
           string dao = "";
           //string resultKey = "";
           string activityClass = "";
+          string activity_Type = "proc";
+          var activity_context = new List<string>();
 
           string currentActivityName = transitionValue;
 
@@ -59,8 +69,25 @@ public class ActivityParser {
                                       .FirstOrDefault(p => p.Attribute("name")?.Value == "procedure-name")
                                       ?.Attribute("value")?.Value ?? "";
 
-            if (!string.IsNullOrWhiteSpace(procName))
+            if (!string.IsNullOrWhiteSpace(procName)) {
               procedureNames.Add(procName);
+            }
+            else {
+
+              procName = activity.Elements(ns + "property")
+                                      .FirstOrDefault(p => p.Attribute("name")?.Value == "sql-key")
+                                      ?.Attribute("value")?.Value ?? "";
+              if (!string.IsNullOrWhiteSpace(procName)) {
+                activity_Type = "sql";
+                procedureNames.Add(procName);
+
+                activity_context.Add(
+                GetSqlContext(rootPath, procName)
+                );
+
+              }
+
+            }
 
             string resKey = activity.Elements(ns + "property")
                                     .FirstOrDefault(p => p.Attribute("name")?.Value == "result-key")
@@ -92,18 +119,55 @@ public class ActivityParser {
             Dao = dao,
             ProcedureName = string.Join(" -> ", procedureNames),
             ResultKey = string.Join(" -> ", resultKeys),
-            Activity = activityClass
+            Activity = activityClass,
+            Activity_Type = activity_Type,
+            Active_context = string.Join($" ------------------------------{Environment.NewLine}{Environment.NewLine}{Environment.NewLine} ", activity_context),
+            
           });
         }
       }
       catch (Exception ex) {
         Console.WriteLine($"[ERROR] {file}: {ex.Message}");
       }
+
+      Console.WriteLine($"[Runed] {file}");
     }
 
     return activityList;
   }
 
+
+
+  public static string GetSqlContext(string path, string sql_key) {
+    string result = string.Empty;
+
+    // _glue_sql로 끝나는 모든 파일 검색
+    var xmlFiles = Directory.GetFiles(path, "*.glue_sql", SearchOption.AllDirectories);
+
+    foreach (var file in xmlFiles) {
+      try {
+        XDocument doc = XDocument.Load(file);
+
+        // XML의 기본 네임스페이스 지정
+        XNamespace ns = "http://www.poscoict.com/glueframework/query";
+
+        // 모든 query 노드 탐색
+        foreach (var query in doc.Descendants(ns + "query")) {
+          var idAttr = query.Attribute("id");
+          if (idAttr != null && idAttr.Value == sql_key) {
+            // CDATA 또는 일반 텍스트 추출
+            result = query.Value.Trim();
+            return result;
+          }
+        }
+      }
+      catch (Exception ex) {
+        Console.WriteLine($"Error reading file {file}: {ex.Message}");
+      }
+    }
+
+    return result;
+  }
 
 
   public static List<SrcFileInfo> ParseSrcFiles(string rootPath, string extend, string skipStr) {

@@ -11,6 +11,8 @@ public class ActivityInfo : BaseModel {
   public string ProcedureName { get; set; }
   public string ResultKey { get; set; }
   public string Activity { get; set; }
+  public string Activity_Type { get; set; }
+  public string Active_context { get; set; }
 }
 
 

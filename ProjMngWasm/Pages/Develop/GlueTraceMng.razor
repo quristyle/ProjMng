@@ -29,21 +29,90 @@
   </RadzenStack>
 </RadzenCard>
 
-<RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" class="context-body-row"  >
-  <RadzenColumn Size="12" >
+
+
+
+
+<RadzenSplitter Orientation="Orientation.Horizontal" >
+
+
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="60%" Min="10%" Max="90%">
+
+
+
 
     <QuriDynamicGrid  
       ReqData=@Data 
-      HiddenCols="activity,resultkey,src_rid,dao,transitionvalue"
+      @bind-SItems=SelectedItems
+      HiddenCols="activity,resultkey,src_rid,dao,transitionvalue,active_context"
       AllowPaging=true />
 
-  </RadzenColumn>
-</RadzenRow>
+      
+</RadzenSplitterPane>
+
+
+  <!-- 왼쪽 -->
+  <RadzenSplitterPane  Size="40%" Min="10%" Max="90%">
+
+
+    
+                  <QuriCodeEditor @ref="_editor" />
+
+      
+</RadzenSplitterPane>
+
+
+
+</RadzenSplitter>
+
+
+
+
 
 @code {
   
+  private QuriCodeEditor? _editor;
+
   CommonCode? projectName { get; set; }
   CommonCode? SrouceName { get; set; }
+
+
+  
+  IList<IDictionary<string, object>> _selectedItems { get; set; } 
+
+  public IList<IDictionary<string, object>> SelectedItems { 
+    get { return _selectedItems; } 
+    set { 
+      if( _selectedItems != value ){
+        _selectedItems = value; 
+        LoadContext(_selectedItems[0]);
+        //_editor.SetValue(_selectedItems[0]?["fullpath"] + "");
+      }
+    } 
+  }
+
+  
+  protected async Task LoadContext(IDictionary<string,object> dic) {
+
+    // 여기서 쿼리key 에 사용가능한 쿼리를 가지고 온다.
+    
+    string atype = dic.GetValue("activity_type");
+    if( atype == "sql" ){
+      
+      string active_context = dic.GetValue("active_context");
+  
+      _editor.SetValue( active_context );
+
+    }
+    else{
+      
+    _editor.SetValue( "" );
+    }
+  }
+
+
+
 
   protected override async Task OnAfterRenderAsync(bool firstRender) {
     if (firstRender) {
