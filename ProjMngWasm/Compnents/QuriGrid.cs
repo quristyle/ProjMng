@@ -46,7 +46,7 @@ namespace ProjMngWasm.Compnents {
           builder.AddAttribute(1, "class", "action-btn px-1 py-1");
 
           builder.OpenElement(2, "a");
-          builder.AddAttribute(3, "class", "action float-start pe-2");
+          builder.AddAttribute(3, "class", "action float-start pe-2 pt-1");
           builder.AddAttribute(4, "onclick", EventCallback.Factory.Create(this, () => ExportXlsx()));
           builder.AddAttribute(5, "title", "excel");
           builder.AddMarkupContent(6, "<i class=\"bi bi-file-earmark-excel\"></i>");

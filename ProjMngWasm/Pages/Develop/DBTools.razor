@@ -235,35 +235,79 @@ class="context-body-row"
 
     <RadzenTabsItem Text="Prop">
 
-      <RadzenCard class="rz-my-6">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap"> 
-          <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-            <RadzenText >
 
+
+      
+  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+
+      
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="4px">
+          <RadzenSwitch @bind-Value=@IsFristWordUpperCase Change=@(args => OnFristWordUpperCaseChange(args, "Switch")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" />
+          
+      <QuriDropDown @bind-Value="_language" CodeId="SOURCE_LANG" />
+    </RadzenStack>
+
+
+  </RadzenStack>
+
+
+
+
+
+
+
+      
+
+    <pre Style="height:100%;">
+      
+
+              
               @if( dataCol != null ){
+
+                
                 foreach(var dr in dataCol){
-                  @($"{dr.ColunmName},")
+
+
+                  var name = dr.ColunmName;
+                  if (IsFristWordUpperCase && !string.IsNullOrEmpty(name))        {
+                      name = char.ToUpper(name[0]) + name.Substring(1);
+                  }
+
+                  @($"{name},")
+
+                }
+
+
+                foreach (var dr in dataCol) {
+                  
+                  var name = dr.ColunmName;
+                  if (IsFristWordUpperCase && !string.IsNullOrEmpty(name))        {
+                      name = char.ToUpper(name[0]) + name.Substring(1);
+                  }
+
+                  @($"public string {name} {"{"}get; set; {"}"}" + System.Environment.NewLine)
+                }
+
+
+
+                foreach (var dr in dataCol) {
+                  
+                  var name = dr.ColunmName;
+                  if (IsFristWordUpperCase && !string.IsNullOrEmpty(name))        {
+                      name = char.ToUpper(name[0]) + name.Substring(1);
+                  }
+
+                  @($"<{compnentTag} title=\"{(string.IsNullOrWhiteSpace(dr.ColDescription) ? name:dr.ColDescription)}\" Property=\"{name}\" />" + System.Environment.NewLine)
+  
+
+
                 }
               }
-
-            </RadzenText>
-          </RadzenStack>
-        </RadzenStack>
-      </RadzenCard>
+              
 
 
-      <RadzenCard class="rz-my-6">
-
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-
-          <RadzenColumn Size="7">
-            <pre Style="height:60vh;">
-              @SelectedTableProp
             </pre>
-          </RadzenColumn>
-        </RadzenRow>
 
-      </RadzenCard>
 
 
 
@@ -272,37 +316,6 @@ class="context-body-row"
 
 
 
-    <RadzenTabsItem Text="Razer">
-
-
-
-
-      <RadzenCard >
-
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" >
-
-          <RadzenTextBox Value=@compnentTag />
-
-        </RadzenRow>
-
-        <RadzenRow JustifyContent="JustifyContent.Normal" AlignItems="AlignItems.Normal" Gap="1rem" >
-
-
-          <RadzenColumn Size="7">
-            <pre Style="height:60vh;">
-              @SelectedTableGridColum
-            </pre>
-
-          </RadzenColumn>
-        </RadzenRow>
-
-      </RadzenCard>
-
-
-
-
-
-    </RadzenTabsItem>
 
 
 
@@ -342,8 +355,10 @@ class="context-body-row"
 
   QuriGrid<ColumnInfo> _ColGrd{ get; set; }
 
+  bool IsFristWordUpperCase{ get; set; }
 
-
+  void OnFristWordUpperCaseChange(bool? value, string name)    {
+    }
 
 
   private QuriCodeEditor? _editor;
@@ -351,6 +366,8 @@ class="context-body-row"
   private QuriCodeEditor? _editProc;
 
   IEnumerable<CommonCode>? dbTypeList { get; set; }
+
+  CommonCode _language { get; set; }
 
   IList<ProcInfo> _selectedItems { get; set; } = new List<ProcInfo>() { new ProcInfo() { Routine_Definition = "empty" } };
   IList<ProcInfo> selectedItems { 
@@ -375,8 +392,8 @@ class="context-body-row"
   //ProcInfo? selected_pi;
 
   //string? SelectedColumnComma;
-  string? SelectedTableProp;
-  string? SelectedTableGridColum;
+  //string? SelectedTableProp;
+  //string? SelectedTableGridColum;
 
   string compnentTag = "RadzenDataGridColumn";
 
@@ -516,6 +533,9 @@ class="context-body-row"
 
   protected override async Task OnInitializedAsync() {
     await base.OnInitializedAsync();
+
+
+
     //await OnLoad();
   }
 
@@ -573,13 +593,13 @@ class="context-body-row"
    // var ri = await devService.GetList<ColumnInfo>("columnsOftable", dic);
    // dataCol = ri.Data;
 
-    SelectedTableProp = "";
-    SelectedTableGridColum = "";
+    //SelectedTableProp = "";
+    //SelectedTableGridColum = "";
 
-    foreach (var dr in dataCol) {
-      SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}" + System.Environment.NewLine;
-      SelectedTableGridColum += $"<{compnentTag} title=\"{(string.IsNullOrWhiteSpace(dr.ColDescription) ? dr.ColunmName:dr.ColDescription)}\" Property=\"{dr.ColunmName}\" />" + System.Environment.NewLine;
-    }
+    // foreach (var dr in dataCol) {
+    //   SelectedTableProp += $"public string {dr.ColunmName} {"{"}get; set; {"}"}" + System.Environment.NewLine;
+    //   SelectedTableGridColum += $"<{compnentTag} title=\"{(string.IsNullOrWhiteSpace(dr.ColDescription) ? dr.ColunmName:dr.ColDescription)}\" Property=\"{dr.ColunmName}\" />" + System.Environment.NewLine;
+    // }
 
     string nowdate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
