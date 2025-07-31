@@ -64,7 +64,13 @@ public class BaseService {
         }
       };
       result = jobj.ToObject<ResultInfo<T>>(JsonSerializer.Create(settings));
-
+      if (typeof(BaseModel).IsAssignableFrom(typeof(T))) {
+          // T는 baseModel을 상속하거나 baseModel 그 자체임
+        
+        foreach (var r in result.Data) {
+          (r as BaseModel).isChanged = false;
+        }
+      }
     }
     else {
       SetResultCode<T>( ref result, -97, $"응답 실패, 응답이 비어 있습니다");

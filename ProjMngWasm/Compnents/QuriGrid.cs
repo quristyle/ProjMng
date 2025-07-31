@@ -228,7 +228,11 @@ namespace ProjMngWasm.Compnents {
       editorFocused = false;
 
       if (ordersToUpdate.Any()) {
-        await this.UpdateRow(ordersToUpdate.First());
+        var sItem = ordersToUpdate.First();
+        await this.UpdateRow(sItem);
+        if( sItem is BaseModel) {
+          (sItem as BaseModel).isChanged = false;
+        }
       }
     }
 
@@ -254,7 +258,9 @@ namespace ProjMngWasm.Compnents {
         try {
           await editor.FocusAsync();
         }
-        catch {
+        catch(Exception eee) {
+
+          Console.WriteLine($" fouce...... {eee.Message}");
           //
         }
       }

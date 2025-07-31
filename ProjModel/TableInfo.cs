@@ -1,6 +1,6 @@
 ﻿
 namespace ProjModel;
-  public class TableInfo {
+  public class TableInfo :BaseModel {
     public string TableName { get; set; }
   public string Description { get; set; }
   public string Schema { get; set; }

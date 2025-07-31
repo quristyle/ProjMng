@@ -220,15 +220,18 @@
 
   void OnUpdateRow(TableInfo order)    {
     _tGrd.Reset(order);
-  Dictionary<string, string> dic = new Dictionary<string, string>() {
-  {"db",dbType.Others["db_type"]},
-  {"dbnick",dbType.Others["db_nick"]},
-  {"schema",dbType.Others["db_schema"]},
-  {"table_name", order.TableName },
-  {"table_desc", order.Description },
-  };
+    Console.WriteLine($"order ischange : {order.isChanged} ");
+    if(order.isChanged ){
+      Dictionary<string, string> dic = new Dictionary<string, string>() {
+      {"db",dbType.Others["db_type"]},
+      {"dbnick",dbType.Others["db_nick"]},
+      {"schema",dbType.Others["db_schema"]},
+      {"table_name", order.TableName },
+      {"table_desc", order.Description },
+      };
 
-  JsCont<TableInfo>("tableCommentUpdate", dic);
+      JsCont<TableInfo>("tableCommentUpdate", dic);
+    }
   }
 
     
