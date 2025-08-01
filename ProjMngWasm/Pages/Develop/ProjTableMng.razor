@@ -58,9 +58,9 @@
             @bind-Value=@selectedTable
             @ref=@_tGrd
             KeySelector=@(i=>i.TableName)
-            RowUpdate="@OnUpdateRow" 
-            CellClick=@( args => _tGrd.OnCellClickCehck(args))
-            RowSelect=OnRowSelect
+            RowUpdate="@OnUpdateRow"
+            CellDoubleClick=@( args => _tGrd.OnCellClickCehck(args))
+            
             TItem="TableInfo"
             Sort="@(args => _tGrd.Reset())" Page="@(args => _tGrd.Reset())" Filter="@(args => _tGrd.Reset())"
           
@@ -70,11 +70,11 @@
 
               <RadzenDataGridColumn TItem="TableInfo" Property="Description" Title="Desc" IsInEditMode="@_tGrd.IsEditing">
                   <Template Context="order">
-                      <RadzenText Text="@(order.Description)" />
+                      @(order.Description)
                   </Template>
                   <EditTemplate Context="order">
-                      <RadzenTextBox  Change="@(args => _tGrd.Update())" @bind-Value="order.Description" Name="Description" aria-label="Enter Description" />
-                      <RadzenRequiredValidator Text="Description is required" Component="Description" Popup="true" />
+                      <RadzenTextBox @ref=editor Change="@(args => _tGrd.Update())" @bind-Value="order.Description" Name="Description" aria-label="Enter Description" />
+                      @* <RadzenRequiredValidator Text="Description is required" Component="Description" Popup="true" /> *@
                   </EditTemplate>
               </RadzenDataGridColumn>
 
@@ -103,18 +103,18 @@
             RowUpdate="@OnUpdateColumnDesc" 
             CellClick=@( args => _cGrd.OnCellClickCehck(args))
             TItem="ColumnInfo"
-            RowSelect=OnRowSelectCol
+    
             >
               <Columns>
                 <RadzenDataGridColumn TItem="ColumnInfo" title="ColunmName" Property="ColunmName" />
                 
               <RadzenDataGridColumn TItem="ColumnInfo" Property="Description" Title="Desc" IsInEditMode="@_cGrd.IsEditing">
                   <Template Context="order">
-                      <RadzenText Text="@(order.Description)" />
+                      @(order.Description)
                   </Template>
                   <EditTemplate Context="order">
-                      <RadzenTextBox  Change="@(args => _cGrd.Update())" @bind-Value="order.Description" Name="Description" aria-label="Enter Description" />
-                      <RadzenRequiredValidator Text="Description is required" Component="Description" Popup="true" />
+                      <RadzenTextBox  @ref=editor  Change="@(args => _cGrd.Update())" @bind-Value="order.Description" Name="Description" aria-label="Enter Description" />
+                      @* <RadzenRequiredValidator Text="Description is required" Component="Description" Popup="true" /> *@
                   </EditTemplate>
               </RadzenDataGridColumn>
 
@@ -209,9 +209,62 @@
   CommonCode dbType2 { get; set; }
 
 
+  
+  IList<TableInfo> _selectedTable{get;set;}
+  IList<TableInfo> selectedTable{
+    get{
+      return _selectedTable;
+    }
+    set{
+      _selectedTable = value;
+      ShowColumns(_selectedTable.FirstOrDefault());
+    }
+  }
 
-  IList<TableInfo> selectedTable;
-  IList<ColumnInfo> selectedColumn;
+  IList<ColumnInfo> _selectedColumn;
+  IList<ColumnInfo> selectedColumn{
+    get{
+      return _selectedColumn;
+    }
+    set{
+      _selectedColumn = value;
+      ShowOnoterColumns(_selectedColumn.FirstOrDefault());
+    }
+  }
+
+
+  IRadzenFormComponent editor;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+      await base.OnAfterRenderAsync(firstRender);
+
+      Console.WriteLine($" quriGrid..OnAfterRenderAsync : {_cGrd.GetEditorFocused()} ");
+      //if (!_cGrd.GetEditorFocused() && editor != null) {
+          //_cGrd.SetEditorFocused(true);
+
+        try {
+
+          Console.WriteLine($" FocusAsync..start");
+          await editor.FocusAsync();
+          //await this.FocusAsync();
+          Console.WriteLine($" FocusAsync..end");
+        }
+        catch(Exception eee) {
+
+          Console.WriteLine($" fouce...... {eee.Message}");
+          //
+        }
+      //}
+    }
+
+
+
+
+
+
+
+
+
 
   public ResultInfo<Dictionary<string, object>> DataMenu { get; set; }
 
@@ -427,8 +480,8 @@
 
 
   // 왼쪽 테이블의 칼럼 조회
-  async Task OnRowSelect(TableInfo tableInfo) {
-
+  public async Task ShowColumns(TableInfo tableInfo){
+    
     Dictionary<string, string> dic = new Dictionary<string, string>() {
       {"db",dbType.Others["db_type"]},
       {"dbnick",dbType.Others["db_nick"]},
@@ -439,12 +492,11 @@
     };
 
     await _cGrd.Load("columnsOftable", dic);
-
   }
 
 
   // 왼쪽 테이블의 칼럼 선택
-  async Task OnRowSelectCol(ColumnInfo colInfo) {
+  async Task ShowOnoterColumns(ColumnInfo colInfo) {
     return;
     Dictionary<string, string> dic = new Dictionary<string, string>() {
       {"db",dbType2.Others["db_type"]},
@@ -460,7 +512,6 @@
 
     var ri = await JsCont<Dictionary<string, object>>("columnOftable", dic);
     DataMenu = ri;
-
 
     FindProc();
   }

@@ -896,3 +896,16 @@ a{
 .rz-text-body1 {
   margin-block-end: 0;
 }
+
+
+
+.rz-data-row .rz-cell-data {
+  height: 2.3rem;
+  vertical-align: middle;
+/*  padding-top: 0.3rem;*/
+}
+
+
+  .rz-data-row .rz-cell-data:not(:has(:is(*))) {
+    padding-top: 0.5rem;
+  }

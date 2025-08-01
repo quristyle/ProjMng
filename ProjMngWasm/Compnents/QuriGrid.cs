@@ -19,6 +19,8 @@ namespace ProjMngWasm.Compnents {
 
 
 
+
+
     public QuriGrid() {
       Style = "height:100%;";
       FilterCaseSensitivity = Radzen. FilterCaseSensitivity.CaseInsensitive;
@@ -35,6 +37,118 @@ namespace ProjMngWasm.Compnents {
 
 
     }
+
+
+
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender) {
+    //  await base.OnAfterRenderAsync(firstRender);
+
+    //  Console.WriteLine($" rrrrrrrrrrrrrrrquriGrid..OnAfterRenderAsync : {editorFocused} ");
+
+
+    //  /*
+    //  //if (!editorFocused && editor != null) {
+    //    if (!editorFocused ) {
+    //      editorFocused = true;
+
+    //    try {
+
+    //      Console.WriteLine($" FocusAsync..start");
+    //      //await editor.FocusAsync();
+    //      //await this.FocusAsync();
+    //      Console.WriteLine($" FocusAsync..end");
+    //    }
+    //    catch(Exception eee) {
+
+    //      Console.WriteLine($" fouce...... {eee.Message}");
+    //      //
+    //    }
+    //  }
+    //    */
+    //}
+    private bool _initialized;
+
+    /*
+     RadzenDataGrid<TItem>.CellClick은 일반적인 delegate 이벤트가 아니라
+    EventCallback<DataGridCellMouseEventArgs<TItem>> 형태의 [Parameter] 속성이기 때문에
+
+    RadzenDataGrid<T>의 CellClick은 [Parameter]이므로 일반적인 이벤트처럼 += 할 수 없습니다.
+
+따라서 위처럼 EventCallback.Factory.Create로 동적으로 주입해야 합니다.
+
+OnAfterRenderAsync 내에서 최초 렌더링 시점에만 바인딩하면 외부 속성 선언 없이도 작동합니다.
+
+
+
+     
+     */
+    protected override async Task OnAfterRenderAsync(bool firstRender) { // 이거 중요하다... parameter 방식의 이벤트 처럼 보이는 것들.... 이런 방식으로 내부 구현 가능.
+      if (!_initialized && firstRender) {
+        _initialized = true;
+
+        // CellClick에 내부 핸들러 주입
+        this.CellClick = EventCallback.Factory.Create<DataGridCellMouseEventArgs<TItem>>(this, OnInternalCellClick);
+      }
+
+      await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+
+
+
+    private async Task OnInternalCellClick(DataGridCellMouseEventArgs<TItem> args) {
+      Console.WriteLine($"[QuriGrid 내부] Cell 클릭됨 - {args.Column?.Property}");
+
+
+
+      if (!this.IsValid ||
+          (ordersToUpdate.Contains(args.Data) && columnEditing == args.Column.Property)) return;
+
+      // Record the previous edited field, if you're not using IRevertibleChangeTracking to track object changes
+      if (ordersToUpdate.Any()) {
+        //var tname = (ordersToUpdate.First() as TableInfo).TableName;
+        //editedFields.Add(new(tname, columnEditing));
+
+        if (KeySelector != null)
+          editedFields.Add(new(KeySelector(ordersToUpdate.First()), columnEditing));
+
+
+
+        await Update();
+      }
+
+      // This sets which column is currently being edited.
+      columnEditing = args.Column.Property;
+
+      // This sets the Item to be edited.
+      //await EditRow2(args.Data);
+
+
+
+
+      // 사용자 정의 이벤트에도 전달
+      //if (QuriCellClick.HasDelegate) {
+      //  await QuriCellClick.InvokeAsync(args);
+      //}
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     protected override void OnInitialized() {
       base.OnInitialized();
 
@@ -147,7 +261,7 @@ namespace ProjMngWasm.Compnents {
       // };
 
       // JavaScript로 엑셀 다운로드 함수 호출
-      await jsRuntime.InvokeVoidAsync("downloadExcel", data.ToArray(), "엑셀파일s.xlsx");
+      await jsRuntime.InvokeVoidAsync("downloadExcel", data.ToArray(), "엑셀파일.xlsx");
 
 
 
@@ -172,8 +286,8 @@ namespace ProjMngWasm.Compnents {
 
 
 
-    IRadzenFormComponent editor;
-    bool editorFocused;
+    //IRadzenFormComponent editor;
+    public bool editorFocused;
     string columnEditing;
     List<KeyValuePair<string, string>> editedFields = new List<KeyValuePair<string, string>>();
     List<TItem> ordersToUpdate = new List<TItem>();
@@ -181,6 +295,14 @@ namespace ProjMngWasm.Compnents {
 
 
     [Parameter]    public Func<TItem, string> KeySelector { get; set; }
+
+    public bool GetEditorFocused() {
+      return editorFocused;
+    }
+
+    public void SetEditorFocused(bool val) {
+       editorFocused = val;
+    }
 
 
 
@@ -227,6 +349,8 @@ namespace ProjMngWasm.Compnents {
     public async Task Update() {
       editorFocused = false;
 
+      Console.WriteLine($" Update editorFocused : {editorFocused}");
+
       if (ordersToUpdate.Any()) {
         var sItem = ordersToUpdate.First();
         await this.UpdateRow(sItem);
@@ -249,23 +373,6 @@ namespace ProjMngWasm.Compnents {
 
 
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-      await base.OnAfterRenderAsync(firstRender);
-
-      if (!editorFocused && editor != null) {
-        editorFocused = true;
-
-        try {
-          await editor.FocusAsync();
-        }
-        catch(Exception eee) {
-
-          Console.WriteLine($" fouce...... {eee.Message}");
-          //
-        }
-      }
-    }
-
 
 
 
@@ -280,6 +387,7 @@ namespace ProjMngWasm.Compnents {
 
     public void Reset(TItem order) {
       editorFocused = false;
+      Console.WriteLine($" Reset editorFocused : {editorFocused}");
 
       if (!EqualityComparer<TItem>.Default.Equals(order, default)) {
         ordersToUpdate.Remove(order);
