@@ -43,6 +43,7 @@ public static class BaseModelExtensions {
 
 
   public static string GetValue(this IDictionary<string, string> param, string pkey) {
+    if (param == null) { return string.Empty; }
     if (param.TryGetValue(pkey, out var dbValue) && dbValue != null)
       return dbValue.ToString().Trim();
 
@@ -57,6 +58,7 @@ public static class BaseModelExtensions {
 
   public static string GetValue(this IDictionary<string, object> param, string pkey) {
     //Console.WriteLine($" dicGetValue : {pkey}");
+    if (param == null) { return string.Empty; }
     if (param.TryGetValue(pkey, out var dbValue) && dbValue != null)
       return dbValue.ToString().Trim();
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using WasmShear;
 using WasmShear.Services;
+using static System.Runtime.InteropServices.Marshalling.IIUnknownCacheStrategy;
 
 namespace ProjMngWasm.Compnents {
   public class QuriGrid<TItem> : RadzenDataGrid<TItem> {
@@ -407,9 +408,11 @@ OnAfterRenderAsync 내에서 최초 렌더링 시점에만 바인딩하면 외�
     /// <returns></returns>
     public async Task<IEnumerable<TItem>> Load(string procName, Dictionary<string, string> dic) {
 
+      Console.WriteLine($"Load :1");
       IsLoading = true;
       await InvokeAsync(StateHasChanged);
 
+      Console.WriteLine($"Load :2");
 
       RequestDto rd = appData.CreateDto(procName, dic);
       //rd.IsProjDb = true;
@@ -430,9 +433,12 @@ OnAfterRenderAsync 내에서 최초 렌더링 시점에만 바인딩하면 외�
         Data = ri.Data.ToList();
       }
 
+      Console.WriteLine($"Load :3");
       IsLoading = false;
       //await Reload();
       await InvokeAsync(StateHasChanged);
+
+      Console.WriteLine($"Load :4");
       return Data;
     }
 

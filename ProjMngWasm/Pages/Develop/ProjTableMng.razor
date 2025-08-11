@@ -209,7 +209,7 @@
   CommonCode dbType2 { get; set; }
 
 
-  
+
   IList<TableInfo> _selectedTable{get;set;}
   IList<TableInfo> selectedTable{
     get{
@@ -237,6 +237,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
       await base.OnAfterRenderAsync(firstRender);
+
+
+
+
 
       Console.WriteLine($" quriGrid..OnAfterRenderAsync : {_cGrd.GetEditorFocused()} ");
       //if (!_cGrd.GetEditorFocused() && editor != null) {
@@ -490,8 +494,15 @@
       {"table_name", tableInfo.TableName},
 
     };
+    Console.WriteLine($"ShowColumns :{tableInfo.TableName}");
+
+
 
     await _cGrd.Load("columnsOftable", dic);
+
+
+
+    StateHasChanged();
   }
 
 
@@ -514,6 +525,7 @@
     DataMenu = ri;
 
     FindProc();
+    StateHasChanged();
   }
 
 
