@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <PackageJsonName Condition="$(PackageJsonName) == ''">vue-admin-template</PackageJsonName>
+    <PackageJsonVersion Condition="$(PackageJsonVersion) == ''">4.4.0</PackageJsonVersion>
+    <PackageJsonDescription Condition="$(PackageJsonDescription) == ''">A vue admin template with Element UI &amp; axios &amp; iconfont &amp; permission control &amp; lint</PackageJsonDescription>
+    <PackageJsonAuthor Condition="$(PackageJsonAuthor) == ''">Pan &lt;panfree23@gmail.com&gt;</PackageJsonAuthor>
+    <PackageJsonScriptsDev Condition="$(PackageJsonScriptsDev) == ''">vue-cli-service serve</PackageJsonScriptsDev>
+    <PackageJsonScriptsBuildProd Condition="$(PackageJsonScriptsBuildProd) == ''">vue-cli-service build</PackageJsonScriptsBuildProd>
+    <PackageJsonScriptsBuildStage Condition="$(PackageJsonScriptsBuildStage) == ''">vue-cli-service build --mode staging</PackageJsonScriptsBuildStage>
+    <PackageJsonScriptsPreview Condition="$(PackageJsonScriptsPreview) == ''">node build/index.js --preview</PackageJsonScriptsPreview>
+    <PackageJsonScriptsSvgo Condition="$(PackageJsonScriptsSvgo) == ''">svgo -f src/icons/svg --config=src/icons/svgo.yml</PackageJsonScriptsSvgo>
+    <PackageJsonScriptsLint Condition="$(PackageJsonScriptsLint) == ''">eslint --ext .js,.vue src</PackageJsonScriptsLint>
+    <PackageJsonScriptsTestUnit Condition="$(PackageJsonScriptsTestUnit) == ''">jest --clearCache &amp;&amp; vue-cli-service test:unit</PackageJsonScriptsTestUnit>
+    <PackageJsonScriptsTestCi Condition="$(PackageJsonScriptsTestCi) == ''">npm run lint &amp;&amp; npm run test:unit</PackageJsonScriptsTestCi>
+    <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">0.18.1</PackageJsonDependenciesAxios>
+    <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">3.6.5</PackageJsonDependenciesCoreJs>
+    <PackageJsonDependenciesElementUi Condition="$(PackageJsonDependenciesElementUi) == ''">2.13.2</PackageJsonDependenciesElementUi>
+    <PackageJsonDependenciesJsCookie Condition="$(PackageJsonDependenciesJsCookie) == ''">2.2.0</PackageJsonDependenciesJsCookie>
+    <PackageJsonDependenciesNormalizeCss Condition="$(PackageJsonDependenciesNormalizeCss) == ''">7.0.0</PackageJsonDependenciesNormalizeCss>
+    <PackageJsonDependenciesNprogress Condition="$(PackageJsonDependenciesNprogress) == ''">0.2.0</PackageJsonDependenciesNprogress>
+    <PackageJsonDependenciesPathToRegexp Condition="$(PackageJsonDependenciesPathToRegexp) == ''">2.4.0</PackageJsonDependenciesPathToRegexp>
+    <PackageJsonDependenciesVue Condition="$(PackageJsonDependenciesVue) == ''">2.6.10</PackageJsonDependenciesVue>
+    <PackageJsonDependenciesVueRouter Condition="$(PackageJsonDependenciesVueRouter) == ''">3.0.6</PackageJsonDependenciesVueRouter>
+    <PackageJsonDependenciesVuex Condition="$(PackageJsonDependenciesVuex) == ''">3.1.0</PackageJsonDependenciesVuex>
+    <PackageJsonDevdependenciesVueCliPluginBabel Condition="$(PackageJsonDevdependenciesVueCliPluginBabel) == ''">4.4.4</PackageJsonDevdependenciesVueCliPluginBabel>
+    <PackageJsonDevdependenciesVueCliPluginEslint Condition="$(PackageJsonDevdependenciesVueCliPluginEslint) == ''">4.4.4</PackageJsonDevdependenciesVueCliPluginEslint>
+    <PackageJsonDevdependenciesVueCliPluginUnitJest Condition="$(PackageJsonDevdependenciesVueCliPluginUnitJest) == ''">4.4.4</PackageJsonDevdependenciesVueCliPluginUnitJest>
+    <PackageJsonDevdependenciesVueCliService Condition="$(PackageJsonDevdependenciesVueCliService) == ''">4.4.4</PackageJsonDevdependenciesVueCliService>
+    <PackageJsonDevdependenciesVueTestUtils Condition="$(PackageJsonDevdependenciesVueTestUtils) == ''">1.0.0-beta.29</PackageJsonDevdependenciesVueTestUtils>
+    <PackageJsonDevdependenciesAutoprefixer Condition="$(PackageJsonDevdependenciesAutoprefixer) == ''">9.5.1</PackageJsonDevdependenciesAutoprefixer>
+    <PackageJsonDevdependenciesBabelEslint Condition="$(PackageJsonDevdependenciesBabelEslint) == ''">10.1.0</PackageJsonDevdependenciesBabelEslint>
+    <PackageJsonDevdependenciesBabelJest Condition="$(PackageJsonDevdependenciesBabelJest) == ''">23.6.0</PackageJsonDevdependenciesBabelJest>
+    <PackageJsonDevdependenciesBabelPluginDynamicImportNode Condition="$(PackageJsonDevdependenciesBabelPluginDynamicImportNode) == ''">2.3.3</PackageJsonDevdependenciesBabelPluginDynamicImportNode>
+    <PackageJsonDevdependenciesChalk Condition="$(PackageJsonDevdependenciesChalk) == ''">2.4.2</PackageJsonDevdependenciesChalk>
+    <PackageJsonDevdependenciesConnect Condition="$(PackageJsonDevdependenciesConnect) == ''">3.6.6</PackageJsonDevdependenciesConnect>
+    <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">6.7.2</PackageJsonDevdependenciesEslint>
+    <PackageJsonDevdependenciesEslintPluginVue Condition="$(PackageJsonDevdependenciesEslintPluginVue) == ''">6.2.2</PackageJsonDevdependenciesEslintPluginVue>
+    <PackageJsonDevdependenciesHtmlWebpackPlugin Condition="$(PackageJsonDevdependenciesHtmlWebpackPlugin) == ''">3.2.0</PackageJsonDevdependenciesHtmlWebpackPlugin>
+    <PackageJsonDevdependenciesMockjs Condition="$(PackageJsonDevdependenciesMockjs) == ''">1.0.1-beta3</PackageJsonDevdependenciesMockjs>
+    <PackageJsonDevdependenciesRunjs Condition="$(PackageJsonDevdependenciesRunjs) == ''">4.3.2</PackageJsonDevdependenciesRunjs>
+    <PackageJsonDevdependenciesSass Condition="$(PackageJsonDevdependenciesSass) == ''">1.26.8</PackageJsonDevdependenciesSass>
+    <PackageJsonDevdependenciesSassLoader Condition="$(PackageJsonDevdependenciesSassLoader) == ''">8.0.2</PackageJsonDevdependenciesSassLoader>
+    <PackageJsonDevdependenciesScriptExtHtmlWebpackPlugin Condition="$(PackageJsonDevdependenciesScriptExtHtmlWebpackPlugin) == ''">2.1.3</PackageJsonDevdependenciesScriptExtHtmlWebpackPlugin>
+    <PackageJsonDevdependenciesServeStatic Condition="$(PackageJsonDevdependenciesServeStatic) == ''">1.13.2</PackageJsonDevdependenciesServeStatic>
+    <PackageJsonDevdependenciesSvgSpriteLoader Condition="$(PackageJsonDevdependenciesSvgSpriteLoader) == ''">4.1.3</PackageJsonDevdependenciesSvgSpriteLoader>
+    <PackageJsonDevdependenciesSvgo Condition="$(PackageJsonDevdependenciesSvgo) == ''">1.2.2</PackageJsonDevdependenciesSvgo>
+    <PackageJsonDevdependenciesVueTemplateCompiler Condition="$(PackageJsonDevdependenciesVueTemplateCompiler) == ''">2.6.10</PackageJsonDevdependenciesVueTemplateCompiler>
+    <PackageJsonBrowserslist Condition="$(PackageJsonBrowserslist) == ''">[
+  "\u003E 1%",
+  "last 2 versions"
+]</PackageJsonBrowserslist>
+    <PackageJsonEnginesNode Condition="$(PackageJsonEnginesNode) == ''">&gt;=8.9</PackageJsonEnginesNode>
+    <PackageJsonEnginesNpm Condition="$(PackageJsonEnginesNpm) == ''">&gt;= 3.0.0</PackageJsonEnginesNpm>
+    <PackageJsonLicense Condition="$(PackageJsonLicense) == ''">MIT</PackageJsonLicense>
+  </PropertyGroup>
+</Project>
