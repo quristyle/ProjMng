@@ -1,0 +1,64 @@
+﻿@page "/luckysheet"
+@inject IJSRuntime JS
+
+@inherits PageBaseComponent
+<h3>Luckysheet Demo</h3>
+
+<button class="btn btn-primary" @onclick="SaveData">save</button>
+<button class="btn btn-primary" @onclick="loadData">load</button>
+<!-- Luckysheet가 붙을 div -->
+<div id="luckysheet" style="margin:0;padding:0;position:absolute;width:100%;height:80vh;"></div>
+
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("luckysheetInterop.create", "luckysheet", null);
+        }
+    }
+    
+    private async Task loadData()
+    {
+
+      
+    var loadobj = await DbCont<IDictionary<string, object>>("sp_dev_excel_exec", new Dictionary<string, string>() {
+        {"xls_id", "1"},
+    });
+
+    string cont = string.Empty;
+    if (loadobj.Data.Count > 0) {
+      cont = loadobj.Data[0]["cont"].ToString();
+    }
+
+
+
+        //var data = await JS.InvokeAsync<object>("luckysheetInterop.getData");
+        Console.WriteLine(cont);
+
+        var parsedData = System.Text.Json.JsonSerializer.Deserialize<object>(cont);
+
+        await JS.InvokeVoidAsync("luckysheetInterop.setData", "luckysheet", "titlte 제목", parsedData);
+
+
+
+        //await JS.InvokeAsync<object>("luckysheetInterop.setData", cont);
+
+
+
+    }
+    private async Task SaveData()
+    {
+        var data = await JS.InvokeAsync<object>("luckysheetInterop.getData");
+        Console.WriteLine(data);
+
+        
+    var saveobj = await DbSave<IDictionary<string, object>>("sp_dev_excel_exec", new Dictionary<string, string>(){
+      {"cont", data.ToString()},
+    });
+
+
+
+    }
+}
